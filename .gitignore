@@ -287,3 +287,4 @@ inst/
 R/
 man/
 src/jl
+src/*.jl
