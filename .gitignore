@@ -278,3 +278,7 @@ GitHub.sublime-settings
 # Julia manifest file names
 Manifest.toml
 JuliaManifest.toml
+
+# Auto-generated files
+dash_js_grid/
+!dash_js_grid/__init__.py
