@@ -284,3 +284,4 @@ dash_js_grid/
 !dash_js_grid/__init__.py
 deps/
 inst/deps/
+R/
