@@ -36,7 +36,7 @@
     "accessor-pairs": ["error"],
     "block-scoped-var": ["error"],
     "consistent-return": ["error"],
-    "curly": ["error", "consistent"],
+    "curly": ["error", "multi", "consistent"],
     "default-case": ["error"],
     "dot-location": ["off"],
     "dot-notation": ["error"],

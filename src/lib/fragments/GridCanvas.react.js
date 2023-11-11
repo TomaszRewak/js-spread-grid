@@ -28,10 +28,16 @@ export default function GridCanvas({
 
             console.log(devicePixelRatio);
 
+            const roundToPixels = (value) => {
+                return Math.round(value * devicePixelRatio) / devicePixelRatio;
+            }
+
             const ctx = canvas.getContext("2d");
-            const cellSize = 20;
-            const width = cells[0].length * cellSize;
-            const height = cells.length * cellSize;
+            const borderWidth = 1 / devicePixelRatio;
+            const borderOffset = borderWidth / 2;
+            const cellSize = roundToPixels(20);
+            const width = roundToPixels(cells[0].length * cellSize + borderWidth);
+            const height = roundToPixels(cells.length * cellSize + borderWidth);
 
             canvas.width = width * devicePixelRatio;
             canvas.height = height * devicePixelRatio;
@@ -52,11 +58,17 @@ export default function GridCanvas({
 
             // Draw borders
             ctx.strokeStyle = "#000";
-            ctx.lineWidth = 1 / devicePixelRatio;
+            ctx.lineWidth = borderWidth;
             ctx.beginPath();
             cells.forEach((row, y) => {
                 row.forEach((cell, x) => {
-                    ctx.rect(x * cellSize + 1, y * cellSize + 1, cellSize - 2, cellSize - 2);
+                    ctx.beginPath();
+                    ctx.moveTo(x * cellSize + borderOffset, y * cellSize + borderOffset);
+                    ctx.lineTo(x * cellSize + cellSize + borderOffset, y * cellSize + borderOffset);
+                    ctx.lineTo(x * cellSize + cellSize + borderOffset, y * cellSize + cellSize + borderOffset);
+                    ctx.lineTo(x * cellSize + borderOffset, y * cellSize + cellSize + borderOffset);
+                    ctx.closePath();
+                    ctx.stroke();
                 });
             });
             ctx.stroke();
@@ -64,9 +76,11 @@ export default function GridCanvas({
 
         const nextFrame = requestAnimationFrame(draw);
 
+        // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
     }, [cells, canvas, devicePixelRatio]);
 
+    // style={{imageRendering: 'pixelated'}}
     return (
         <canvas ref={updateCanvas} />
     )
