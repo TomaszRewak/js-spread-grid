@@ -116,6 +116,11 @@
       "ignoreArrayIndexes": true,
         "ignore": [-1, 0, 1, 2, 3, 100, 10, 0.5]
     }],
-    "no-underscore-dangle": ["off"]
+    "no-underscore-dangle": ["off"],
+    "overrides": [
+      {
+        "excludedFiles": "*.test.js"
+      }
+    ]
   }
 }
