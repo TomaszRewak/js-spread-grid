@@ -6,10 +6,14 @@ import useDevicePixelRatio from "../hooks/useDevicePixelRatio";
  *   cells: {
  *     value: string
  *   }[][]
+ *   rowHeight: number
+ *   columnWidths: number[]
  * }} props
  */
 export default function GridCanvas({
-    cells
+    cells,
+    rowHeight,
+    columnWidths
 }) {
     const [canvas, setCanvas] = useState(null);
     const devicePixelRatio = useDevicePixelRatio();
@@ -33,26 +37,41 @@ export default function GridCanvas({
             }
 
             const ctx = canvas.getContext("2d");
-            const borderWidth = 1 / devicePixelRatio;
+            const borderWidth = 1 / devicePixelRatio; // Already rounded by definition
             const borderOffset = borderWidth / 2;
-            const cellSize = roundToPixels(20);
-            const width = roundToPixels(cells[0].length * cellSize + borderWidth);
-            const height = roundToPixels(cells.length * cellSize + borderWidth);
+            const rowCount = cells.length;
+            const columnCount = cells[0].length;
+            const roundedRowHeight = roundToPixels(rowHeight);
+            const roundedColumnWidths = columnWidths.map(roundToPixels);
+            const width = roundedColumnWidths.reduce((a, b) => a + b, 0) + (columnCount + 1) * borderWidth;
+            const height = rowCount * roundedRowHeight + (rowCount + 1) * borderWidth;
 
-            canvas.width = width * devicePixelRatio;
-            canvas.height = height * devicePixelRatio;
+            console.log(width * devicePixelRatio, height * devicePixelRatio);
+
+            canvas.width = Math.round(width * devicePixelRatio);
+            canvas.height = Math.round(height * devicePixelRatio);
             canvas.style.width = `${width}px`;
             canvas.style.height = `${height}px`;
 
             ctx.scale(devicePixelRatio, devicePixelRatio);
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = "#f00";
+            ctx.fillRect(0, 0, width, height);
 
             // Draw cells
             cells.forEach((row, y) => {
+                const top = y * roundedRowHeight + (y + 1) * borderWidth;
+                let left = borderWidth;
+
                 row.forEach((cell, x) => {
+                    const roundedColumnWidth = roundedColumnWidths[x];
+
                     ctx.fillStyle = "#fff";
-                    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    ctx.fillRect(left, top, roundedColumnWidth, roundedRowHeight);
                     ctx.fillStyle = "#000";
-                    ctx.fillText(cell.value, x * cellSize + 10, y * cellSize + 10);
+                    ctx.fillText(cell.value, left + 5, top + roundedRowHeight - 5);
+
+                    left += roundedColumnWidth + borderWidth;
                 });
             });
 
@@ -61,24 +80,30 @@ export default function GridCanvas({
             ctx.lineWidth = borderWidth;
             ctx.beginPath();
             cells.forEach((row, y) => {
+                const top = y * roundedRowHeight + y * borderWidth + borderOffset;
+                let left = borderOffset;
+
                 row.forEach((cell, x) => {
+                    const roundedColumnWidth = roundedColumnWidths[x];
+
                     ctx.beginPath();
-                    ctx.moveTo(x * cellSize + borderOffset, y * cellSize + borderOffset);
-                    ctx.lineTo(x * cellSize + cellSize + borderOffset, y * cellSize + borderOffset);
-                    ctx.lineTo(x * cellSize + cellSize + borderOffset, y * cellSize + cellSize + borderOffset);
-                    ctx.lineTo(x * cellSize + borderOffset, y * cellSize + cellSize + borderOffset);
+                    ctx.moveTo(left, top);
+                    ctx.lineTo(left + roundedColumnWidth + borderWidth, top);
+                    ctx.lineTo(left + roundedColumnWidth + borderWidth, top + roundedRowHeight + borderWidth);
+                    ctx.lineTo(left, top + roundedRowHeight + borderWidth);
                     ctx.closePath();
                     ctx.stroke();
+
+                    left += roundedColumnWidth + borderWidth;
                 });
             });
-            ctx.stroke();
         };
 
         const nextFrame = requestAnimationFrame(draw);
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [cells, canvas, devicePixelRatio]);
+    }, [cells, canvas, devicePixelRatio, rowHeight, columnWidths]);
 
     // style={{imageRendering: 'pixelated'}}
     return (
