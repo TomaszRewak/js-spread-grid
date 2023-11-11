@@ -4,9 +4,7 @@ from dash import Dash, callback, html, Input, Output
 app = Dash(__name__)
 
 app.layout = html.Div([
-    dash_js_grid.DashJsGrid(
-        title= 'My Grid',
-    ),
+    dash_js_grid.DashJsGrid(),
     html.Div(id='output')
 ])
 

@@ -1,5 +1,5 @@
 {
-  "extends": ["eslint:recommended", "prettier"],
+  "extends": ["eslint:recommended", "prettier", "plugin:react/recommended", "plugin:react-hooks/recommended"],
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 6,
@@ -29,13 +29,14 @@
   },
   "plugins": [
     "react",
+    "react-hooks",
     "import"
   ],
   "rules": {
     "accessor-pairs": ["error"],
     "block-scoped-var": ["error"],
     "consistent-return": ["error"],
-    "curly": ["error", "all"],
+    "curly": ["error", "multi", "consistent"],
     "default-case": ["error"],
     "dot-location": ["off"],
     "dot-notation": ["error"],
@@ -100,6 +101,7 @@
     "react/no-unknown-property": ["error"],
     "react/prefer-es6-class": ["error", "always"],
     "react/prop-types": "error",
+    "react-hooks/exhaustive-deps": ["error"],
     "valid-jsdoc": ["off"],
     "yoda": ["error"],
     "spaced-comment": ["error", "always", {
@@ -117,5 +119,14 @@
         "ignore": [-1, 0, 1, 2, 3, 100, 10, 0.5]
     }],
     "no-underscore-dangle": ["off"]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*.react.js"],
+      "excludedFiles": ["src/lib/components/*.react.js"],
+      "rules": {
+        "react/prop-types": "off"
+      }
+    }
+  ]
 }
