@@ -1,20 +1,45 @@
 /* eslint-disable import/prefer-default-export */
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
 
-function DashJsGrid({ data, columns, rowHeight, fixedColumns, fixedRows, rowSelector, minRowIndex, maxRowIndex }) {
+function useResolvedRowSelector(rowSelector) {
+    return useMemo(() => {
+        return eval(`(data, rowIndex) => ${rowSelector}`)
+    }, [rowSelector])
+}
+
+function useResolvedProps(props) {
+    const data = props.data;
+    const columns = props.columns;
+    const rowHeight = props.rowHeight;
+    const minRowIndex = props.minRowIndex === null ? 0 : props.minRowIndex;
+    const maxRowIndex = props.maxRowIndex === null ? data.length : props.maxRowIndex;
+    const fixedColumns = Math.min(props.fixedColumns, columns.length);
+    const fixedRows = Math.min(props.fixedRows, maxRowIndex - minRowIndex);
+    const rowSelector = useResolvedRowSelector(props.rowSelector);
+
+    return {
+        data,
+        columns,
+        rowHeight,
+        minRowIndex,
+        maxRowIndex,
+        fixedColumns,
+        fixedRows,
+        rowSelector
+    }
+}
+
+function DashJsGrid(props) {
+    const { data, columns, rowHeight, fixedColumns, fixedRows, rowSelector, minRowIndex, maxRowIndex } = useResolvedProps(props);
+
     const leftColumns = columns.slice(0, fixedColumns);
     const rightColumns = columns.slice(fixedColumns);
 
-    const minIndex = minRowIndex === null ? 0 : minRowIndex;
-    const maxIndex = maxRowIndex === null ? data.length : maxRowIndex;
-
-    const rowSelectorFunc = eval(`(data, rowIndex) => ${rowSelector}`);
-
     // TODO: move somewhere else
     const produceCells = (columns, data, start, end, includeHeaders) => {
-        const rows = new Array(end - start).fill(0).map((_, index) => rowSelectorFunc(data, start + index));
+        const rows = new Array(end - start).fill(0).map((_, index) => rowSelector(data, start + index));
         const cells = rows.map(row => columns.map(column => ({ value: row[column] })));
 
         if (!includeHeaders)
@@ -31,14 +56,14 @@ function DashJsGrid({ data, columns, rowHeight, fixedColumns, fixedRows, rowSele
             <div style={{ display: 'flex' }}>
                 <GridCanvas
                     rowHeight={rowHeight}
-                    cells={produceCells(leftColumns, data, minIndex, fixedRows, true)}
+                    cells={produceCells(leftColumns, data, minRowIndex, fixedRows, true)}
                     columnWidths={[50, 67]}
                     showLeftBorder
                     showTopBorder
                 />
                 <GridCanvas
                     rowHeight={rowHeight}
-                    cells={produceCells(rightColumns, data, minIndex, fixedRows, true)}
+                    cells={produceCells(rightColumns, data, minRowIndex, fixedRows, true)}
                     columnWidths={[100, 151, 33]}
                     showTopBorder
                 />
@@ -46,13 +71,13 @@ function DashJsGrid({ data, columns, rowHeight, fixedColumns, fixedRows, rowSele
             <div style={{ display: 'flex' }}>
                 <GridCanvas
                     rowHeight={rowHeight}
-                    cells={produceCells(leftColumns, data, fixedRows, maxIndex, false)}
+                    cells={produceCells(leftColumns, data, fixedRows, maxRowIndex, false)}
                     columnWidths={[50, 67]}
                     showLeftBorder
                 />
                 <GridCanvas
                     rowHeight={rowHeight}
-                    cells={produceCells(rightColumns, data, fixedRows, maxIndex, false)}
+                    cells={produceCells(rightColumns, data, fixedRows, maxRowIndex, false)}
                     columnWidths={[100, 151, 33]}
                 />
             </div>
@@ -61,6 +86,7 @@ function DashJsGrid({ data, columns, rowHeight, fixedColumns, fixedRows, rowSele
 };
 
 // TODO: add descriptions
+// TODO: fixing rows to top and bottom
 DashJsGrid.propTypes = {
     //
     data: PropTypes.array,
