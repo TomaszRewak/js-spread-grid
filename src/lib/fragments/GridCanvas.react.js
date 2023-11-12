@@ -8,12 +8,16 @@ import useDevicePixelRatio from "../hooks/useDevicePixelRatio";
  *   }[][]
  *   rowHeight: number
  *   columnWidths: number[]
+ *   showLeftBorder: bool // TODO: check if it's bool or boolean
+ *   showTopBorder: bool
  * }} props
  */
 export default function GridCanvas({
     cells,
     rowHeight,
-    columnWidths
+    columnWidths,
+    showLeftBorder,
+    showTopBorder
 }) {
     const [canvas, setCanvas] = useState(null);
     const devicePixelRatio = useDevicePixelRatio();
@@ -41,10 +45,12 @@ export default function GridCanvas({
             const borderOffset = borderWidth / 2;
             const rowCount = cells.length;
             const columnCount = cells[0].length;
+            const horizontalBorderCount = rowCount + (showTopBorder ? 1 : 0);
+            const verticalBorderCount = columnCount + (showLeftBorder ? 1 : 0);
             const roundedRowHeight = roundToPixels(rowHeight);
             const roundedColumnWidths = columnWidths.map(roundToPixels);
-            const width = roundedColumnWidths.reduce((a, b) => a + b, 0) + (columnCount + 1) * borderWidth;
-            const height = rowCount * roundedRowHeight + (rowCount + 1) * borderWidth;
+            const width = roundedColumnWidths.reduce((a, b) => a + b, 0) + verticalBorderCount * borderWidth;
+            const height = rowCount * roundedRowHeight + horizontalBorderCount * borderWidth;
 
             console.log(width * devicePixelRatio, height * devicePixelRatio);
 
@@ -54,9 +60,15 @@ export default function GridCanvas({
             canvas.style.height = `${height}px`;
 
             ctx.scale(devicePixelRatio, devicePixelRatio);
+
             ctx.clearRect(0, 0, width, height);
             ctx.fillStyle = "#f00";
             ctx.fillRect(0, 0, width, height);
+
+            ctx.translate(
+                showLeftBorder ? 0 : -borderWidth,
+                showTopBorder ? 0 : -borderWidth
+            );
 
             // Draw cells
             cells.forEach((row, y) => {
