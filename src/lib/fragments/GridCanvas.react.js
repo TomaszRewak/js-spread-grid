@@ -78,7 +78,7 @@ export default function GridCanvas({
                 row.forEach((cell, x) => {
                     const roundedColumnWidth = roundedColumnWidths[x];
 
-                    ctx.fillStyle = "#fff";
+                    ctx.fillStyle = cell.background || 'white';
                     ctx.fillRect(left, top, roundedColumnWidth, roundedRowHeight);
                     ctx.fillStyle = "#000";
                     ctx.fillText(cell.value, left + 5, top + roundedRowHeight - 5);
@@ -115,7 +115,7 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [cells, canvas, devicePixelRatio, rowHeight, columnWidths]);
+    }, [cells, canvas, devicePixelRatio, rowHeight, columnWidths, showTopBorder, showLeftBorder]);
 
     // style={{imageRendering: 'pixelated'}}
     return (
