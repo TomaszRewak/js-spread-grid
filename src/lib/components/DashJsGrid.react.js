@@ -3,12 +3,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
 
-function DashJsGrid({ data, columns, rowHeight, fixedColumns, fixedRows, rowSelector }) {
+function DashJsGrid({ data, columns, rowHeight, fixedColumns, fixedRows, rowSelector, minRowIndex, maxRowIndex }) {
     const leftColumns = columns.slice(0, fixedColumns);
     const rightColumns = columns.slice(fixedColumns);
 
-    const minIndex = 0;
-    const maxIndex = data.length;
+    const minIndex = minRowIndex === null ? 0 : minRowIndex;
+    const maxIndex = maxRowIndex === null ? data.length : maxRowIndex;
 
     const rowSelectorFunc = eval(`(data, rowIndex) => ${rowSelector}`);
 
@@ -73,7 +73,11 @@ DashJsGrid.propTypes = {
     //
     fixedColumns: PropTypes.number,
     //
-    fixedRows: PropTypes.number
+    fixedRows: PropTypes.number,
+    //
+    minRowIndex: PropTypes.number,
+    //
+    maxRowIndex: PropTypes.number
 };
 
 DashJsGrid.defaultProps = {
@@ -82,7 +86,9 @@ DashJsGrid.defaultProps = {
     rowHeight: 20,
     rowSelector: 'data[rowIndex]',
     fixedColumns: 0,
-    fixedRows: 0
+    fixedRows: 0,
+    minRowIndex: null,
+    maxRowIndex: null
 };
 
 export default DashJsGrid;

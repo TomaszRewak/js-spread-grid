@@ -16,6 +16,15 @@ app.layout = html.Div([
         fixedColumns=2,
         fixedRows=2
     ),
+    html.Div(style={'height': '10px'}),
+    dash_js_grid.DashJsGrid(
+        columns=['column_1', 'column_2', 'column_3', 'column_4', 'column_5'],
+        minRowIndex=-10,
+        maxRowIndex=100,
+        rowSelector='({column_1: 1 + 100 * rowIndex, column_2: 2 + 100 * rowIndex, column_3: 3 + 100 * rowIndex, column_4: 4 + 100 * rowIndex, column_5: 5 + 100 * rowIndex})',
+        fixedColumns=2,
+        fixedRows=2
+    ),
     html.Div(id='output')
 ])
 
