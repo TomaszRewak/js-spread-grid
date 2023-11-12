@@ -3,15 +3,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
 
-function DashJsGrid({ data, columns, rowHeight, fixedColumns, fixedRows }) {
+function DashJsGrid({ data, columns, rowHeight, fixedColumns, fixedRows, rowSelector }) {
     const leftColumns = columns.slice(0, fixedColumns);
     const rightColumns = columns.slice(fixedColumns);
 
-    const topData = data.slice(0, fixedRows);
-    const bottomData = data.slice(fixedRows);
+    const minIndex = 0;
+    const maxIndex = data.length;
+
+    const rowSelectorFunc = eval(`(data, rowIndex) => ${rowSelector}`);
 
     // TODO: move somewhere else
-    const produceCells = (columns, rows, includeHeaders) => {
+    const produceCells = (columns, data, start, end, includeHeaders) => {
+        const rows = new Array(end - start).fill(0).map((_, index) => rowSelectorFunc(data, start + index));
         const cells = rows.map(row => columns.map(column => ({ value: row[column] })));
 
         if (!includeHeaders)
@@ -28,14 +31,14 @@ function DashJsGrid({ data, columns, rowHeight, fixedColumns, fixedRows }) {
             <div style={{ display: 'flex' }}>
                 <GridCanvas
                     rowHeight={rowHeight}
-                    cells={produceCells(leftColumns, topData, true)}
+                    cells={produceCells(leftColumns, data, minIndex, fixedRows, true)}
                     columnWidths={[50, 67]}
                     showLeftBorder
                     showTopBorder
                 />
                 <GridCanvas
                     rowHeight={rowHeight}
-                    cells={produceCells(rightColumns, topData, true)}
+                    cells={produceCells(rightColumns, data, minIndex, fixedRows, true)}
                     columnWidths={[100, 151, 33]}
                     showTopBorder
                 />
@@ -43,13 +46,13 @@ function DashJsGrid({ data, columns, rowHeight, fixedColumns, fixedRows }) {
             <div style={{ display: 'flex' }}>
                 <GridCanvas
                     rowHeight={rowHeight}
-                    cells={produceCells(leftColumns, bottomData, false)}
+                    cells={produceCells(leftColumns, data, fixedRows, maxIndex, false)}
                     columnWidths={[50, 67]}
                     showLeftBorder
                 />
                 <GridCanvas
                     rowHeight={rowHeight}
-                    cells={produceCells(rightColumns, bottomData, false)}
+                    cells={produceCells(rightColumns, data, fixedRows, maxIndex, false)}
                     columnWidths={[100, 151, 33]}
                 />
             </div>
@@ -66,7 +69,7 @@ DashJsGrid.propTypes = {
     //
     rowHeight: PropTypes.number,
     //
-    dataSelector: PropTypes.string,
+    rowSelector: PropTypes.string,
     //
     fixedColumns: PropTypes.number,
     //
@@ -77,7 +80,7 @@ DashJsGrid.defaultProps = {
     data: [],
     columns: null,
     rowHeight: 20,
-    dataSelector: 'data[rowIndex]',
+    rowSelector: 'data[rowIndex]',
     fixedColumns: 0,
     fixedRows: 0
 };
