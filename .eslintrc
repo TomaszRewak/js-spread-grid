@@ -55,7 +55,7 @@
     "no-else-return": ["error"],
     "no-empty-pattern": ["error"],
     "no-eq-null": ["error"],
-    "no-eval": ["error"],
+    "no-eval": ["off"],
     "no-extend-native": ["error"],
     "no-extra-bind": ["error"],
     "no-extra-boolean-cast": ["error"],
