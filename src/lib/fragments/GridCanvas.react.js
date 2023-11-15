@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react"
 import useDevicePixelRatio from "../hooks/useDevicePixelRatio";
 
-/**
+/** TODO: update the arguments to reflect the real props
  * @param {{
  *   cells: {
  *     value: string
@@ -14,8 +14,8 @@ import useDevicePixelRatio from "../hooks/useDevicePixelRatio";
  */
 export default function GridCanvas({
     cells,
-    rowHeight,
-    columnWidths,
+    columns,
+    rows,
     showLeftBorder,
     showTopBorder
 }) {
@@ -43,15 +43,31 @@ export default function GridCanvas({
             const ctx = canvas.getContext("2d");
             const borderWidth = 1 / devicePixelRatio; // Already rounded by definition
             const borderOffset = borderWidth / 2;
-            const rowCount = cells.length;
-            const columnCount = cells[0].length;
+            const rowCount = rows.length;
+            const columnCount = columns.length;
             const horizontalBorderCount = rowCount + (showTopBorder ? 1 : 0);
             const verticalBorderCount = columnCount + (showLeftBorder ? 1 : 0);
-            const roundedRowHeight = roundToPixels(rowHeight);
-            const roundedColumnWidths = columnWidths.map(roundToPixels);
+            const roundedRowHeights = rows.map(row => row.height).map(roundToPixels);
+            const roundedColumnWidths = columns.map(column => column.width).map(roundToPixels);
             const width = roundedColumnWidths.reduce((a, b) => a + b, 0) + verticalBorderCount * borderWidth;
-            const height = rowCount * roundedRowHeight + horizontalBorderCount * borderWidth;
+            const height = roundedRowHeights.reduce((a, b) => a + b, 0) + horizontalBorderCount * borderWidth;
 
+            // TODO: Move somewhere else
+            const columnOffsets = roundedColumnWidths.reduce((acc, width, index) => {
+                const prevOffset = acc[index];
+                const offset = prevOffset + width + borderWidth;
+                acc.push(offset);
+                return acc;
+            }, [showLeftBorder ? borderWidth : 0]);
+            const rowOffsets = roundedRowHeights.reduce((acc, height, index) => {
+                const prevOffset = acc[index];
+                const offset = prevOffset + height + borderWidth;
+                acc.push(offset);
+                return acc;
+            }, [showTopBorder ? borderWidth : 0]);
+
+            console.dir(columnOffsets);
+            console.dir(rowOffsets);
             console.log(width * devicePixelRatio, height * devicePixelRatio);
 
             canvas.width = Math.round(width * devicePixelRatio);
@@ -65,48 +81,40 @@ export default function GridCanvas({
             ctx.fillStyle = "#f00";
             ctx.fillRect(0, 0, width, height);
 
-            ctx.translate(
-                showLeftBorder ? 0 : -borderWidth,
-                showTopBorder ? 0 : -borderWidth
-            );
-
             // Draw cells
-            cells.forEach((row, y) => {
-                const top = y * roundedRowHeight + (y + 1) * borderWidth;
-                let left = borderWidth;
-
-                row.forEach((cell, x) => {
-                    const roundedColumnWidth = roundedColumnWidths[x];
+            columns.forEach((_, columnIndex) => {
+                rows.forEach((_, rowIndex) => {
+                    const cell = cells[rowIndex][columnIndex];
+                    const top = rowOffsets[rowIndex];
+                    const left = columnOffsets[columnIndex];
+                    const width = roundedColumnWidths[columnIndex];
+                    const height = roundedRowHeights[rowIndex];
 
                     ctx.fillStyle = cell.background || 'white';
-                    ctx.fillRect(left, top, roundedColumnWidth, roundedRowHeight);
+                    ctx.fillRect(left, top, width, height);
                     ctx.fillStyle = "#000";
-                    ctx.fillText(cell.value, left + 5, top + roundedRowHeight - 5);
-
-                    left += roundedColumnWidth + borderWidth;
+                    ctx.fillText(cell.value, left + 5, top + height - 5);
                 });
             });
 
             // Draw borders
             ctx.strokeStyle = "#000";
             ctx.lineWidth = borderWidth;
-            ctx.beginPath();
-            cells.forEach((row, y) => {
-                const top = y * roundedRowHeight + y * borderWidth + borderOffset;
-                let left = borderOffset;
 
-                row.forEach((cell, x) => {
-                    const roundedColumnWidth = roundedColumnWidths[x];
+            columns.forEach((_, columnIndex) => {
+                rows.forEach((_, rowIndex) => {
+                    const top = rowOffsets[rowIndex] - borderOffset
+                    const left = columnOffsets[columnIndex] - borderOffset;
+                    const bottom = rowOffsets[rowIndex] + roundedRowHeights[rowIndex] + borderOffset;
+                    const right = columnOffsets[columnIndex] + roundedColumnWidths[columnIndex] + borderOffset;
 
                     ctx.beginPath();
                     ctx.moveTo(left, top);
-                    ctx.lineTo(left + roundedColumnWidth + borderWidth, top);
-                    ctx.lineTo(left + roundedColumnWidth + borderWidth, top + roundedRowHeight + borderWidth);
-                    ctx.lineTo(left, top + roundedRowHeight + borderWidth);
+                    ctx.lineTo(right, top);
+                    ctx.lineTo(right, bottom);
+                    ctx.lineTo(left, bottom);
                     ctx.closePath();
                     ctx.stroke();
-
-                    left += roundedColumnWidth + borderWidth;
                 });
             });
         };
@@ -115,9 +123,9 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [cells, canvas, devicePixelRatio, rowHeight, columnWidths, showTopBorder, showLeftBorder]);
+    }, [cells, canvas, devicePixelRatio, showTopBorder, showLeftBorder, rows, columns]);
 
-    // style={{imageRendering: 'pixelated'}}
+    // style={{imageRendering: 'pixelated'}} - is this even needed, though?
     return (
         <canvas ref={updateCanvas} />
     )

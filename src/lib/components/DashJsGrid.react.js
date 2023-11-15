@@ -90,30 +90,30 @@ function DashJsGrid(props) {
         <div>
             <div style={{ display: 'flex' }}>
                 <GridCanvas
-                    rowHeight={20}
                     cells={produceCells(data, leftColumns, topRows, true)}
-                    columnWidths={[50, 67]}
+                    columns={leftColumns}
+                    rows={topRows}
                     showLeftBorder
                     showTopBorder
                 />
                 <GridCanvas
-                    rowHeight={20}
                     cells={produceCells(data, rightColumns, topRows, true)}
-                    columnWidths={[100, 151, 33]}
+                    columns={rightColumns}
+                    rows={topRows}
                     showTopBorder
                 />
             </div>
             <div style={{ display: 'flex' }}>
                 <GridCanvas
-                    rowHeight={20}
                     cells={produceCells(data, leftColumns, bottomRows, false)}
-                    columnWidths={[50, 67]}
+                    columns={leftColumns}
+                    rows={bottomRows}
                     showLeftBorder
                 />
                 <GridCanvas
-                    rowHeight={20}
                     cells={produceCells(data, rightColumns, bottomRows, false)}
-                    columnWidths={[100, 151, 33]}
+                    columns={rightColumns}
+                    rows={bottomRows}
                 />
             </div>
         </div>
