@@ -3,50 +3,85 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
 
-function useResolvedRowSelector(rowSelector) {
+function useResolvedValueSelector(valueSelector) {
     return useMemo(() => {
-        return eval(`(data, rowIndex) => ${rowSelector}`)
-    }, [rowSelector])
+        return eval(`(data, rowId, columnId) => (${valueSelector})`);
+    }, [valueSelector])
+}
+
+function useResolvedColumns(columns) {
+    return useMemo(() => {
+        if (typeof columns !== 'string')
+            return columns;
+
+        return eval(`(data) => (${columns})`);
+    }, [columns]);
+}
+
+function useResolvedRows(rows) {
+    return useMemo(() => {
+        if (typeof rows !== 'string')
+            return rows;
+
+        return eval(`(data) => (${rows})`);
+    }, [rows]);
 }
 
 function useResolvedProps(props) {
     const data = props.data;
-    const columns = props.columns;
-    const rowHeight = props.rowHeight;
-    const minRowIndex = props.minRowIndex === null ? 0 : props.minRowIndex;
-    const maxRowIndex = props.maxRowIndex === null ? data.length : props.maxRowIndex;
-    const fixedColumns = Math.min(props.fixedColumns, columns.length);
-    const fixedRows = Math.min(props.fixedRows, maxRowIndex - minRowIndex);
-    const rowSelector = useResolvedRowSelector(props.rowSelector);
+    const columns = useResolvedColumns(props.columns);
+    const rows = useResolvedRows(props.rows);
+    const valueSelector = useResolvedValueSelector(props.valueSelector);
+    const fixedColumns = props.fixedColumns;
+    const fixedRows = props.fixedRows;
 
     return {
         data,
         columns,
-        rowHeight,
-        minRowIndex,
-        maxRowIndex,
+        rows,
+        valueSelector,
         fixedColumns,
-        fixedRows,
-        rowSelector
+        fixedRows
     }
 }
 
 function DashJsGrid(props) {
-    const { data, columns, rowHeight, fixedColumns, fixedRows, rowSelector, minRowIndex, maxRowIndex } = useResolvedProps(props);
+    const { data, columns, rows, valueSelector, fixedColumns, fixedRows } = useResolvedProps(props);
 
-    const leftColumns = columns.slice(0, fixedColumns);
-    const rightColumns = columns.slice(fixedColumns);
+    const columnDefinitions = useMemo(() => {
+        if (typeof columns === 'function')
+            return columns(data);
+
+        return columns;
+    }, [columns, data]);
+
+    const rowDefinitions = useMemo(() => {
+        if (typeof rows === 'function')
+            return rows(data);
+
+        return rows;
+    }, [rows, data]);
+
+    const leftColumns = columnDefinitions.slice(0, fixedColumns);
+    const rightColumns = columnDefinitions.slice(fixedColumns);
+    const topRows = rowDefinitions.slice(0, fixedRows);
+    const bottomRows = rowDefinitions.slice(fixedRows);
 
     // TODO: move somewhere else
-    const produceCells = (columns, data, start, end, includeHeaders) => {
-        const rows = new Array(end - start).fill(0).map((_, index) => rowSelector(data, start + index));
-        const cells = rows.map(row => columns.map(column => ({ value: row[column] })));
+    const produceCells = (data, columns, rows, includeHeaders) => {
+        const cells = rows.map(row => {
+            return columns.map(column => {
+                return {
+                    value: valueSelector(data, row.id, column.id)
+                };
+            });
+        });
 
         if (!includeHeaders)
             return cells;
 
         return [
-            columns.map(column => ({ value: column, background: 'lightgrey' })),
+            columns.map(column => ({ value: column.header, background: 'lightgrey' })),
             ...cells
         ];
     }
@@ -55,30 +90,30 @@ function DashJsGrid(props) {
         <div>
             <div style={{ display: 'flex' }}>
                 <GridCanvas
-                    rowHeight={rowHeight}
-                    cells={produceCells(leftColumns, data, minRowIndex, fixedRows, true)}
-                    columnWidths={[50, 67]}
+                    cells={produceCells(data, leftColumns, topRows, true)}
+                    columns={leftColumns}
+                    rows={topRows}
                     showLeftBorder
                     showTopBorder
                 />
                 <GridCanvas
-                    rowHeight={rowHeight}
-                    cells={produceCells(rightColumns, data, minRowIndex, fixedRows, true)}
-                    columnWidths={[100, 151, 33]}
+                    cells={produceCells(data, rightColumns, topRows, true)}
+                    columns={rightColumns}
+                    rows={topRows}
                     showTopBorder
                 />
             </div>
             <div style={{ display: 'flex' }}>
                 <GridCanvas
-                    rowHeight={rowHeight}
-                    cells={produceCells(leftColumns, data, fixedRows, maxRowIndex, false)}
-                    columnWidths={[50, 67]}
+                    cells={produceCells(data, leftColumns, bottomRows, false)}
+                    columns={leftColumns}
+                    rows={bottomRows}
                     showLeftBorder
                 />
                 <GridCanvas
-                    rowHeight={rowHeight}
-                    cells={produceCells(rightColumns, data, fixedRows, maxRowIndex, false)}
-                    columnWidths={[100, 151, 33]}
+                    cells={produceCells(data, rightColumns, bottomRows, false)}
+                    columns={rightColumns}
+                    rows={bottomRows}
                 />
             </div>
         </div>
@@ -91,30 +126,24 @@ DashJsGrid.propTypes = {
     //
     data: PropTypes.array,
     //
-    columns: PropTypes.array,
+    columns: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     //
-    rowHeight: PropTypes.number,
+    rows: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     //
-    rowSelector: PropTypes.string,
+    valueSelector: PropTypes.string,
     //
     fixedColumns: PropTypes.number,
     //
     fixedRows: PropTypes.number,
-    //
-    minRowIndex: PropTypes.number,
-    //
-    maxRowIndex: PropTypes.number
 };
 
 DashJsGrid.defaultProps = {
     data: [],
-    columns: null,
-    rowHeight: 20,
-    rowSelector: 'data[rowIndex]',
+    columns: 'data.length > 0 ? Object.keys(data[0]).map((key) => ({id: key, header: key, width: 100})) : []',
+    rows: 'data.map((_, index) => ({id: index, height: 20}))',
+    valueSelector: 'data[rowId][columnId]',
     fixedColumns: 0,
-    fixedRows: 0,
-    minRowIndex: null,
-    maxRowIndex: null
+    fixedRows: 0
 };
 
 export default DashJsGrid;
