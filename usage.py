@@ -5,7 +5,7 @@ app = Dash(__name__)
 
 app.layout = html.Div([
     dash_js_grid.DashJsGrid(
-        columns=['column_1', 'column_2', 'column_3', 'column_4', 'column_5'],
+        # columns=['column_1', 'column_2', 'column_3', 'column_4', 'column_5'],
         data=[
             {'column_1': '1', 'column_2': '2', 'column_3': '3', 'column_4': '4', 'column_5': '5'},
             {'column_1': '11', 'column_2': '12', 'column_3': '13', 'column_4': '14', 'column_5': '15'},
@@ -14,18 +14,19 @@ app.layout = html.Div([
             {'column_1': '41', 'column_2': '42', 'column_3': '43', 'column_4': '44', 'column_5': '45'},
         ],
         fixedColumns=2,
-        fixedRows=2
+        fixedRows=2,
+        # cellStyle=[
+        #     {
+        #         # {match: ANY | TOP | BOTTOM | LEFT | RIGHT | HEADER}
+        #         # {id: any | any[]}
+        #         # {index: number | number[]}
+        #         'column': {'match': 'ANY'},
+        #         'row': {'match': 'ANY'},
+                
+        #     }
+        # ],
     ),
     html.Div(style={'height': '10px'}),
-    dash_js_grid.DashJsGrid(
-        columns=['column_1', 'column_2', 'column_3', 'column_4', 'column_5'],
-        minRowIndex=-10,
-        maxRowIndex=100,
-        rowSelector='({column_1: 1 + 100 * rowIndex, column_2: 2 + 100 * rowIndex, column_3: 3 + 100 * rowIndex, column_4: 4 + 100 * rowIndex, column_5: 5 + 100 * rowIndex})',
-        fixedColumns=2,
-        fixedRows=2
-    ),
-    html.Div(id='output')
 ])
 
 
