@@ -28,16 +28,21 @@ app.layout = html.Div([
         ],
         fixedColumns=2,
         fixedRows=2,
-        # cellStyle=[
-        #     {
-        #         # {match: ANY | TOP | BOTTOM | LEFT | RIGHT | HEADER}
-        #         # {id: any | any[]}
-        #         # {index: number | number[]}
-        #         'column': {'match': 'ANY'},
-        #         'row': {'match': 'ANY'},
-                
-        #     }
-        # ],
+        cellStyle=[
+            {
+                'column': {'id': 'column_3'},
+                'style': '{background: "lightgreen"}'
+            },
+            {
+                'row': {'index': 3},
+                'style': '{background: "lightblue"}'
+            },
+            {
+                'row': {'index': 3},
+                'column': {'id': 'column_3'},
+                'style': '{background: "lightcoral"}'
+            }
+        ],
     ),
     html.Div(style={'height': '10px'}),
 ])
