@@ -85,12 +85,13 @@ export default function GridCanvas({
             columns.forEach((_, columnIndex) => {
                 rows.forEach((_, rowIndex) => {
                     const cell = cells[rowIndex][columnIndex];
+                    const style = cell.style;
                     const top = rowOffsets[rowIndex];
                     const left = columnOffsets[columnIndex];
                     const width = roundedColumnWidths[columnIndex];
                     const height = roundedRowHeights[rowIndex];
 
-                    ctx.fillStyle = cell.background || 'white';
+                    ctx.fillStyle = style.background || 'white';
                     ctx.fillRect(left, top, width, height);
                     ctx.fillStyle = "#000";
                     ctx.fillText(cell.value, left + 5, top + height - 5);

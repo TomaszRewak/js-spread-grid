@@ -2,6 +2,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
+import StyleResolver from '../utils/StyleResolver';
 
 function useResolvedValueSelector(valueSelector) {
     return useMemo(() => {
@@ -27,6 +28,17 @@ function useResolvedRows(rows) {
     }, [rows]);
 }
 
+function useResolvedCellStyle(cellStyle) {
+    return useMemo(() => {
+        return cellStyle.map(style => ({
+            column: style.column,
+            row: style.row,
+            condition: eval(`(value) => (${style.condition || 'true'})`),
+            style: eval(`(value) => (${style.style})`)
+        }));
+    }, [cellStyle]);
+}
+
 function useResolvedProps(props) {
     const data = props.data;
     const columns = useResolvedColumns(props.columns);
@@ -34,6 +46,7 @@ function useResolvedProps(props) {
     const valueSelector = useResolvedValueSelector(props.valueSelector);
     const fixedColumns = props.fixedColumns;
     const fixedRows = props.fixedRows;
+    const cellStyle = useResolvedCellStyle(props.cellStyle);
 
     return {
         data,
@@ -41,12 +54,13 @@ function useResolvedProps(props) {
         rows,
         valueSelector,
         fixedColumns,
-        fixedRows
+        fixedRows,
+        cellStyle
     }
 }
 
 function DashJsGrid(props) {
-    const { data, columns, rows, valueSelector, fixedColumns, fixedRows } = useResolvedProps(props);
+    const { data, columns, rows, valueSelector, fixedColumns, fixedRows, cellStyle } = useResolvedProps(props);
 
     const columnDefinitions = useMemo(() => {
         if (typeof columns === 'function')
@@ -62,17 +76,27 @@ function DashJsGrid(props) {
         return rows;
     }, [rows, data]);
 
+    const styleResolver = useMemo(() => {
+        return new StyleResolver(cellStyle);
+    }, [cellStyle]);
+
+    // TODO: useMemo
     const leftColumns = columnDefinitions.slice(0, fixedColumns);
     const rightColumns = columnDefinitions.slice(fixedColumns);
     const topRows = rowDefinitions.slice(0, fixedRows);
     const bottomRows = rowDefinitions.slice(fixedRows);
 
+    // TODO: useMemo
     // TODO: move somewhere else
-    const produceCells = (data, columns, rows, includeHeaders) => {
-        const cells = rows.map(row => {
-            return columns.map(column => {
+    const produceCells = (data, columns, rows, includeHeaders, columnOffset, rowOffset) => {
+        const cells = rows.map((row, rowIndex) => {
+            return columns.map((column, columnIndex) => {
+                const value = valueSelector(data, row.id, column.id);
+                const style = styleResolver.resolve(column.id, columnIndex + columnOffset, row.id, rowIndex + rowOffset, value);
+
                 return {
-                    value: valueSelector(data, row.id, column.id)
+                    value,
+                    style
                 };
             });
         });
@@ -80,8 +104,9 @@ function DashJsGrid(props) {
         if (!includeHeaders)
             return cells;
 
+        // TODO: style headers
         return [
-            columns.map(column => ({ value: column.header, background: 'lightgrey' })),
+            columns.map(column => ({ value: column.header, style: { background: 'lightgrey' } })),
             ...cells
         ];
     }
@@ -90,14 +115,14 @@ function DashJsGrid(props) {
         <div>
             <div style={{ display: 'flex' }}>
                 <GridCanvas
-                    cells={produceCells(data, leftColumns, topRows, true)}
+                    cells={produceCells(data, leftColumns, topRows, true, 0, 0)}
                     columns={leftColumns}
                     rows={topRows}
                     showLeftBorder
                     showTopBorder
                 />
                 <GridCanvas
-                    cells={produceCells(data, rightColumns, topRows, true)}
+                    cells={produceCells(data, rightColumns, topRows, true, fixedColumns, 0)}
                     columns={rightColumns}
                     rows={topRows}
                     showTopBorder
@@ -105,13 +130,13 @@ function DashJsGrid(props) {
             </div>
             <div style={{ display: 'flex' }}>
                 <GridCanvas
-                    cells={produceCells(data, leftColumns, bottomRows, false)}
+                    cells={produceCells(data, leftColumns, bottomRows, false, 0, fixedRows)}
                     columns={leftColumns}
                     rows={bottomRows}
                     showLeftBorder
                 />
                 <GridCanvas
-                    cells={produceCells(data, rightColumns, bottomRows, false)}
+                    cells={produceCells(data, rightColumns, bottomRows, false, fixedColumns, fixedRows)}
                     columns={rightColumns}
                     rows={bottomRows}
                 />
@@ -131,10 +156,28 @@ DashJsGrid.propTypes = {
     rows: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     //
     valueSelector: PropTypes.string,
-    //
+    // TODO: Make the fixed columns/rows be defined in column/now definitions
     fixedColumns: PropTypes.number,
     //
     fixedRows: PropTypes.number,
+    //
+    cellStyle: PropTypes.arrayOf(
+        PropTypes.shape({
+            column: PropTypes.oneOfType([
+                PropTypes.shape({ match: PropTypes.oneOf(['ANY', 'LEFT', 'RIGHT', 'HEADER']) }),
+                PropTypes.shape({ id: PropTypes.any }),
+                PropTypes.shape({ index: PropTypes.number }),
+            ]),
+            row: PropTypes.oneOfType([
+                PropTypes.shape({ match: PropTypes.oneOf(['ANY', 'TOP', 'BOTTOM', 'HEADER']) }),
+                PropTypes.shape({ id: PropTypes.any }),
+                PropTypes.shape({ index: PropTypes.number }),
+            ]),
+            condition: PropTypes.string,
+            // TODO: Make this also accept style objects
+            style: PropTypes.string
+        })
+    )
 };
 
 DashJsGrid.defaultProps = {
@@ -143,7 +186,8 @@ DashJsGrid.defaultProps = {
     rows: 'data.map((_, index) => ({id: index, height: 20}))',
     valueSelector: 'data[rowId][columnId]',
     fixedColumns: 0,
-    fixedRows: 0
+    fixedRows: 0,
+    cellStyle: [{ column: { match: 'HEADER' }, style: '{background: "lightgrey"}' }]
 };
 
 export default DashJsGrid;
