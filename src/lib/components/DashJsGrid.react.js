@@ -174,6 +174,7 @@ DashJsGrid.propTypes = {
                 PropTypes.shape({ index: PropTypes.number }),
             ]),
             condition: PropTypes.string,
+            // TODO: Make this also accept style objects
             style: PropTypes.string
         })
     )
