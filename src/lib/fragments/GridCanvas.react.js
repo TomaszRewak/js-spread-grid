@@ -78,7 +78,7 @@ export default function GridCanvas({
             ctx.scale(devicePixelRatio, devicePixelRatio);
 
             ctx.clearRect(0, 0, width, height);
-            ctx.fillStyle = "#f00";
+            ctx.fillStyle = "#ddd";
             ctx.fillRect(0, 0, width, height);
 
             // Draw cells
@@ -100,22 +100,43 @@ export default function GridCanvas({
 
             // Draw borders
             ctx.strokeStyle = "#000";
-            ctx.lineWidth = borderWidth;
 
+            // TODO: memo/move somewhere
+            const drawBorder = (x1, y1, x2, y2, style) => {
+                const width = style.width * borderWidth;
+
+                ctx.lineWidth = width;
+                ctx.moveTo(
+                    x1 - (x1 !== x2 ? width / 2 : 0),
+                    y1 - (y1 !== y2 ? width / 2 : 0));
+                ctx.lineTo(
+                    x2 + (x1 !== x2 ? width / 2 : 0),
+                    y2 + (y1 !== y2 ? width / 2 : 0));
+                ctx.stroke();
+            }
+
+            // TODO: combine lines
             columns.forEach((_, columnIndex) => {
                 rows.forEach((_, rowIndex) => {
+                    const cell = cells[rowIndex][columnIndex];
+                    const style = cell.style;
+
                     const top = rowOffsets[rowIndex] - borderOffset
                     const left = columnOffsets[columnIndex] - borderOffset;
                     const bottom = rowOffsets[rowIndex] + roundedRowHeights[rowIndex] + borderOffset;
                     const right = columnOffsets[columnIndex] + roundedColumnWidths[columnIndex] + borderOffset;
 
-                    ctx.beginPath();
-                    ctx.moveTo(left, top);
-                    ctx.lineTo(right, top);
-                    ctx.lineTo(right, bottom);
-                    ctx.lineTo(left, bottom);
-                    ctx.closePath();
-                    ctx.stroke();
+                    if (style.borderLeft)
+                        drawBorder(left, top, left, bottom, style.borderLeft);
+
+                    if (style.borderRight)
+                        drawBorder(right, top, right, bottom, style.borderRight);
+
+                    if (style.borderTop)
+                        drawBorder(left, top, right, top, style.borderTop);
+
+                    if (style.borderBottom)
+                        drawBorder(left, bottom, right, bottom, style.borderBottom);
                 });
             });
         };
