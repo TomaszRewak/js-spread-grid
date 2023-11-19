@@ -78,7 +78,7 @@ export default function GridCanvas({
             ctx.scale(devicePixelRatio, devicePixelRatio);
 
             ctx.clearRect(0, 0, width, height);
-            ctx.fillStyle = "#f00";
+            ctx.fillStyle = "#ddd";
             ctx.fillRect(0, 0, width, height);
 
             // Draw cells
@@ -100,24 +100,106 @@ export default function GridCanvas({
 
             // Draw borders
             ctx.strokeStyle = "#000";
-            ctx.lineWidth = borderWidth;
+            ctx.setLineDash([15 / devicePixelRatio, 15 / devicePixelRatio]);
 
-            columns.forEach((_, columnIndex) => {
-                rows.forEach((_, rowIndex) => {
-                    const top = rowOffsets[rowIndex] - borderOffset
-                    const left = columnOffsets[columnIndex] - borderOffset;
-                    const bottom = rowOffsets[rowIndex] + roundedRowHeights[rowIndex] + borderOffset;
-                    const right = columnOffsets[columnIndex] + roundedColumnWidths[columnIndex] + borderOffset;
+            // TODO: memo/move somewhere
+            const drawBorder = (x1, y1, x2, y2, style) => {
+                if (!style)
+                    return;
 
-                    ctx.beginPath();
-                    ctx.moveTo(left, top);
-                    ctx.lineTo(right, top);
-                    ctx.lineTo(right, bottom);
-                    ctx.lineTo(left, bottom);
-                    ctx.closePath();
-                    ctx.stroke();
-                });
-            });
+                const width = style.width * borderWidth;
+
+                ctx.lineWidth = width;
+                ctx.moveTo(
+                    x1 - (x1 !== x2 ? width / 2 : 0),
+                    y1 - (y1 !== y2 ? width / 2 : 0));
+                ctx.lineTo(
+                    x2 + (x1 !== x2 ? width / 2 : 0),
+                    y2 + (y1 !== y2 ? width / 2 : 0));
+                ctx.stroke();
+            }
+            const compareBorders = (borderStyleA, borderStyleB) => {
+                return borderStyleA?.width === borderStyleB?.width;
+            }
+            const selectBorder = (borderStyleA, borderStyleB) => {
+                if (!borderStyleA)
+                    return borderStyleB;
+                
+                if (!borderStyleB)
+                    return borderStyleA;
+
+                if (borderStyleA.index > borderStyleB.index)
+                    return borderStyleA;
+
+                return borderStyleB;
+            }
+
+            // TODO: Move somewhere else
+            for (let horizontalBorderIndex = 0; horizontalBorderIndex < horizontalBorderCount; horizontalBorderIndex++) {
+                const topRowIndex = horizontalBorderIndex - 1 + (showTopBorder ? 0 : 1);
+                const bottomRowIndex = topRowIndex + 1;
+
+                let currentBorderStyle = null;
+                let currentBorderIndex = null;
+
+                const completeBorder = (columnIndex) => {
+                    drawBorder(
+                        columnOffsets[currentBorderIndex] - borderOffset,
+                        rowOffsets[bottomRowIndex] - borderOffset,
+                        columnOffsets[columnIndex] - borderOffset,
+                        rowOffsets[bottomRowIndex] - borderOffset,
+                        currentBorderStyle);
+                };
+
+                for (let columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+                    const topBorderStyle = topRowIndex >= 0 ? cells[topRowIndex][columnIndex].style.borderBottom : null;
+                    const bottomBorderStyle = bottomRowIndex < rowCount ? cells[bottomRowIndex][columnIndex].style.borderTop : null;
+
+                    const borderStyle = selectBorder(topBorderStyle, bottomBorderStyle);
+
+                    if (!compareBorders(currentBorderStyle, borderStyle)) {
+                        completeBorder(columnIndex);
+
+                        currentBorderStyle = borderStyle;
+                        currentBorderIndex = columnIndex;
+                    }
+                }
+
+                completeBorder(columnCount);
+            }
+
+            for (let verticalBorderIndex = 0; verticalBorderIndex < verticalBorderCount; verticalBorderIndex++) {
+                const leftColumnIndex = verticalBorderIndex - 1 + (showLeftBorder ? 0 : 1);
+                const rightColumnIndex = leftColumnIndex + 1;
+
+                let currentBorderStyle = null;
+                let currentBorderIndex = null;
+
+                const completeBorder = (rowIndex) => {
+                    drawBorder(
+                        columnOffsets[rightColumnIndex] - borderOffset,
+                        rowOffsets[currentBorderIndex] - borderOffset,
+                        columnOffsets[rightColumnIndex] - borderOffset,
+                        rowOffsets[rowIndex] - borderOffset,
+                        currentBorderStyle);
+                };
+
+                for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+                    const leftBorderStyle = leftColumnIndex >= 0 ? cells[rowIndex][leftColumnIndex].style.borderRight : null;
+                    const rightBorderStyle = rightColumnIndex < columnCount ? cells[rowIndex][rightColumnIndex].style.borderLeft : null;
+
+                    const borderStyle = selectBorder(leftBorderStyle, rightBorderStyle);
+
+                    if (!compareBorders(currentBorderStyle, borderStyle)) {
+                        completeBorder(rowIndex);
+
+                        currentBorderStyle = borderStyle;
+                        currentBorderIndex = rowIndex;
+                    }
+                }
+
+                completeBorder(rowCount);
+            }
         };
 
         const nextFrame = requestAnimationFrame(draw);

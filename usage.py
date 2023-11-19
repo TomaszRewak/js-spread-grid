@@ -30,17 +30,49 @@ app.layout = html.Div([
         fixedRows=2,
         cellStyle=[
             {
-                'column': {'id': 'column_3'},
+                'column': {'id': 'column_5'},
                 'style': '{background: "lightgreen"}'
             },
             {
-                'row': {'index': 3},
+                'row': {'index': 5},
                 'style': '{background: "lightblue"}'
             },
             {
-                'row': {'index': 3},
-                'column': {'id': 'column_3'},
+                'row': {'index': 5},
+                'column': {'id': 'column_5'},
                 'style': '{background: "lightcoral"}'
+            },
+            {
+                'row': {'index': 4},
+                'column': {'id': 'column_5'},
+                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderRight: {width: 3}}'
+            },
+            {
+                'row': {'index': 5},
+                'column': {'id': 'column_4'},
+                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderBottom: {width: 3}}'
+            },
+            {
+                'row': {'index': 5},
+                'column': {'id': 'column_6'},
+                'style': '{borderTop: {width: 3}, borderBottom: {width: 3}, borderRight: {width: 3}}'
+            },
+            {
+                'row': {'index': 6},
+                'column': {'id': 'column_5'},
+                'style': '{borderLeft: {width: 3}, borderRight: {width: 3}, borderBottom: {width: 3}}'
+            },
+            {
+                'row': {'index': 9},
+                'style': '{borderBottom: {width: 3}}'
+            },
+            {
+                'column': {'index': 0},
+                'style': '{borderLeft: {width: 3}}'
+            },
+            {
+                'column': {'index': 6},
+                'style': '{borderRight: {width: 3}}'
             }
         ],
     ),

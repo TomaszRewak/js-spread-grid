@@ -85,6 +85,7 @@ function DashJsGrid(props) {
     const rightColumns = columnDefinitions.slice(fixedColumns);
     const topRows = rowDefinitions.slice(0, fixedRows);
     const bottomRows = rowDefinitions.slice(fixedRows);
+    const topRowsWithHeader = [{ id: 'header', height: 20 }, ...topRows]; // TODO: Is that the best way of doing that?
 
     // TODO: useMemo
     // TODO: move somewhere else
@@ -117,14 +118,14 @@ function DashJsGrid(props) {
                 <GridCanvas
                     cells={produceCells(data, leftColumns, topRows, true, 0, 0)}
                     columns={leftColumns}
-                    rows={topRows}
+                    rows={topRowsWithHeader}
                     showLeftBorder
                     showTopBorder
                 />
                 <GridCanvas
                     cells={produceCells(data, rightColumns, topRows, true, fixedColumns, 0)}
                     columns={rightColumns}
-                    rows={topRows}
+                    rows={topRowsWithHeader}
                     showTopBorder
                 />
             </div>
