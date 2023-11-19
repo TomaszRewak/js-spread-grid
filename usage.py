@@ -45,22 +45,34 @@ app.layout = html.Div([
             {
                 'row': {'index': 4},
                 'column': {'id': 'column_5'},
-                'style': '{borderLeft: {width: 5}, borderTop: {width: 5}, borderRight: {width: 5}}'
+                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderRight: {width: 3}}'
             },
             {
                 'row': {'index': 5},
                 'column': {'id': 'column_4'},
-                'style': '{borderLeft: {width: 5}, borderTop: {width: 5}, borderBottom: {width: 5}}'
+                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderBottom: {width: 3}}'
             },
             {
                 'row': {'index': 5},
                 'column': {'id': 'column_6'},
-                'style': '{borderTop: {width: 5}, borderBottom: {width: 5}, borderRight: {width: 5}}'
+                'style': '{borderTop: {width: 3}, borderBottom: {width: 3}, borderRight: {width: 3}}'
             },
             {
                 'row': {'index': 6},
                 'column': {'id': 'column_5'},
-                'style': '{borderLeft: {width: 5}, borderRight: {width: 5}, borderBottom: {width: 5}}'
+                'style': '{borderLeft: {width: 3}, borderRight: {width: 3}, borderBottom: {width: 3}}'
+            },
+            {
+                'row': {'index': 9},
+                'style': '{borderBottom: {width: 3}}'
+            },
+            {
+                'column': {'index': 0},
+                'style': '{borderLeft: {width: 3}}'
+            },
+            {
+                'column': {'index': 6},
+                'style': '{borderRight: {width: 3}}'
             }
         ],
     ),
