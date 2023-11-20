@@ -60,7 +60,7 @@ function useResolvedProps(props) {
 }
 
 function DashJsGrid(props) {
-    const { data, columns, rows, valueSelector, fixedColumns, fixedRows, cellStyle } = useResolvedProps(props);
+    const { data, columns, rows, valueSelector, cellStyle } = useResolvedProps(props);
 
     const columnDefinitions = useMemo(() => {
         if (typeof columns === 'function')
@@ -81,16 +81,18 @@ function DashJsGrid(props) {
     }, [cellStyle]);
 
     // TODO: useMemo
-    const leftColumns = columnDefinitions.slice(0, fixedColumns);
-    const rightColumns = columnDefinitions.slice(fixedColumns);
-    const topRows = rowDefinitions.slice(0, fixedRows);
-    const bottomRows = rowDefinitions.slice(fixedRows);
-    const topRowsWithHeader = [{ id: 'header', height: 20 }, ...topRows]; // TODO: Is that the best way of doing that?
+    const leftColumns = columnDefinitions.filter(column => column.fixed === 'left');
+    const rightColumns = columnDefinitions.filter(column => column.fixed !== 'left');
+    const topRows = rowDefinitions.filter(row => row.fixed === 'top');
+    const bottomRows = rowDefinitions.filter(row => row.fixed !== 'top');
 
     // TODO: useMemo
     // TODO: move somewhere else
-    const produceCells = (data, columns, rows, includeHeaders, columnOffset, rowOffset) => {
-        const cells = rows.map((row, rowIndex) => {
+    const produceCells = (data, columns, rows, columnOffset, rowOffset) => {
+        return rows.map((row, rowIndex) => {
+            if (row.type === 'header')
+                return columns.map(column => ({ value: column.header, style: { background: 'lightgrey' } }));
+
             return columns.map((column, columnIndex) => {
                 const value = valueSelector(data, row.id, column.id);
                 const style = styleResolver.resolve(column.id, columnIndex + columnOffset, row.id, rowIndex + rowOffset, value);
@@ -101,43 +103,34 @@ function DashJsGrid(props) {
                 };
             });
         });
-
-        if (!includeHeaders)
-            return cells;
-
-        // TODO: style headers
-        return [
-            columns.map(column => ({ value: column.header, style: { background: 'lightgrey' } })),
-            ...cells
-        ];
     }
 
     return (
         <div>
             <div style={{ display: 'flex' }}>
                 <GridCanvas
-                    cells={produceCells(data, leftColumns, topRows, true, 0, 0)}
+                    cells={produceCells(data, leftColumns, topRows, 0, 0)}
                     columns={leftColumns}
-                    rows={topRowsWithHeader}
+                    rows={topRows}
                     showLeftBorder
                     showTopBorder
                 />
                 <GridCanvas
-                    cells={produceCells(data, rightColumns, topRows, true, fixedColumns, 0)}
+                    cells={produceCells(data, rightColumns, topRows, leftColumns.length, 0)}
                     columns={rightColumns}
-                    rows={topRowsWithHeader}
+                    rows={topRows}
                     showTopBorder
                 />
             </div>
             <div style={{ display: 'flex' }}>
                 <GridCanvas
-                    cells={produceCells(data, leftColumns, bottomRows, false, 0, fixedRows)}
+                    cells={produceCells(data, leftColumns, bottomRows, 0, topRows.length)}
                     columns={leftColumns}
                     rows={bottomRows}
                     showLeftBorder
                 />
                 <GridCanvas
-                    cells={produceCells(data, rightColumns, bottomRows, false, fixedColumns, fixedRows)}
+                    cells={produceCells(data, rightColumns, bottomRows, leftColumns.length, topRows.length)}
                     columns={rightColumns}
                     rows={bottomRows}
                 />
@@ -157,10 +150,6 @@ DashJsGrid.propTypes = {
     rows: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     //
     valueSelector: PropTypes.string,
-    // TODO: Make the fixed columns/rows be defined in column/now definitions
-    fixedColumns: PropTypes.number,
-    //
-    fixedRows: PropTypes.number,
     //
     cellStyle: PropTypes.arrayOf(
         PropTypes.shape({
@@ -184,10 +173,8 @@ DashJsGrid.propTypes = {
 DashJsGrid.defaultProps = {
     data: [],
     columns: 'data.length > 0 ? Object.keys(data[0]).map((key) => ({id: key, header: key, width: 100})) : []',
-    rows: 'data.map((_, index) => ({id: index, height: 20}))',
+    rows: '[{type: "header", height: 20, fixed: "top"}, ...data.map((_, index) => ({id: index, height: 20}))]',
     valueSelector: 'data[rowId][columnId]',
-    fixedColumns: 0,
-    fixedRows: 0,
     cellStyle: [{ column: { match: 'HEADER' }, style: '{background: "lightgrey"}' }]
 };
 

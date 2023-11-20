@@ -6,13 +6,26 @@ app = Dash(__name__)
 app.layout = html.Div([
     dash_js_grid.DashJsGrid(
         columns=[
-            {'id': 'column_1', 'header': 'Column 1', 'width': 100},
-            {'id': 'column_2', 'header': 'Column 2', 'width': 80},
+            {'id': 'column_1', 'header': 'Column 1', 'width': 100, 'fixed': 'left'},
+            {'id': 'column_2', 'header': 'Column 2', 'width': 80, 'fixed': 'left'},
             {'id': 'column_3', 'header': 'Column 3', 'width': 80},
             {'id': 'column_4', 'header': 'Column 4', 'width': 111},
             {'id': 'column_5', 'header': 'Column 5', 'width': 73},
             {'id': 'column_6', 'header': 'Column 6', 'width': 30},
             {'id': 'column_7', 'header': 'Column 7', 'width': 100}
+        ],
+        rows=[
+            {'type': 'header', 'height': 20, 'fixed': 'top'},
+            {'id': 0, 'height': 20, 'fixed': 'top'},
+            {'id': 1, 'height': 20, 'fixed': 'top'},
+            {'id': 2, 'height': 20},
+            {'id': 3, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 5, 'height': 20},
+            {'id': 6, 'height': 20},
+            {'id': 7, 'height': 20},
+            {'id': 8, 'height': 20},
+            {'id': 9, 'height': 20}
         ],
         data=[
             {'column_1': '1', 'column_2': '2', 'column_3': '3', 'column_4': '4', 'column_5': '5', 'column_6': '6', 'column_7': '7'},
@@ -26,8 +39,6 @@ app.layout = html.Div([
             {'column_1': '81', 'column_2': '82', 'column_3': '83', 'column_4': '84', 'column_5': '85', 'column_6': '86', 'column_7': '87'},
             {'column_1': '91', 'column_2': '92', 'column_3': '93', 'column_4': '94', 'column_5': '95', 'column_6': '96', 'column_7': '97'},
         ],
-        fixedColumns=2,
-        fixedRows=2,
         cellStyle=[
             {
                 'column': {'id': 'column_5'},
@@ -63,16 +74,16 @@ app.layout = html.Div([
                 'style': '{borderLeft: {width: 3}, borderRight: {width: 3}, borderBottom: {width: 3}}'
             },
             {
-                'row': {'index': 9},
-                'style': '{borderBottom: {width: 3}}'
+                'row': {'index': 10},
+                'style': '{borderBottom: {width: 5}}'
             },
             {
                 'column': {'index': 0},
-                'style': '{borderLeft: {width: 3}}'
+                'style': '{borderLeft: {width: 5}}'
             },
             {
                 'column': {'index': 6},
-                'style': '{borderRight: {width: 3}}'
+                'style': '{borderRight: {width: 5}}'
             }
         ],
     ),

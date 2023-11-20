@@ -41,6 +41,7 @@ export default function GridCanvas({
             }
 
             const ctx = canvas.getContext("2d");
+            // TODO: Make that "1" configurable as cell spacing
             const borderWidth = 1 / devicePixelRatio; // Already rounded by definition
             const borderOffset = borderWidth / 2;
             const rowCount = rows.length;
@@ -110,6 +111,8 @@ export default function GridCanvas({
                 const width = style.width * borderWidth;
 
                 ctx.lineWidth = width;
+
+                ctx.beginPath();
                 ctx.moveTo(
                     x1 - (x1 !== x2 ? width / 2 : 0),
                     y1 - (y1 !== y2 ? width / 2 : 0));
