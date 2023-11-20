@@ -28,15 +28,15 @@ function useResolvedRows(rows) {
     }, [rows]);
 }
 
-function useResolvedCellStyle(cellStyle) {
+function useResolvedFormatting(formatting) {
     return useMemo(() => {
-        return cellStyle.map(style => ({
+        return formatting.map(style => ({
             column: style.column,
             row: style.row,
             condition: eval(`(value) => (${style.condition || 'true'})`),
             style: eval(`(value) => (${style.style})`)
         }));
-    }, [cellStyle]);
+    }, [formatting]);
 }
 
 function useResolvedProps(props) {
@@ -46,7 +46,7 @@ function useResolvedProps(props) {
     const valueSelector = useResolvedValueSelector(props.valueSelector);
     const fixedColumns = props.fixedColumns;
     const fixedRows = props.fixedRows;
-    const cellStyle = useResolvedCellStyle(props.cellStyle);
+    const formatting = useResolvedFormatting(props.formatting);
 
     return {
         data,
@@ -55,12 +55,12 @@ function useResolvedProps(props) {
         valueSelector,
         fixedColumns,
         fixedRows,
-        cellStyle
+        formatting
     }
 }
 
 function DashJsGrid(props) {
-    const { data, columns, rows, valueSelector, cellStyle } = useResolvedProps(props);
+    const { data, columns, rows, valueSelector, formatting } = useResolvedProps(props);
 
     const columnDefinitions = useMemo(() => {
         if (typeof columns === 'function')
@@ -77,8 +77,8 @@ function DashJsGrid(props) {
     }, [rows, data]);
 
     const styleResolver = useMemo(() => {
-        return new StyleResolver(cellStyle);
-    }, [cellStyle]);
+        return new StyleResolver(formatting);
+    }, [formatting]);
 
     // TODO: useMemo
     const leftColumns = columnDefinitions.filter(column => column.fixed === 'left');
@@ -189,7 +189,7 @@ DashJsGrid.propTypes = {
     //
     valueSelector: PropTypes.string,
     //
-    cellStyle: PropTypes.arrayOf(
+    formatting: PropTypes.arrayOf(
         PropTypes.shape({
             column: PropTypes.oneOfType([
                 PropTypes.shape({ match: PropTypes.oneOf(['ANY', 'LEFT', 'RIGHT', 'HEADER']) }),
@@ -213,7 +213,7 @@ DashJsGrid.defaultProps = {
     columns: 'data.length > 0 ? Object.keys(data[0]).map((key) => ({id: key, header: key, width: 100})) : []',
     rows: '[{type: "header", height: 20, fixed: "top"}, ...data.map((_, index) => ({id: index, height: 20}))]',
     valueSelector: 'data[rowId][columnId]',
-    cellStyle: [{ column: { match: 'HEADER' }, style: '{background: "lightgrey"}' }]
+    formatting: [{ column: { match: 'HEADER' }, style: '{background: "lightgrey"}' }]
 };
 
 export default DashJsGrid;

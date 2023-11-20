@@ -58,7 +58,7 @@ app.layout = html.Div([
             {'column_1': '81', 'column_2': '82', 'column_3': '83', 'column_4': '84', 'column_5': '85', 'column_6': '86', 'column_7': '87'},
             {'column_1': '91', 'column_2': '92', 'column_3': '93', 'column_4': '94', 'column_5': '95', 'column_6': '96', 'column_7': '97'},
         ],
-        cellStyle=[
+        formatting=[
             {
                 'column': {'id': 'column_5'},
                 'style': '{background: "lightgreen"}'
