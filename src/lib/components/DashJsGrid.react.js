@@ -82,9 +82,11 @@ function DashJsGrid(props) {
 
     // TODO: useMemo
     const leftColumns = columnDefinitions.filter(column => column.fixed === 'left');
-    const rightColumns = columnDefinitions.filter(column => column.fixed !== 'left');
+    const middleColumns = columnDefinitions.filter(column => column.fixed !== 'left' && column.fixed !== 'right');
+    const rightColumns = columnDefinitions.filter(column => column.fixed === 'right');
     const topRows = rowDefinitions.filter(row => row.fixed === 'top');
-    const bottomRows = rowDefinitions.filter(row => row.fixed !== 'top');
+    const middleRows = rowDefinitions.filter(row => row.fixed !== 'top' && row.fixed !== 'bottom');
+    const bottomRows = rowDefinitions.filter(row => row.fixed === 'bottom');
 
     // TODO: useMemo
     // TODO: move somewhere else
@@ -116,7 +118,13 @@ function DashJsGrid(props) {
                     showTopBorder
                 />
                 <GridCanvas
-                    cells={produceCells(data, rightColumns, topRows, leftColumns.length, 0)}
+                    cells={produceCells(data, middleColumns, topRows, leftColumns.length, 0)}
+                    columns={middleColumns}
+                    rows={topRows}
+                    showTopBorder
+                />
+                <GridCanvas
+                    cells={produceCells(data, rightColumns, topRows, leftColumns.length + middleColumns.length, 0)}
                     columns={rightColumns}
                     rows={topRows}
                     showTopBorder
@@ -124,13 +132,36 @@ function DashJsGrid(props) {
             </div>
             <div style={{ display: 'flex' }}>
                 <GridCanvas
-                    cells={produceCells(data, leftColumns, bottomRows, 0, topRows.length)}
+                    cells={produceCells(data, leftColumns, middleRows, 0, topRows.length)}
+                    columns={leftColumns}
+                    rows={middleRows}
+                    showLeftBorder
+                />
+                <GridCanvas
+                    cells={produceCells(data, middleColumns, middleRows, leftColumns.length, topRows.length)}
+                    columns={middleColumns}
+                    rows={middleRows}
+                />
+                <GridCanvas
+                    cells={produceCells(data, rightColumns, middleRows, leftColumns.length + middleColumns.length, topRows.length)}
+                    columns={rightColumns}
+                    rows={middleRows}
+                />
+            </div>
+            <div style={{ display: 'flex' }}>
+                <GridCanvas
+                    cells={produceCells(data, leftColumns, bottomRows, 0, topRows.length + middleRows.length)}
                     columns={leftColumns}
                     rows={bottomRows}
                     showLeftBorder
                 />
                 <GridCanvas
-                    cells={produceCells(data, rightColumns, bottomRows, leftColumns.length, topRows.length)}
+                    cells={produceCells(data, middleColumns, bottomRows, leftColumns.length, topRows.length + middleRows.length)}
+                    columns={middleColumns}
+                    rows={bottomRows}
+                />
+                <GridCanvas
+                    cells={produceCells(data, rightColumns, bottomRows, leftColumns.length + middleColumns.length, topRows.length + middleRows.length)}
                     columns={rightColumns}
                     rows={bottomRows}
                 />

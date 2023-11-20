@@ -12,20 +12,23 @@ app.layout = html.Div([
             {'id': 'column_4', 'header': 'Column 4', 'width': 111},
             {'id': 'column_5', 'header': 'Column 5', 'width': 73},
             {'id': 'column_6', 'header': 'Column 6', 'width': 30},
-            {'id': 'column_7', 'header': 'Column 7', 'width': 100}
+            {'id': 'column_7', 'header': 'Column 7', 'width': 100, 'fixed': 'right'}
         ],
         rows=[
             {'type': 'header', 'height': 20, 'fixed': 'top'},
             {'id': 0, 'height': 20, 'fixed': 'top'},
             {'id': 1, 'height': 20, 'fixed': 'top'},
+            {'type': 'header', 'height': 20, 'fixed': 'top'},
             {'id': 2, 'height': 20},
             {'id': 3, 'height': 20},
             {'id': 4, 'height': 20},
             {'id': 5, 'height': 20},
             {'id': 6, 'height': 20},
             {'id': 7, 'height': 20},
-            {'id': 8, 'height': 20},
-            {'id': 9, 'height': 20}
+            {'type': 'header', 'height': 20, 'fixed': 'bottom'},
+            {'id': 8, 'height': 20, 'fixed': 'bottom'},
+            {'id': 9, 'height': 20, 'fixed': 'bottom'},
+            {'type': 'header', 'height': 20, 'fixed': 'bottom'},
         ],
         data=[
             {'column_1': '1', 'column_2': '2', 'column_3': '3', 'column_4': '4', 'column_5': '5', 'column_6': '6', 'column_7': '7'},
@@ -45,37 +48,33 @@ app.layout = html.Div([
                 'style': '{background: "lightgreen"}'
             },
             {
-                'row': {'index': 5},
+                'row': {'index': 6},
                 'style': '{background: "lightblue"}'
-            },
-            {
-                'row': {'index': 5},
-                'column': {'id': 'column_5'},
-                'style': '{background: "lightcoral"}'
-            },
-            {
-                'row': {'index': 4},
-                'column': {'id': 'column_5'},
-                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderRight: {width: 3}}'
-            },
-            {
-                'row': {'index': 5},
-                'column': {'id': 'column_4'},
-                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderBottom: {width: 3}}'
-            },
-            {
-                'row': {'index': 5},
-                'column': {'id': 'column_6'},
-                'style': '{borderTop: {width: 3}, borderBottom: {width: 3}, borderRight: {width: 3}}'
             },
             {
                 'row': {'index': 6},
                 'column': {'id': 'column_5'},
-                'style': '{borderLeft: {width: 3}, borderRight: {width: 3}, borderBottom: {width: 3}}'
+                'style': '{background: "lightcoral"}'
             },
             {
-                'row': {'index': 10},
-                'style': '{borderBottom: {width: 5}}'
+                'row': {'index': 5},
+                'column': {'id': 'column_5'},
+                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderRight: {width: 3}}'
+            },
+            {
+                'row': {'index': 6},
+                'column': {'id': 'column_4'},
+                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderBottom: {width: 3}}'
+            },
+            {
+                'row': {'index': 6},
+                'column': {'id': 'column_6'},
+                'style': '{borderTop: {width: 3}, borderBottom: {width: 3}, borderRight: {width: 3}}'
+            },
+            {
+                'row': {'index': 7},
+                'column': {'id': 'column_5'},
+                'style': '{borderLeft: {width: 3}, borderRight: {width: 3}, borderBottom: {width: 3}}'
             },
             {
                 'column': {'index': 0},
