@@ -107,10 +107,12 @@ function DashJsGrid(props) {
         });
     }
 
+    // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
     return (
-        <div>
-            <div style={{ display: 'flex' }}>
+        <div style={{width: '500px', height: '400px', overflow: 'auto'}}>
+            <div style={{ display: 'flex', position: 'sticky', top: 0, zIndex: 1 }}>
                 <GridCanvas
+                    style={{ position: 'sticky', left: 0 }}
                     cells={produceCells(data, leftColumns, topRows, 0, 0)}
                     columns={leftColumns}
                     rows={topRows}
@@ -124,14 +126,16 @@ function DashJsGrid(props) {
                     showTopBorder
                 />
                 <GridCanvas
+                    style={{ position: 'sticky', right: 0 }}
                     cells={produceCells(data, rightColumns, topRows, leftColumns.length + middleColumns.length, 0)}
                     columns={rightColumns}
                     rows={topRows}
                     showTopBorder
                 />
             </div>
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex', zIndex: 0 }}>
                 <GridCanvas
+                    style={{ position: 'sticky', left: 0 }}
                     cells={produceCells(data, leftColumns, middleRows, 0, topRows.length)}
                     columns={leftColumns}
                     rows={middleRows}
@@ -143,13 +147,15 @@ function DashJsGrid(props) {
                     rows={middleRows}
                 />
                 <GridCanvas
+                    style={{ position: 'sticky', right: 0 }}
                     cells={produceCells(data, rightColumns, middleRows, leftColumns.length + middleColumns.length, topRows.length)}
                     columns={rightColumns}
                     rows={middleRows}
                 />
             </div>
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex', position: 'sticky', bottom: 0, zIndex: 1 }}>
                 <GridCanvas
+                    style={{ position: 'sticky', left: 0 }}
                     cells={produceCells(data, leftColumns, bottomRows, 0, topRows.length + middleRows.length)}
                     columns={leftColumns}
                     rows={bottomRows}
@@ -161,6 +167,7 @@ function DashJsGrid(props) {
                     rows={bottomRows}
                 />
                 <GridCanvas
+                    style={{ position: 'sticky', right: 0 }}
                     cells={produceCells(data, rightColumns, bottomRows, leftColumns.length + middleColumns.length, topRows.length + middleRows.length)}
                     columns={rightColumns}
                     rows={bottomRows}

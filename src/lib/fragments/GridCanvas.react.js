@@ -17,7 +17,8 @@ export default function GridCanvas({
     columns,
     rows,
     showLeftBorder,
-    showTopBorder
+    showTopBorder,
+    style
 }) {
     const [canvas, setCanvas] = useState(null);
     const devicePixelRatio = useDevicePixelRatio();
@@ -213,6 +214,6 @@ export default function GridCanvas({
 
     // style={{imageRendering: 'pixelated'}} - is this even needed, though?
     return (
-        <canvas ref={updateCanvas} />
+        <canvas ref={updateCanvas} style={style} />
     )
 }

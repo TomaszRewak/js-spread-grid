@@ -22,6 +22,22 @@ app.layout = html.Div([
             {'id': 2, 'height': 20},
             {'id': 3, 'height': 20},
             {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
+            {'id': 4, 'height': 20},
             {'id': 5, 'height': 20},
             {'id': 6, 'height': 20},
             {'id': 7, 'height': 20},
@@ -83,6 +99,14 @@ app.layout = html.Div([
             {
                 'column': {'index': 6},
                 'style': '{borderRight: {width: 5}}'
+            },
+            {
+                'column': {'index': 1},
+                'style': '{borderRight: {width: 5}, background: "lightgrey"}'
+            },
+            {
+                'column': {'index': 6},
+                'style': '{borderLeft: {width: 5}, background: "lightgrey"}'
             }
         ],
     ),
