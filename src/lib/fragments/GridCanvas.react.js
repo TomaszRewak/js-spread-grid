@@ -139,6 +139,7 @@ export default function GridCanvas({
             }
 
             // TODO: Move somewhere else
+            // TODO: Don't actually combine borders, but use the ctx.lineDashOffset to align them
             for (let horizontalBorderIndex = 0; horizontalBorderIndex < horizontalBorderCount; horizontalBorderIndex++) {
                 const topRowIndex = horizontalBorderIndex - 1 + (showTopBorder ? 0 : 1);
                 const bottomRowIndex = topRowIndex + 1;
