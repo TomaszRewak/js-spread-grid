@@ -23,9 +23,7 @@ export default function GridCanvas({
     const [canvas, setCanvas] = useState(null);
     const devicePixelRatio = useDevicePixelRatio();
 
-    const updateCanvas = useCallback((node) => {
-        setCanvas(node);
-    }, []);
+    // TODO: Read and apply: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas?retiredLocale=pl
 
     useEffect(() => {
         const draw = () => {
@@ -34,8 +32,6 @@ export default function GridCanvas({
 
             // Checking how often this is called
             console.log('draw');
-
-            console.log(devicePixelRatio);
 
             const roundToPixels = (value) => {
                 return Math.round(value * devicePixelRatio) / devicePixelRatio;
@@ -67,10 +63,6 @@ export default function GridCanvas({
                 acc.push(offset);
                 return acc;
             }, [showTopBorder ? borderWidth : 0]);
-
-            console.dir(columnOffsets);
-            console.dir(rowOffsets);
-            console.log(width * devicePixelRatio, height * devicePixelRatio);
 
             canvas.width = Math.round(width * devicePixelRatio);
             canvas.height = Math.round(height * devicePixelRatio);
@@ -215,6 +207,6 @@ export default function GridCanvas({
 
     // style={{imageRendering: 'pixelated'}} - is this even needed, though?
     return (
-        <canvas ref={updateCanvas} style={style} />
+        <canvas ref={setCanvas} style={style} />
     )
 }
