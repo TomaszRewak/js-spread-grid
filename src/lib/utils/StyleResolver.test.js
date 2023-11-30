@@ -5,7 +5,7 @@ describe('StyleResolver', () => {
   describe('constructor', () => {
     it('should create an empty styleLookup object', () => {
       const resolver = new StyleResolver([]);
-      expect(resolver.styleLookup).toEqual({});
+      expect(resolver.styleLookup).toEqual(new Map());
     });
 
     it('should add styles to the styleLookup object', () => {
@@ -14,10 +14,10 @@ describe('StyleResolver', () => {
         { column: { id: 'col2' }, row: { id: 'row2' }, condition: () => true, style: () => ({ color: 'blue' }) },
       ];
       const resolver = new StyleResolver(styles);
-      expect(resolver.styleLookup).toEqual({
-        '{id:"col1"}:{id:"row1"}': [{ index: 0, condition: styles[0].condition, style: styles[0].style }],
-        '{id:"col2"}:{id:"row2"}': [{ index: 1, condition: styles[1].condition, style: styles[1].style }],
-      });
+      expect(resolver.styleLookup).toEqual(new Map([
+        ['{id:"col1"}:{id:"row1"}', [{ index: 0, condition: styles[0].condition, style: styles[0].style }]],
+        ['{id:"col2"}:{id:"row2"}', [{ index: 1, condition: styles[1].condition, style: styles[1].style }]],
+      ]));
     });
 
     it('should handle styles with missing column or row properties', () => {
@@ -27,11 +27,11 @@ describe('StyleResolver', () => {
         { row: { id: 'row1' }, condition: () => true, style: () => ({ color: 'green' }) },
       ];
       const resolver = new StyleResolver(styles);
-      expect(resolver.styleLookup).toEqual({
-        '{match:"ANY"}:{match:"ANY"}': [{ index: 0, condition: styles[0].condition, style: styles[0].style }],
-        '{id:"col1"}:{match:"ANY"}': [{ index: 1, condition: styles[1].condition, style: styles[1].style }],
-        '{match:"ANY"}:{id:"row1"}': [{ index: 2, condition: styles[2].condition, style: styles[2].style }],
-      });
+      expect(resolver.styleLookup).toEqual(new Map([
+        ['{match:"ANY"}:{match:"ANY"}', [{ index: 0, condition: styles[0].condition, style: styles[0].style }]],
+        ['{id:"col1"}:{match:"ANY"}', [{ index: 1, condition: styles[1].condition, style: styles[1].style }]],
+        ['{match:"ANY"}:{id:"row1"}', [{ index: 2, condition: styles[2].condition, style: styles[2].style }]],
+      ]));
     });
 
     it('should handle styles with duplicate cell keys', () => {
@@ -40,12 +40,12 @@ describe('StyleResolver', () => {
         { column: { id: 'col1' }, row: { id: 'row1' }, condition: () => true, style: () => ({ color: 'blue' }) },
       ];
       const resolver = new StyleResolver(styles);
-      expect(resolver.styleLookup).toEqual({
-        '{id:"col1"}:{id:"row1"}': [
+      expect(resolver.styleLookup).toEqual(new Map([
+        ['{id:"col1"}:{id:"row1"}', [
           { index: 0, condition: styles[0].condition, style: styles[0].style },
           { index: 1, condition: styles[1].condition, style: styles[1].style },
-        ],
-      });
+        ]],
+      ]));
     });
   });
 

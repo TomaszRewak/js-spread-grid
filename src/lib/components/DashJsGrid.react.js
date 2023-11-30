@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
 import StyleResolver from '../utils/StyleResolver';
 import useScrollRect from '../hooks/useScrollRect';
+import stringifyKey from '../utils/stringifyKey';
 
 function useResolvedValueSelector(valueSelector) {
     return useMemo(() => {
@@ -68,6 +69,7 @@ function DashJsGrid(props) {
     const [fixedLeft, setFixedLeft] = useState(null);
     const [fixedRight, setFixedRight] = useState(null);
 
+    // TODO: Move to separate files
     const columnDefinitions = useMemo(() => {
         if (typeof columns === 'function')
             return columns(data);
@@ -82,6 +84,22 @@ function DashJsGrid(props) {
         return rows;
     }, [rows, data]);
 
+    const indexedColumnDefinitions = useMemo(() => {
+        return columnDefinitions.map((column, index) => ({
+            ...column,
+            index,
+            key: stringifyKey(column.id),
+        }));
+    }, [columnDefinitions]);
+
+    const indexedRowDefinitions = useMemo(() => {
+        return rowDefinitions.map((row, index) => ({
+            ...row,
+            index,
+            key: stringifyKey(row.id),
+        }));
+    }, [rowDefinitions]);
+
     const styleResolver = useMemo(() => {
         return new StyleResolver(formatting);
     }, [formatting]);
@@ -89,12 +107,12 @@ function DashJsGrid(props) {
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
     // TODO: useMemo
-    const leftColumns = columnDefinitions.filter(column => column.fixed === 'left');
-    const middleColumns = columnDefinitions.filter(column => column.fixed !== 'left' && column.fixed !== 'right');
-    const rightColumns = columnDefinitions.filter(column => column.fixed === 'right');
-    const topRows = rowDefinitions.filter(row => row.fixed === 'top');
-    const middleRows = rowDefinitions.filter(row => row.fixed !== 'top' && row.fixed !== 'bottom');
-    const bottomRows = rowDefinitions.filter(row => row.fixed === 'bottom');
+    const leftColumns = indexedColumnDefinitions.filter(column => column.fixed === 'left');
+    const middleColumns = indexedColumnDefinitions.filter(column => column.fixed !== 'left' && column.fixed !== 'right');
+    const rightColumns = indexedColumnDefinitions.filter(column => column.fixed === 'right');
+    const topRows = indexedRowDefinitions.filter(row => row.fixed === 'top');
+    const middleRows = indexedRowDefinitions.filter(row => row.fixed !== 'top' && row.fixed !== 'bottom');
+    const bottomRows = indexedRowDefinitions.filter(row => row.fixed === 'bottom');
 
     // TODO: useMemo
     // TODO: move somewhere else
