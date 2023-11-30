@@ -3,8 +3,8 @@ import { area, clip, contains, expand, subtract } from "../utils/rect";
 
 // TODO: Write unit tests
 
-const requiredMargin = 50;
-const preloadedMargin = 150;
+const requiredMargin = 200;
+const preloadedMargin = 400;
 const emptyRect = {
     left: 0,
     top: 0,

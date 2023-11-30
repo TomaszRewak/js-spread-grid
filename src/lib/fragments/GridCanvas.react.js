@@ -84,9 +84,9 @@ export default function GridCanvas({
             ctx.scale(devicePixelRatio, devicePixelRatio);
             ctx.translate(-left, -top);
 
-            ctx.clearRect(0, 0, width, height);
+            ctx.clearRect(0, 0, totalWidth, totalHeight);
             ctx.fillStyle = "#ddd";
-            ctx.fillRect(0, 0, width, height);
+            ctx.fillRect(0, 0, totalWidth, totalHeight);
 
             // Draw cells
             columns.forEach((_, columnIndex) => {
