@@ -1,3 +1,8 @@
 {
-  "jest.autoRun": "off"
+  "jest.autoRun": "off",
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }

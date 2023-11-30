@@ -144,12 +144,12 @@ function DashJsGrid(props) {
     const bottomRightCell = useCells(data, rightColumns, bottomRows, valueSelector, styleResolver);
 
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
-    // TODO: Max width: fit-content
     // TODO: Memoize styles
     return (
         <div
+            className='dash-js-grid'
             ref={setContainer}
-            style={{ width: '80vw', height: '50vh', overflow: 'auto', display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
+            style={{ maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
         >
             <div ref={setFixedLeft} style={{ gridRow: '1 / 4', gridColumn: '1' }} />
             <div ref={setFixedRight} style={{ gridRow: '1 / 4', gridColumn: '3' }} />
