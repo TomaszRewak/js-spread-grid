@@ -13,6 +13,7 @@ function indexBorders(style, index) {
 }
 
 // TODO: Optimize by not searching using keys that don't have correlated match rules
+// TODO: Optimize for big numbers of rows/columns
 export default class StyleResolver {
     constructor(styles) {
         this.styleLookup = new Map();
