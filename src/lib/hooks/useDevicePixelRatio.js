@@ -7,7 +7,7 @@ function useDevicePixelRatio() {
     useEffect(() => {
         const media = matchMedia(`(resolution: ${devicePixelRatio}dppx)`);
         const updateDevicePixelRatio = () => {
-            console.log('Device pixel ratio changed')
+            console.log('Device pixel ratio changed');
             setDevicePixelRatio(window.devicePixelRatio);
         };
 

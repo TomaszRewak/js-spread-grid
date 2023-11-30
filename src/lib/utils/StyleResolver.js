@@ -13,9 +13,10 @@ function indexBorders(style, index) {
 }
 
 // TODO: Optimize by not searching using keys that don't have correlated match rules
+// TODO: Optimize for big numbers of rows/columns
 export default class StyleResolver {
     constructor(styles) {
-        this.styleLookup = {};
+        this.styleLookup = new Map();
 
         styles.forEach((style, index) => {
             const column = style.column || { match: 'ANY' };
@@ -25,10 +26,10 @@ export default class StyleResolver {
             const rowStr = stringifyKey(row);
             const cellStr = `${columnStr}:${rowStr}`;
 
-            if (!(cellStr in this.styleLookup))
-                this.styleLookup[cellStr] = [];
+            if (!this.styleLookup.has(cellStr))
+                this.styleLookup.set(cellStr, []);
 
-            this.styleLookup[cellStr].push({
+            this.styleLookup.get(cellStr).push({
                 index,
                 condition: style.condition,
                 style: style.style
@@ -50,12 +51,12 @@ export default class StyleResolver {
         const cellKeys = columnKeys.map(columnKey => rowKeys.map(rowKey => `${columnKey}:${rowKey}`)).flat();
 
         const styles = cellKeys
-            .filter(key => key in this.styleLookup)
-            .map(key => this.styleLookup[key])
+            .filter(key => this.styleLookup.has(key))
+            .map(key => this.styleLookup.get(key))
             .flat()
             .filter(style => style.condition(value))
             .sort((a, b) => a.index - b.index)
-            .map((style, index) => indexBorders(style.style(value), index));
+            .map(style => indexBorders(style.style(value), style.index));
 
         const style = styles.reduce((acc, style) => ({ ...acc, ...style }), {});
 

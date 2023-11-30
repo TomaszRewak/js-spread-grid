@@ -1,8 +1,10 @@
 /* eslint-disable import/prefer-default-export */
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
 import StyleResolver from '../utils/StyleResolver';
+import useScrollRect from '../hooks/useScrollRect';
+import stringifyKey from '../utils/stringifyKey';
 
 function useResolvedValueSelector(valueSelector) {
     return useMemo(() => {
@@ -28,15 +30,15 @@ function useResolvedRows(rows) {
     }, [rows]);
 }
 
-function useResolvedCellStyle(cellStyle) {
+function useResolvedFormatting(formatting) {
     return useMemo(() => {
-        return cellStyle.map(style => ({
+        return formatting.map(style => ({
             column: style.column,
             row: style.row,
             condition: eval(`(value) => (${style.condition || 'true'})`),
             style: eval(`(value) => (${style.style})`)
         }));
-    }, [cellStyle]);
+    }, [formatting]);
 }
 
 function useResolvedProps(props) {
@@ -46,7 +48,7 @@ function useResolvedProps(props) {
     const valueSelector = useResolvedValueSelector(props.valueSelector);
     const fixedColumns = props.fixedColumns;
     const fixedRows = props.fixedRows;
-    const cellStyle = useResolvedCellStyle(props.cellStyle);
+    const formatting = useResolvedFormatting(props.formatting);
 
     return {
         data,
@@ -55,13 +57,19 @@ function useResolvedProps(props) {
         valueSelector,
         fixedColumns,
         fixedRows,
-        cellStyle
+        formatting
     }
 }
 
 function DashJsGrid(props) {
-    const { data, columns, rows, valueSelector, fixedColumns, fixedRows, cellStyle } = useResolvedProps(props);
+    const { data, columns, rows, valueSelector, formatting } = useResolvedProps(props);
+    const [container, setContainer] = useState(null);
+    const [fixedTop, setFixedTop] = useState(null);
+    const [fixedBottom, setFixedBottom] = useState(null);
+    const [fixedLeft, setFixedLeft] = useState(null);
+    const [fixedRight, setFixedRight] = useState(null);
 
+    // TODO: Move to separate files
     const columnDefinitions = useMemo(() => {
         if (typeof columns === 'function')
             return columns(data);
@@ -76,21 +84,43 @@ function DashJsGrid(props) {
         return rows;
     }, [rows, data]);
 
+    const indexedColumnDefinitions = useMemo(() => {
+        return columnDefinitions.map((column, index) => ({
+            ...column,
+            index,
+            key: stringifyKey(column.id),
+        }));
+    }, [columnDefinitions]);
+
+    const indexedRowDefinitions = useMemo(() => {
+        return rowDefinitions.map((row, index) => ({
+            ...row,
+            index,
+            key: stringifyKey(row.id),
+        }));
+    }, [rowDefinitions]);
+
     const styleResolver = useMemo(() => {
-        return new StyleResolver(cellStyle);
-    }, [cellStyle]);
+        return new StyleResolver(formatting);
+    }, [formatting]);
+
+    const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
     // TODO: useMemo
-    const leftColumns = columnDefinitions.slice(0, fixedColumns);
-    const rightColumns = columnDefinitions.slice(fixedColumns);
-    const topRows = rowDefinitions.slice(0, fixedRows);
-    const bottomRows = rowDefinitions.slice(fixedRows);
-    const topRowsWithHeader = [{ id: 'header', height: 20 }, ...topRows]; // TODO: Is that the best way of doing that?
+    const leftColumns = indexedColumnDefinitions.filter(column => column.fixed === 'left');
+    const middleColumns = indexedColumnDefinitions.filter(column => column.fixed !== 'left' && column.fixed !== 'right');
+    const rightColumns = indexedColumnDefinitions.filter(column => column.fixed === 'right');
+    const topRows = indexedRowDefinitions.filter(row => row.fixed === 'top');
+    const middleRows = indexedRowDefinitions.filter(row => row.fixed !== 'top' && row.fixed !== 'bottom');
+    const bottomRows = indexedRowDefinitions.filter(row => row.fixed === 'bottom');
 
     // TODO: useMemo
     // TODO: move somewhere else
-    const produceCells = (data, columns, rows, includeHeaders, columnOffset, rowOffset) => {
-        const cells = rows.map((row, rowIndex) => {
+    const produceCells = (data, columns, rows, columnOffset, rowOffset) => {
+        return rows.map((row, rowIndex) => {
+            if (row.type === 'header')
+                return columns.map(column => ({ value: column.header, style: { background: 'lightgrey' } }));
+
             return columns.map((column, columnIndex) => {
                 const value = valueSelector(data, row.id, column.id);
                 const style = styleResolver.resolve(column.id, columnIndex + columnOffset, row.id, rowIndex + rowOffset, value);
@@ -101,47 +131,93 @@ function DashJsGrid(props) {
                 };
             });
         });
-
-        if (!includeHeaders)
-            return cells;
-
-        // TODO: style headers
-        return [
-            columns.map(column => ({ value: column.header, style: { background: 'lightgrey' } })),
-            ...cells
-        ];
     }
 
+    // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
+    // TODO: Max width: fit-content
+    // TODO: Memoize styles
     return (
-        <div>
-            <div style={{ display: 'flex' }}>
-                <GridCanvas
-                    cells={produceCells(data, leftColumns, topRows, true, 0, 0)}
-                    columns={leftColumns}
-                    rows={topRowsWithHeader}
-                    showLeftBorder
-                    showTopBorder
-                />
-                <GridCanvas
-                    cells={produceCells(data, rightColumns, topRows, true, fixedColumns, 0)}
-                    columns={rightColumns}
-                    rows={topRowsWithHeader}
-                    showTopBorder
-                />
-            </div>
-            <div style={{ display: 'flex' }}>
-                <GridCanvas
-                    cells={produceCells(data, leftColumns, bottomRows, false, 0, fixedRows)}
-                    columns={leftColumns}
-                    rows={bottomRows}
-                    showLeftBorder
-                />
-                <GridCanvas
-                    cells={produceCells(data, rightColumns, bottomRows, false, fixedColumns, fixedRows)}
-                    columns={rightColumns}
-                    rows={bottomRows}
-                />
-            </div>
+        <div
+            ref={setContainer}
+            style={{ width: '500px', height: '400px', overflow: 'auto', display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
+        >
+            <div ref={setFixedLeft} style={{ gridRow: '1 / 4', gridColumn: '1' }} />
+            <div ref={setFixedRight} style={{ gridRow: '1 / 4', gridColumn: '3' }} />
+            <div ref={setFixedTop} style={{ gridRow: '1', gridColumn: '1 / 4' }} />
+            <div ref={setFixedBottom} style={{ gridRow: '3', gridColumn: '1 / 4' }} />
+
+            <GridCanvas
+                style={{ position: 'sticky', left: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '1' }}
+                cells={produceCells(data, leftColumns, topRows, 0, 0)}
+                columns={leftColumns}
+                rows={topRows}
+                showLeftBorder
+                showTopBorder
+            />
+            <GridCanvas
+                style={{ position: 'sticky', top: 0, zIndex: 1, gridRow: '1', gridColumn: '2' }}
+                cells={produceCells(data, middleColumns, topRows, leftColumns.length, 0)}
+                columns={middleColumns}
+                rows={topRows}
+                showTopBorder
+                scrollLeft={scrollRect.left}
+                scrollWidth={scrollRect.width}
+            />
+            <GridCanvas
+                style={{ position: 'sticky', right: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '3' }}
+                cells={produceCells(data, rightColumns, topRows, leftColumns.length + middleColumns.length, 0)}
+                columns={rightColumns}
+                rows={topRows}
+                showTopBorder
+            />
+            <GridCanvas
+                style={{ position: 'sticky', left: 0, zIndex: 1, gridRow: '2', gridColumn: '1' }}
+                cells={produceCells(data, leftColumns, middleRows, 0, topRows.length)}
+                columns={leftColumns}
+                rows={middleRows}
+                showLeftBorder
+                scrollTop={scrollRect.top}
+                scrollHeight={scrollRect.height}
+            />
+            <GridCanvas
+                style={{ gridRow: '2', gridColumn: '2' }}
+                cells={produceCells(data, middleColumns, middleRows, leftColumns.length, topRows.length)}
+                columns={middleColumns}
+                rows={middleRows}
+                scrollLeft={scrollRect.left}
+                scrollTop={scrollRect.top}
+                scrollWidth={scrollRect.width}
+                scrollHeight={scrollRect.height}
+            />
+            <GridCanvas
+                style={{ position: 'sticky', right: 0, zIndex: 1, gridRow: '2', gridColumn: '3' }}
+                cells={produceCells(data, rightColumns, middleRows, leftColumns.length + middleColumns.length, topRows.length)}
+                columns={rightColumns}
+                rows={middleRows}
+                scrollTop={scrollRect.top}
+                scrollHeight={scrollRect.height}
+            />
+            <GridCanvas
+                style={{ position: 'sticky', left: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '1' }}
+                cells={produceCells(data, leftColumns, bottomRows, 0, topRows.length + middleRows.length)}
+                columns={leftColumns}
+                rows={bottomRows}
+                showLeftBorder
+            />
+            <GridCanvas
+                style={{ position: 'sticky', bottom: 0, zIndex: 1, gridRow: '3', gridColumn: '2' }}
+                cells={produceCells(data, middleColumns, bottomRows, leftColumns.length, topRows.length + middleRows.length)}
+                columns={middleColumns}
+                rows={bottomRows}
+                scrollLeft={scrollRect.left}
+                scrollWidth={scrollRect.width}
+            />
+            <GridCanvas
+                style={{ position: 'sticky', right: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '3' }}
+                cells={produceCells(data, rightColumns, bottomRows, leftColumns.length + middleColumns.length, topRows.length + middleRows.length)}
+                columns={rightColumns}
+                rows={bottomRows}
+            />
         </div>
     );
 };
@@ -157,12 +233,8 @@ DashJsGrid.propTypes = {
     rows: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     //
     valueSelector: PropTypes.string,
-    // TODO: Make the fixed columns/rows be defined in column/now definitions
-    fixedColumns: PropTypes.number,
     //
-    fixedRows: PropTypes.number,
-    //
-    cellStyle: PropTypes.arrayOf(
+    formatting: PropTypes.arrayOf(
         PropTypes.shape({
             column: PropTypes.oneOfType([
                 PropTypes.shape({ match: PropTypes.oneOf(['ANY', 'LEFT', 'RIGHT', 'HEADER']) }),
@@ -184,11 +256,9 @@ DashJsGrid.propTypes = {
 DashJsGrid.defaultProps = {
     data: [],
     columns: 'data.length > 0 ? Object.keys(data[0]).map((key) => ({id: key, header: key, width: 100})) : []',
-    rows: 'data.map((_, index) => ({id: index, height: 20}))',
+    rows: '[{type: "header", height: 20, fixed: "top"}, ...data.map((_, index) => ({id: index, height: 20}))]',
     valueSelector: 'data[rowId][columnId]',
-    fixedColumns: 0,
-    fixedRows: 0,
-    cellStyle: [{ column: { match: 'HEADER' }, style: '{background: "lightgrey"}' }]
+    formatting: [{ column: { match: 'HEADER' }, style: '{background: "lightgrey"}' }]
 };
 
 export default DashJsGrid;
