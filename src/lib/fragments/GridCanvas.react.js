@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import useDevicePixelRatio from "../hooks/useDevicePixelRatio";
 
 /** TODO: update the arguments to reflect the real props
@@ -18,7 +18,11 @@ export default function GridCanvas({
     rows,
     showLeftBorder,
     showTopBorder,
-    style
+    style,
+    scrollLeft,
+    scrollTop,
+    scrollWidth,
+    scrollHeight
 }) {
     const [canvas, setCanvas] = useState(null);
     const devicePixelRatio = useDevicePixelRatio();
@@ -47,8 +51,12 @@ export default function GridCanvas({
             const verticalBorderCount = columnCount + (showLeftBorder ? 1 : 0);
             const roundedRowHeights = rows.map(row => row.height).map(roundToPixels);
             const roundedColumnWidths = columns.map(column => column.width).map(roundToPixels);
-            const width = roundedColumnWidths.reduce((a, b) => a + b, 0) + verticalBorderCount * borderWidth;
-            const height = roundedRowHeights.reduce((a, b) => a + b, 0) + horizontalBorderCount * borderWidth;
+            const totalWidth = roundedColumnWidths.reduce((a, b) => a + b, 0) + verticalBorderCount * borderWidth;
+            const totalHeight = roundedRowHeights.reduce((a, b) => a + b, 0) + horizontalBorderCount * borderWidth;
+            const left = (scrollLeft === undefined) ? 0 : scrollLeft;
+            const top = (scrollTop === undefined) ? 0 : scrollTop;
+            const width = (scrollWidth === undefined) ? totalWidth : scrollWidth;
+            const height = (scrollHeight === undefined) ? totalHeight : scrollHeight;
 
             // TODO: Move somewhere else
             const columnOffsets = roundedColumnWidths.reduce((acc, width, index) => {
@@ -68,8 +76,13 @@ export default function GridCanvas({
             canvas.height = Math.round(height * devicePixelRatio);
             canvas.style.width = `${width}px`;
             canvas.style.height = `${height}px`;
+            canvas.style.marginLeft = `${left}px`;
+            canvas.style.marginTop = `${top}px`;
+            canvas.style.marginRight = `${totalWidth - width - left}px`;
+            canvas.style.marginBottom = `${totalHeight - height - top}px`;
 
             ctx.scale(devicePixelRatio, devicePixelRatio);
+            ctx.translate(-left, -top);
 
             ctx.clearRect(0, 0, width, height);
             ctx.fillStyle = "#ddd";
@@ -203,10 +216,11 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [cells, canvas, devicePixelRatio, showTopBorder, showLeftBorder, rows, columns]);
+    }, [cells, canvas, devicePixelRatio, showTopBorder, showLeftBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight]);
 
-    // style={{imageRendering: 'pixelated'}} - is this even needed, though?
+    // TODO: style={{imageRendering: 'pixelated'}} - is this even needed, though?
+    // TODO: memoize style
     return (
         <canvas ref={setCanvas} style={style} />
-    )
+    );
 }

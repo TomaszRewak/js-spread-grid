@@ -1,8 +1,9 @@
 /* eslint-disable import/prefer-default-export */
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
 import StyleResolver from '../utils/StyleResolver';
+import useScrollRect from '../hooks/useScrollRect';
 
 function useResolvedValueSelector(valueSelector) {
     return useMemo(() => {
@@ -61,6 +62,11 @@ function useResolvedProps(props) {
 
 function DashJsGrid(props) {
     const { data, columns, rows, valueSelector, formatting } = useResolvedProps(props);
+    const [container, setContainer] = useState(null);
+    const [fixedTop, setFixedTop] = useState(null);
+    const [fixedBottom, setFixedBottom] = useState(null);
+    const [fixedLeft, setFixedLeft] = useState(null);
+    const [fixedRight, setFixedRight] = useState(null);
 
     const columnDefinitions = useMemo(() => {
         if (typeof columns === 'function')
@@ -79,6 +85,8 @@ function DashJsGrid(props) {
     const styleResolver = useMemo(() => {
         return new StyleResolver(formatting);
     }, [formatting]);
+
+    const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
     // TODO: useMemo
     const leftColumns = columnDefinitions.filter(column => column.fixed === 'left');
@@ -109,10 +117,19 @@ function DashJsGrid(props) {
 
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
     // TODO: Max width: fit-content
+    // TODO: Memoize styles
     return (
-        <div style={{ width: '500px', height: '400px', overflow: 'auto', display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}>
+        <div
+            ref={setContainer}
+            style={{ width: '500px', height: '400px', overflow: 'auto', display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
+        >
+            <div ref={setFixedLeft} style={{ gridRow: '1 / 4', gridColumn: '1' }} />
+            <div ref={setFixedRight} style={{ gridRow: '1 / 4', gridColumn: '3' }} />
+            <div ref={setFixedTop} style={{ gridRow: '1', gridColumn: '1 / 4' }} />
+            <div ref={setFixedBottom} style={{ gridRow: '3', gridColumn: '1 / 4' }} />
+
             <GridCanvas
-                style={{ position: 'sticky', left: 0, top: 0, zIndex: 2 }}
+                style={{ position: 'sticky', left: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '1' }}
                 cells={produceCells(data, leftColumns, topRows, 0, 0)}
                 columns={leftColumns}
                 rows={topRows}
@@ -120,52 +137,65 @@ function DashJsGrid(props) {
                 showTopBorder
             />
             <GridCanvas
-                style={{ position: 'sticky', top: 0, zIndex: 1 }}
+                style={{ position: 'sticky', top: 0, zIndex: 1, gridRow: '1', gridColumn: '2' }}
                 cells={produceCells(data, middleColumns, topRows, leftColumns.length, 0)}
                 columns={middleColumns}
                 rows={topRows}
                 showTopBorder
+                scrollLeft={scrollRect.left}
+                scrollWidth={scrollRect.width}
             />
             <GridCanvas
-                style={{ position: 'sticky', right: 0, top: 0, zIndex: 2 }}
+                style={{ position: 'sticky', right: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '3' }}
                 cells={produceCells(data, rightColumns, topRows, leftColumns.length + middleColumns.length, 0)}
                 columns={rightColumns}
                 rows={topRows}
                 showTopBorder
             />
             <GridCanvas
-                style={{ position: 'sticky', left: 0, zIndex: 1 }}
+                style={{ position: 'sticky', left: 0, zIndex: 1, gridRow: '2', gridColumn: '1' }}
                 cells={produceCells(data, leftColumns, middleRows, 0, topRows.length)}
                 columns={leftColumns}
                 rows={middleRows}
                 showLeftBorder
+                scrollTop={scrollRect.top}
+                scrollHeight={scrollRect.height}
             />
             <GridCanvas
+                style={{ gridRow: '2', gridColumn: '2' }}
                 cells={produceCells(data, middleColumns, middleRows, leftColumns.length, topRows.length)}
                 columns={middleColumns}
                 rows={middleRows}
+                scrollLeft={scrollRect.left}
+                scrollTop={scrollRect.top}
+                scrollWidth={scrollRect.width}
+                scrollHeight={scrollRect.height}
             />
             <GridCanvas
-                style={{ position: 'sticky', right: 0, zIndex: 1 }}
+                style={{ position: 'sticky', right: 0, zIndex: 1, gridRow: '2', gridColumn: '3' }}
                 cells={produceCells(data, rightColumns, middleRows, leftColumns.length + middleColumns.length, topRows.length)}
                 columns={rightColumns}
                 rows={middleRows}
+                scrollTop={scrollRect.top}
+                scrollHeight={scrollRect.height}
             />
             <GridCanvas
-                style={{ position: 'sticky', left: 0, bottom: 0, zIndex: 2 }}
+                style={{ position: 'sticky', left: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '1' }}
                 cells={produceCells(data, leftColumns, bottomRows, 0, topRows.length + middleRows.length)}
                 columns={leftColumns}
                 rows={bottomRows}
                 showLeftBorder
             />
             <GridCanvas
-                style={{ position: 'sticky', bottom: 0, zIndex: 1 }}
+                style={{ position: 'sticky', bottom: 0, zIndex: 1, gridRow: '3', gridColumn: '2' }}
                 cells={produceCells(data, middleColumns, bottomRows, leftColumns.length, topRows.length + middleRows.length)}
                 columns={middleColumns}
                 rows={bottomRows}
+                scrollLeft={scrollRect.left}
+                scrollWidth={scrollRect.width}
             />
             <GridCanvas
-                style={{ position: 'sticky', right: 0, bottom: 0, zIndex: 2 }}
+                style={{ position: 'sticky', right: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '3' }}
                 cells={produceCells(data, rightColumns, bottomRows, leftColumns.length + middleColumns.length, topRows.length + middleRows.length)}
                 columns={rightColumns}
                 rows={bottomRows}
