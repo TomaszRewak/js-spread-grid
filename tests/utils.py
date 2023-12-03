@@ -49,9 +49,6 @@ def expect_image(image):
     screenshot_path = get_target_file_path('png')
     screenshot_latest_path = get_target_file_path('latest.png')
 
-    print(f'Writing screenshot to {screenshot_path}')
-    print(f'Writing screenshot to {screenshot_latest_path}')
-
     os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
 
     if not os.path.exists(screenshot_path):

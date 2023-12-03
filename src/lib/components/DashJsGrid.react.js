@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
 import StyleResolver from '../utils/StyleResolver';
 import useScrollRect from '../hooks/useScrollRect';
-import stringifyKey from '../utils/stringifyKey';
+import stringifyId from '../utils/stringifyId';
 
 function useResolvedValueSelector(valueSelector) {
     return useMemo(() => {
@@ -62,6 +62,7 @@ function useResolvedProps(props) {
 }
 
 // TODO: move somewhere else
+// TODO: resolve the full style only for the cells in view
 function useCells(data, columns, rows, valueSelector, styleResolver) {
     return useMemo(() => {
         return rows.map(row => {
@@ -81,6 +82,7 @@ function useCells(data, columns, rows, valueSelector, styleResolver) {
     }, [data, columns, rows, valueSelector, styleResolver]);
 }
 
+// TODO: Use intersection observer to only render the grid if it is in view
 function DashJsGrid(props) {
     const { data, columns, rows, valueSelector, formatting } = useResolvedProps(props);
     const [container, setContainer] = useState(null);
@@ -108,7 +110,7 @@ function DashJsGrid(props) {
         return columnDefinitions.map((column, index) => ({
             ...column,
             index,
-            key: stringifyKey(column.id),
+            key: stringifyId(column.id),
         }));
     }, [columnDefinitions]);
 
@@ -116,7 +118,7 @@ function DashJsGrid(props) {
         return rowDefinitions.map((row, index) => ({
             ...row,
             index,
-            key: stringifyKey(row.id),
+            key: stringifyId(row.id),
         }));
     }, [rowDefinitions]);
 
@@ -145,11 +147,12 @@ function DashJsGrid(props) {
 
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
     // TODO: Memoize styles
+    // TODO: Remove hardcoded width/height
     return (
         <div
             className='dash-js-grid'
             ref={setContainer}
-            style={{ maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
+            style={{ height: '50vh', width: '60vw', maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
         >
             <div ref={setFixedLeft} style={{ gridRow: '1 / 4', gridColumn: '1' }} />
             <div ref={setFixedRight} style={{ gridRow: '1 / 4', gridColumn: '3' }} />

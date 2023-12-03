@@ -1,5 +1,5 @@
 import StyleResolver from './StyleResolver';
-import stringifyKey from './stringifyKey';
+import stringifyId from './stringifyId';
 
 // TODO: add even more test cases
 describe('StyleResolver', () => {
@@ -10,7 +10,7 @@ describe('StyleResolver', () => {
         { column: { id: 'col2' }, row: { id: 'row2' }, condition: () => false, style: () => ({ color: 'blue' }) },
       ];
       const resolver = new StyleResolver(styles);
-      const style = resolver.resolve(stringifyKey('col3'), 3, stringifyKey('row3'), 3, 'value');
+      const style = resolver.resolve(stringifyId('col3'), 3, stringifyId('row3'), 3, 'value');
       expect(style).toEqual({});
     });
 
@@ -22,7 +22,7 @@ describe('StyleResolver', () => {
         { column: { id: 'col1' }, row: { id: 'row1' }, condition: () => true, style: () => ({ borderRight: { width: 1 } }) },
       ];
       const resolver = new StyleResolver(styles);
-      const style = resolver.resolve(stringifyKey('col1'), 1, stringifyKey('row1'), 1, 'value');
+      const style = resolver.resolve(stringifyId('col1'), 1, stringifyId('row1'), 1, 'value');
       expect(style).toEqual({
         borderTop: { width: 1, index: 0 },
         borderLeft: { width: 1, index: 1 },
@@ -37,7 +37,7 @@ describe('StyleResolver', () => {
         { column: { id: 'col1' }, row: { id: 'row1' }, condition: () => false, style: () => ({ color: 'blue' }) },
       ];
       const resolver = new StyleResolver(styles);
-      const style = resolver.resolve(stringifyKey('col1'), 1, stringifyKey('row1'), 1, 'value');
+      const style = resolver.resolve(stringifyId('col1'), 1, stringifyId('row1'), 1, 'value');
       expect(style).toEqual({ color: 'red' });
     });
 
@@ -47,7 +47,7 @@ describe('StyleResolver', () => {
         { column: { id: 'col1' }, row: { id: 'row1' }, condition: (value) => value === 'other', style: () => ({ color: 'blue' }) },
       ];
       const resolver = new StyleResolver(styles);
-      const style = resolver.resolve(stringifyKey('col1'), 1, stringifyKey('row1'), 1, 'value');
+      const style = resolver.resolve(stringifyId('col1'), 1, stringifyId('row1'), 1, 'value');
       expect(style).toEqual({ color: 'red' });
     });
 
@@ -64,25 +64,25 @@ describe('StyleResolver', () => {
 
     it('should use ANY rules for matching undefined columns and rows', () => {
       const resolver = new StyleResolver(commonStyles);
-      const style = resolver.resolve(stringifyKey('col3'), 3, stringifyKey('row3'), 3, 'value');
+      const style = resolver.resolve(stringifyId('col3'), 3, stringifyId('row3'), 3, 'value');
       expect(style).toEqual({ color: 'green' });
     });
 
     it('should use latest matching rule', () => {
       const resolver = new StyleResolver(commonStyles);
-      const style = resolver.resolve(stringifyKey('col1'), 1, stringifyKey('row1'), 1, 'value');
+      const style = resolver.resolve(stringifyId('col1'), 1, stringifyId('row1'), 1, 'value');
       expect(style).toEqual({ color: 'purple' });
     });
 
     it('combine styles from multiple rules', () => {
       const resolver = new StyleResolver(commonStyles);
-      const style = resolver.resolve(stringifyKey('col2'), 2, stringifyKey('row2'), 2, 'value');
+      const style = resolver.resolve(stringifyId('col2'), 2, stringifyId('row2'), 2, 'value');
       expect(style).toEqual({ color: 'brown', background: 'black' });
     });
 
     it('should use index rules for matching columns and rows by index', () => {
       const resolver = new StyleResolver(commonStyles);
-      const style = resolver.resolve(stringifyKey('col0'), 0, stringifyKey('row2'), 2, 'value');
+      const style = resolver.resolve(stringifyId('col0'), 0, stringifyId('row2'), 2, 'value');
       expect(style).toEqual({ color: 'orange' });
     });
   });

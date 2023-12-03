@@ -1,19 +1,19 @@
 function stringifyObject(object) {
     const keys = Object.keys(object).sort();
     const stringified = keys.map(key => {
-        return `${key}:${stringifyKey(object[key])}`
+        return `${key}:${stringifyId(object[key])}`
     });
 
     return `{${stringified.join(',')}}`;
 }
 
 function stringifyArray(array) {
-    const stringified = array.map(stringifyKey);
+    const stringified = array.map(stringifyId);
 
     return `[${stringified.join(',')}]`;
 }
 
-export default function stringifyKey(key) {
+export default function stringifyId(key) {
     if (Array.isArray(key))
         return stringifyArray(key)
 
