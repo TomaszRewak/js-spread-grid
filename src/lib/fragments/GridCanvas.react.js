@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import useDevicePixelRatio from "../hooks/useDevicePixelRatio";
 
+// TODO: Upgrade to react 18 for better performance
 /** TODO: update the arguments to reflect the real props
  * @param {{
  *   cells: {

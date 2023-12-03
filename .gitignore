@@ -288,3 +288,6 @@ R/
 man/
 src/jl
 src/*.jl
+
+# Temporary test files
+*.latest.png

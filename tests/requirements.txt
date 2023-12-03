@@ -3,3 +3,5 @@
 # pip install -r requirements.txt
 
 dash[dev,testing]>=1.15.0
+pyppeteer==1.0.2
+pytest-asyncio==0.21.1
