@@ -19,6 +19,7 @@ class StyleGroup {
 };
 
 // TODO: Optimize by not searching using keys that don't have correlated match rules
+// TODO: Accept both a function and an object as a style (where the object is a resolved style)
 export default class StyleResolver {
     constructor(styles) {
         this.columnLookup = new StyleGroup();

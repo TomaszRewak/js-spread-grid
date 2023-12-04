@@ -5,9 +5,11 @@ app = Dash(__name__)
 
 app.layout = html.Div([
     dash_js_grid.DashJsGrid(
+        columnsLeft=[
+            {'id': 'column_1', 'header': 'Column 1', 'width': 100},
+            {'id': 'column_2', 'header': 'Column 2', 'width': 80},
+        ],
         columns=[
-            {'id': 'column_1', 'header': 'Column 1', 'width': 100, 'fixed': 'left'},
-            {'id': 'column_2', 'header': 'Column 2', 'width': 80, 'fixed': 'left'},
             {'id': 'column_3', 'header': 'Column 3', 'width': 80},
             {'id': 'column_4', 'header': 'Column 4', 'width': 111},
             {'id': 'column_5', 'header': 'Column 5', 'width': 73},
@@ -27,14 +29,18 @@ app.layout = html.Div([
             {'id': 'column_5', 'header': 'Column 5', 'width': 73},
             {'id': 'column_5', 'header': 'Column 5', 'width': 73},
             {'id': 'column_5', 'header': 'Column 5', 'width': 73},
-            {'id': 'column_6', 'header': 'Column 6', 'width': 30},
-            {'id': 'column_7', 'header': 'Column 7', 'width': 100, 'fixed': 'right'}
+            {'id': 'column_6', 'header': 'Column 6', 'width': 30}
+        ],
+        columnsRight=[
+            {'id': 'column_7', 'header': 'Column 7', 'width': 100}
+        ],
+        rowsTop=[
+            {'type': 'header', 'height': 20},
+            {'id': 0, 'height': 20},
+            {'id': 1, 'height': 20},
+            {'type': 'header', 'height': 20},
         ],
         rows=[
-            {'type': 'header', 'height': 20, 'fixed': 'top'},
-            {'id': 0, 'height': 20, 'fixed': 'top'},
-            {'id': 1, 'height': 20, 'fixed': 'top'},
-            {'type': 'header', 'height': 20, 'fixed': 'top'},
             {'id': 2, 'height': 20},
             {'id': 3, 'height': 20},
             {'id': 4, 'height': 20},
@@ -745,7 +751,9 @@ app.layout = html.Div([
             {'id': 4, 'height': 20},
             {'id': 5, 'height': 20},
             {'id': 6, 'height': 20},
-            {'id': 7, 'height': 20},
+            {'id': 7, 'height': 20}
+        ],
+        rowsBottom=[
             {'type': 'header', 'height': 20, 'fixed': 'bottom'},
             {'id': 8, 'height': 20, 'fixed': 'bottom'},
             {'id': 9, 'height': 20, 'fixed': 'bottom'},

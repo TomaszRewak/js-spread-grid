@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 // TODO: Test this hook
-function useDevicePixelRatio() {
+export default function useDevicePixelRatio() {
     const [devicePixelRatio, setDevicePixelRatio] = useState(window.devicePixelRatio);
 
     useEffect(() => {
@@ -18,5 +18,3 @@ function useDevicePixelRatio() {
 
     return devicePixelRatio;
 }
-
-export default useDevicePixelRatio;

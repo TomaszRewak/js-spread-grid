@@ -86,7 +86,7 @@ export default function GridCanvas({
             ctx.translate(-left, -top);
 
             ctx.clearRect(0, 0, totalWidth, totalHeight);
-            ctx.fillStyle = "#ddd";
+            ctx.fillStyle = "#E9E9E9";
             ctx.fillRect(0, 0, totalWidth, totalHeight);
 
             // Draw cells
@@ -145,7 +145,7 @@ export default function GridCanvas({
             }
 
             // TODO: Move somewhere else
-            // TODO: Don't actually combine borders, but use the ctx.lineDashOffset to align them
+            // TODO: Don't actually combine borders, but use the ctx.lineDashOffset to align them (starting from (0, 0))
             for (let horizontalBorderIndex = 0; horizontalBorderIndex < horizontalBorderCount; horizontalBorderIndex++) {
                 const topRowIndex = horizontalBorderIndex - 1 + (showTopBorder ? 0 : 1);
                 const bottomRowIndex = topRowIndex + 1;
