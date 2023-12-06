@@ -214,7 +214,7 @@ function pickRows(topRowPlacement, middleRowPlacement, bottomRowPlacement, y, he
 }
 
 
-export default function GridInteractions({ setProps, container, leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth, hoverCell }) {
+export default function GridInteractions({ setProps, container, leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth, hoverCell, selectedCells, selectedCellsLookup }) {
     const size = useSize(container);
     const mousePosition = useMousePosition(container);
     const scrollOffset = useScrollOffset(container);
@@ -260,6 +260,32 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
         
         setProps({ hoverCell: newHover });
     }, [bottomRowPlacement, leftColumnPlacement, middleColumnPlacement, middleColumns, middleRowPlacement, middleRows, mousePosition, rightColumnPlacement, size, scrollOffset, topRowPlacement, setProps, hoverCell]);
+
+    useEffect(() => {
+        if (!container)
+            return () => { };
+
+        const onClick = () => {
+            const hoverRowKey = stringifyId(hoverCell.rowId);
+            const hoverColumnKey = stringifyId(hoverCell.columnId);
+
+            if (!hoverCell)
+                return;
+
+            if (selectedCellsLookup.has(hoverColumnKey) && selectedCellsLookup.get(hoverColumnKey).has(hoverRowKey))
+                return;
+
+            console.log(selectedCells, hoverCell);
+
+            setProps({
+                selectedCells: [...selectedCells, hoverCell]
+            });
+        };
+
+        container.addEventListener('click', onClick);
+
+        return () => container.removeEventListener('click', onClick);
+    }, [container, hoverCell, selectedCells, selectedCellsLookup, setProps]);
 
     return (
         <></>

@@ -55,6 +55,7 @@ function useResolvedProps(props) {
     const valueSelector = useResolvedValueSelector(props.valueSelector);
     const formatting = useResolvedFormatting(props.formatting);
     const hoverCell = props.hoverCell;
+    const selectedCells = props.selectedCells;
 
     return {
         setProps,
@@ -67,13 +68,14 @@ function useResolvedProps(props) {
         rowsBottom,
         valueSelector,
         formatting,
-        hoverCell
+        hoverCell,
+        selectedCells
     }
 }
 
 // TODO: move somewhere else
 // TODO: resolve the full style only for the cells in view
-function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell) {
+function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell, selectedCellsLookup) {
     return useMemo(() => {
         // TODO: This can be moved outside this memo block, into its own
         const hoveredColumnKey = hoverCell ? stringifyId(hoverCell.columnId) : null;
@@ -94,13 +96,17 @@ function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell) 
                 else if (hoveredColumnKey === column.key || hoveredRowKey === row.key)
                     style.highlight = '#81948133';
 
+                // TODO: Add borders
+                if (selectedCellsLookup.has(column.key) && selectedCellsLookup.get(column.key).has(row.key))
+                    style.highlight = '#819481FF';
+
                 return {
                     value,
                     style
                 };
             });
         });
-    }, [data, columns, rows, valueSelector, styleResolver, hoverCell]);
+    }, [data, columns, rows, valueSelector, styleResolver, hoverCell, selectedCellsLookup]);
 }
 
 // TODO: Move elsewhere
@@ -145,6 +151,24 @@ function useDefinitionWithRoundedHeight(rowDefinitions, devicePixelRatio) {
     }, [rowDefinitions, devicePixelRatio]);
 }
 
+function useSelectedCellsLookup(selectedCells) {
+    return useMemo(() => {
+        const lookup = new Map();
+
+        selectedCells.forEach(cell => {
+            const columnKey = stringifyId(cell.columnId);
+            const rowKey = stringifyId(cell.rowId);
+
+            if (!lookup.has(columnKey))
+                lookup.set(columnKey, new Set());
+
+            lookup.get(columnKey).add(rowKey);
+        });
+
+        return lookup;
+    }, [selectedCells]);
+}
+
 // TODO: Write description
 function DashJsGrid(props) {
     // TODO: Use intersection observer to only render the grid if it is in view
@@ -153,7 +177,7 @@ function DashJsGrid(props) {
     // TODO: Sorting: [{columnId: 'col1', headerId: 'default' , direction: 'ASC'}]
     // TODO: Use headers (as well as fixed area boundaries) as separators and sort data only in between them
 
-    const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, valueSelector, formatting, hoverCell } = useResolvedProps(props);
+    const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, valueSelector, formatting, hoverCell, selectedCells } = useResolvedProps(props);
     const [container, setContainer] = useState(null);
     const [fixedTop, setFixedTop] = useState(null);
     const [fixedBottom, setFixedBottom] = useState(null);
@@ -162,6 +186,7 @@ function DashJsGrid(props) {
 
     const devicePixelRatio = useDevicePixelRatio();
     const borderWidth = 1 / devicePixelRatio;
+    const selectedCellsLookup = useSelectedCellsLookup(selectedCells);
 
     const leftColumns = useDefinitionWithRoundedWidth(useIndexedDefinitions(useInvoked(columnsLeft, [data])), devicePixelRatio);
     const middleColumns = useDefinitionWithRoundedWidth(useIndexedDefinitions(useInvoked(columns, [data])), devicePixelRatio);
@@ -176,15 +201,15 @@ function DashJsGrid(props) {
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
-    const topLeftCell = useCells(data, leftColumns, topRows, valueSelector, styleResolver, hoverCell);
-    const topMiddleCell = useCells(data, middleColumns, topRows, valueSelector, styleResolver, hoverCell);
-    const topRightCell = useCells(data, rightColumns, topRows, valueSelector, styleResolver, hoverCell);
-    const middleLeftCell = useCells(data, leftColumns, middleRows, valueSelector, styleResolver, hoverCell);
-    const middleMiddleCell = useCells(data, middleColumns, middleRows, valueSelector, styleResolver, hoverCell);
-    const middleRightCell = useCells(data, rightColumns, middleRows, valueSelector, styleResolver, hoverCell);
-    const bottomLeftCell = useCells(data, leftColumns, bottomRows, valueSelector, styleResolver, hoverCell);
-    const bottomMiddleCell = useCells(data, middleColumns, bottomRows, valueSelector, styleResolver, hoverCell);
-    const bottomRightCell = useCells(data, rightColumns, bottomRows, valueSelector, styleResolver, hoverCell);
+    const topLeftCell = useCells(data, leftColumns, topRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
+    const topMiddleCell = useCells(data, middleColumns, topRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
+    const topRightCell = useCells(data, rightColumns, topRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
+    const middleLeftCell = useCells(data, leftColumns, middleRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
+    const middleMiddleCell = useCells(data, middleColumns, middleRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
+    const middleRightCell = useCells(data, rightColumns, middleRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
+    const bottomLeftCell = useCells(data, leftColumns, bottomRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
+    const bottomMiddleCell = useCells(data, middleColumns, bottomRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
+    const bottomRightCell = useCells(data, rightColumns, bottomRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
 
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
     // TODO: Memoize styles
@@ -301,6 +326,8 @@ function DashJsGrid(props) {
                 bottomRows={bottomRows}
                 borderWidth={borderWidth}
                 hoverCell={hoverCell}
+                selectedCells={selectedCells}
+                selectedCellsLookup={selectedCellsLookup}
                 setProps={setProps}
             />
         </div>
@@ -349,6 +376,13 @@ DashJsGrid.propTypes = {
         rowId: PropTypes.any,
         columnId: PropTypes.any
     }),
+    //
+    selectedCells: PropTypes.arrayOf(
+        PropTypes.shape({
+            rowId: PropTypes.any,
+            columnId: PropTypes.any
+        })
+    ),
 };
 
 DashJsGrid.defaultProps = {
@@ -361,7 +395,8 @@ DashJsGrid.defaultProps = {
     rowsBottom: [],
     valueSelector: 'data[rowId][columnId]',
     formatting: [{ column: { match: 'HEADER' }, style: '{background: "lightgrey"}' }],
-    hoverCell: null
+    hoverCell: null,
+    selectedCells: []
 };
 
 export default DashJsGrid;
