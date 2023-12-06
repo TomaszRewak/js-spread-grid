@@ -81,6 +81,18 @@ function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell, 
         const hoveredColumnKey = hoverCell ? stringifyId(hoverCell.columnId) : null;
         const hoveredRowKey = hoverCell ? stringifyId(hoverCell.rowId) : null;
 
+        const isSelected = (rowIndex, columnIndex) => {
+            if (rowIndex < 0 || rowIndex >= rows.length)
+                return false;
+            if (columnIndex < 0 || columnIndex >= columns.length)
+                return false;
+
+            const rowKey = rows[rowIndex].key;
+            const columnKey = columns[columnIndex].key;
+
+            return selectedCellsLookup.has(rowKey) && selectedCellsLookup.get(rowKey).has(columnKey);
+        };
+
         return rows.map(row => {
             // TODO: Don't treat the header separately
             if (row.type === 'header')
@@ -96,9 +108,19 @@ function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell, 
                 else if (hoveredColumnKey === column.key || hoveredRowKey === row.key)
                     style.highlight = '#81948133';
 
-                // TODO: Add borders
-                if (selectedCellsLookup.has(column.key) && selectedCellsLookup.get(column.key).has(row.key))
-                    style.highlight = '#819481FF';
+                if (isSelected(row.index, column.index))
+                {
+                    style.highlight = '#819481aa';
+
+                    if (!isSelected(row.index - 1, column.index))
+                        style.borderTop = { width: 5, color: '#819481ff', index: Number.MAX_SAFE_INTEGER };
+                    if (!isSelected(row.index + 1, column.index))
+                        style.borderBottom = { width: 5, color: '#819481ff', index: Number.MAX_SAFE_INTEGER };
+                    if (!isSelected(row.index, column.index - 1))
+                        style.borderLeft = { width: 5, color: '#819481ff', index: Number.MAX_SAFE_INTEGER };
+                    if (!isSelected(row.index, column.index + 1))
+                        style.borderRight = { width: 5, color: '#819481ff', index: Number.MAX_SAFE_INTEGER };
+                }
 
                 return {
                     value,
@@ -156,13 +178,13 @@ function useSelectedCellsLookup(selectedCells) {
         const lookup = new Map();
 
         selectedCells.forEach(cell => {
-            const columnKey = stringifyId(cell.columnId);
             const rowKey = stringifyId(cell.rowId);
+            const columnKey = stringifyId(cell.columnId);
 
-            if (!lookup.has(columnKey))
-                lookup.set(columnKey, new Set());
+            if (!lookup.has(rowKey))
+                lookup.set(rowKey, new Set());
 
-            lookup.get(columnKey).add(rowKey);
+            lookup.get(rowKey).add(columnKey);
         });
 
         return lookup;

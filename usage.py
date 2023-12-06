@@ -4,7 +4,7 @@ from dash import Dash, callback, html, Input, Output
 app = Dash(__name__)
 
 columns_widths = [100, 80, 80, 111, 73, 173, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 30, 100]
-rows_count = 700
+rows_count = 300
 
 columns = [
     {'id': f'column_{i}', 'header': f'Column {i}', 'width': columns_widths[i]}

@@ -272,10 +272,10 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
             if (!hoverCell)
                 return;
 
-            if (selectedCellsLookup.has(hoverColumnKey) && selectedCellsLookup.get(hoverColumnKey).has(hoverRowKey))
+            if (selectedCellsLookup.has(hoverRowKey) && selectedCellsLookup.get(hoverRowKey).has(hoverColumnKey))
                 return;
 
-            console.log(selectedCells, hoverCell);
+            console.log(selectedCells);
 
             setProps({
                 selectedCells: [...selectedCells, hoverCell]
