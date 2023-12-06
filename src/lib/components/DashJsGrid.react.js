@@ -110,16 +110,16 @@ function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell, 
 
                 if (isSelected(row.index, column.index))
                 {
-                    style.highlight = '#819481aa';
+                    style.highlight = '#81948199';
 
                     if (!isSelected(row.index - 1, column.index))
-                        style.borderTop = { width: 5, color: '#819481ff', index: Number.MAX_SAFE_INTEGER };
+                        style.borderTop = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
                     if (!isSelected(row.index + 1, column.index))
-                        style.borderBottom = { width: 5, color: '#819481ff', index: Number.MAX_SAFE_INTEGER };
+                        style.borderBottom = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
                     if (!isSelected(row.index, column.index - 1))
-                        style.borderLeft = { width: 5, color: '#819481ff', index: Number.MAX_SAFE_INTEGER };
+                        style.borderLeft = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
                     if (!isSelected(row.index, column.index + 1))
-                        style.borderRight = { width: 5, color: '#819481ff', index: Number.MAX_SAFE_INTEGER };
+                        style.borderRight = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
                 }
 
                 return {

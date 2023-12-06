@@ -112,8 +112,6 @@ export default function GridCanvas({
             });
 
             // Draw borders
-            ctx.strokeStyle = "#000";
-            ctx.setLineDash([15 / devicePixelRatio, 15 / devicePixelRatio]);
 
             // TODO: memo/move somewhere
             const drawBorder = (x1, y1, x2, y2, style) => {
@@ -122,20 +120,32 @@ export default function GridCanvas({
 
                 const width = style.width * borderWidth;
 
+                const isHorizontal = y1 === y2;
+
+                const xa = x1 - (isHorizontal ? width / 2 : 0);
+                const ya = y1 - (!isHorizontal ? width / 2 : 0);
+                const xb = x2 + (isHorizontal ? width / 2 : 0);
+                const yb = y2 + (!isHorizontal ? width / 2 : 0);
+
+                ctx.strokeStyle = style.color || 'black'; // TODO: resolve this color earlier
                 ctx.lineWidth = width;
 
+                if (style.dash)
+                {
+                    ctx.setLineDash(style.dash.map(value => value / devicePixelRatio));
+                    ctx.lineDashOffset = (isHorizontal ? xa : ya);
+                }
+                else
+                {
+                    ctx.setLineDash([]);
+                }
+
                 ctx.beginPath();
-                ctx.moveTo(
-                    x1 - (x1 !== x2 ? width / 2 : 0),
-                    y1 - (y1 !== y2 ? width / 2 : 0));
-                ctx.lineTo(
-                    x2 + (x1 !== x2 ? width / 2 : 0),
-                    y2 + (y1 !== y2 ? width / 2 : 0));
+                ctx.moveTo(xa, ya);
+                ctx.lineTo(xb, yb);
                 ctx.stroke();
             }
-            const compareBorders = (borderStyleA, borderStyleB) => {
-                return borderStyleA?.width === borderStyleB?.width;
-            }
+
             const selectBorder = (borderStyleA, borderStyleB) => {
                 if (!borderStyleA)
                     return borderStyleB;
@@ -155,50 +165,24 @@ export default function GridCanvas({
                 const topRowIndex = horizontalBorderIndex - 1 + (showTopBorder ? 0 : 1);
                 const bottomRowIndex = topRowIndex + 1;
 
-                let currentBorderStyle = null;
-                let currentBorderIndex = null;
-
-                const completeBorder = (columnIndex) => {
-                    drawBorder(
-                        columnOffsets[currentBorderIndex] - borderOffset,
-                        rowOffsets[bottomRowIndex] - borderOffset,
-                        columnOffsets[columnIndex] - borderOffset,
-                        rowOffsets[bottomRowIndex] - borderOffset,
-                        currentBorderStyle);
-                };
-
                 for (let columnIndex = 0; columnIndex < columnCount; columnIndex++) {
                     const topBorderStyle = topRowIndex >= 0 ? cells[topRowIndex][columnIndex].style.borderBottom : null;
                     const bottomBorderStyle = bottomRowIndex < rowCount ? cells[bottomRowIndex][columnIndex].style.borderTop : null;
 
                     const borderStyle = selectBorder(topBorderStyle, bottomBorderStyle);
 
-                    if (!compareBorders(currentBorderStyle, borderStyle)) {
-                        completeBorder(columnIndex);
-
-                        currentBorderStyle = borderStyle;
-                        currentBorderIndex = columnIndex;
-                    }
+                    drawBorder(
+                        columnOffsets[columnIndex] - borderOffset,
+                        rowOffsets[bottomRowIndex] - borderOffset,
+                        columnOffsets[columnIndex + 1] - borderOffset,
+                        rowOffsets[bottomRowIndex] - borderOffset,
+                        borderStyle);
                 }
-
-                completeBorder(columnCount);
             }
 
             for (let verticalBorderIndex = 0; verticalBorderIndex < verticalBorderCount; verticalBorderIndex++) {
                 const leftColumnIndex = verticalBorderIndex - 1 + (showLeftBorder ? 0 : 1);
                 const rightColumnIndex = leftColumnIndex + 1;
-
-                let currentBorderStyle = null;
-                let currentBorderIndex = null;
-
-                const completeBorder = (rowIndex) => {
-                    drawBorder(
-                        columnOffsets[rightColumnIndex] - borderOffset,
-                        rowOffsets[currentBorderIndex] - borderOffset,
-                        columnOffsets[rightColumnIndex] - borderOffset,
-                        rowOffsets[rowIndex] - borderOffset,
-                        currentBorderStyle);
-                };
 
                 for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
                     const leftBorderStyle = leftColumnIndex >= 0 ? cells[rowIndex][leftColumnIndex].style.borderRight : null;
@@ -206,15 +190,13 @@ export default function GridCanvas({
 
                     const borderStyle = selectBorder(leftBorderStyle, rightBorderStyle);
 
-                    if (!compareBorders(currentBorderStyle, borderStyle)) {
-                        completeBorder(rowIndex);
-
-                        currentBorderStyle = borderStyle;
-                        currentBorderIndex = rowIndex;
-                    }
+                    drawBorder(
+                        columnOffsets[rightColumnIndex] - borderOffset,
+                        rowOffsets[rowIndex] - borderOffset,
+                        columnOffsets[rightColumnIndex] - borderOffset,
+                        rowOffsets[rowIndex + 1] - borderOffset,
+                        borderStyle);
                 }
-
-                completeBorder(rowCount);
             }
         };
 
