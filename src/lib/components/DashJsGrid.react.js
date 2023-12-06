@@ -6,6 +6,7 @@ import StyleResolver from '../utils/StyleResolver';
 import useScrollRect from '../hooks/useScrollRect';
 import stringifyId from '../utils/stringifyId';
 import GridInteractions from '../fragments/GridInteractions.react';
+import useDevicePixelRatio from '../hooks/useDevicePixelRatio';
 
 function useResolvedValueSelector(valueSelector) {
     return useMemo(() => {
@@ -108,6 +109,28 @@ function useIndexedDefinitions(definitions) {
     }, [definitions]);
 }
 
+function roundToPixels(value, devicePixelRatio) {
+    return Math.round(value * devicePixelRatio) / devicePixelRatio;
+}
+
+function useDefinitionWithRoundedWidth(columnDefinitions, devicePixelRatio) {
+    return useMemo(() => {
+        return columnDefinitions.map(definition => ({
+            ...definition,
+            width: roundToPixels(definition.width, devicePixelRatio)
+        }));
+    }, [columnDefinitions, devicePixelRatio]);
+}
+
+function useDefinitionWithRoundedHeight(rowDefinitions, devicePixelRatio) {
+    return useMemo(() => {
+        return rowDefinitions.map(definition => ({
+            ...definition,
+            height: roundToPixels(definition.height, devicePixelRatio)
+        }));
+    }, [rowDefinitions, devicePixelRatio]);
+}
+
 // TODO: Write description
 function DashJsGrid(props) {
     // TODO: Use intersection observer to only render the grid if it is in view
@@ -123,12 +146,15 @@ function DashJsGrid(props) {
     const [fixedLeft, setFixedLeft] = useState(null);
     const [fixedRight, setFixedRight] = useState(null);
 
-    const leftColumns = useIndexedDefinitions(useInvoked(columnsLeft, [data]));
-    const middleColumns = useIndexedDefinitions(useInvoked(columns, [data]));
-    const rightColumns = useIndexedDefinitions(useInvoked(columnsRight, [data]));
-    const topRows = useIndexedDefinitions(useInvoked(rowsTop, [data]));
-    const middleRows = useIndexedDefinitions(useInvoked(rows, [data]));
-    const bottomRows = useIndexedDefinitions(useInvoked(rowsBottom, [data]));
+    const devicePixelRatio = useDevicePixelRatio();
+    const borderWidth = 1 / devicePixelRatio;
+
+    const leftColumns = useDefinitionWithRoundedWidth(useIndexedDefinitions(useInvoked(columnsLeft, [data])), devicePixelRatio);
+    const middleColumns = useDefinitionWithRoundedWidth(useIndexedDefinitions(useInvoked(columns, [data])), devicePixelRatio);
+    const rightColumns = useDefinitionWithRoundedWidth(useIndexedDefinitions(useInvoked(columnsRight, [data])), devicePixelRatio);
+    const topRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rowsTop, [data])), devicePixelRatio);
+    const middleRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rows, [data])), devicePixelRatio);
+    const bottomRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rowsBottom, [data])), devicePixelRatio);
 
     const styleResolver = useMemo(() => {
         return new StyleResolver(formatting);
@@ -153,7 +179,7 @@ function DashJsGrid(props) {
         <div
             className='dash-js-grid'
             ref={setContainer}
-            style={{ height: '50vh', width: '60vw', maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
+            style={{ height: '50vh', width: '60vw', maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', position: 'relative', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
         >
             <div ref={setFixedLeft} style={{ gridRow: '1 / 4', gridColumn: '1' }} />
             <div ref={setFixedRight} style={{ gridRow: '1 / 4', gridColumn: '3' }} />
@@ -167,6 +193,8 @@ function DashJsGrid(props) {
                 rows={topRows}
                 showLeftBorder
                 showTopBorder
+                borderWidth={borderWidth}
+                devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ position: 'sticky', top: 0, zIndex: 1, gridRow: '1', gridColumn: '2' }}
@@ -176,6 +204,8 @@ function DashJsGrid(props) {
                 showTopBorder
                 scrollLeft={scrollRect.left}
                 scrollWidth={scrollRect.width}
+                borderWidth={borderWidth}
+                devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ position: 'sticky', right: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '3' }}
@@ -183,6 +213,8 @@ function DashJsGrid(props) {
                 columns={rightColumns}
                 rows={topRows}
                 showTopBorder
+                borderWidth={borderWidth}
+                devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ position: 'sticky', left: 0, zIndex: 1, gridRow: '2', gridColumn: '1' }}
@@ -192,6 +224,8 @@ function DashJsGrid(props) {
                 showLeftBorder
                 scrollTop={scrollRect.top}
                 scrollHeight={scrollRect.height}
+                borderWidth={borderWidth}
+                devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ gridRow: '2', gridColumn: '2' }}
@@ -202,6 +236,8 @@ function DashJsGrid(props) {
                 scrollTop={scrollRect.top}
                 scrollWidth={scrollRect.width}
                 scrollHeight={scrollRect.height}
+                borderWidth={borderWidth}
+                devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ position: 'sticky', right: 0, zIndex: 1, gridRow: '2', gridColumn: '3' }}
@@ -210,6 +246,8 @@ function DashJsGrid(props) {
                 rows={middleRows}
                 scrollTop={scrollRect.top}
                 scrollHeight={scrollRect.height}
+                borderWidth={borderWidth}
+                devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ position: 'sticky', left: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '1' }}
@@ -217,6 +255,8 @@ function DashJsGrid(props) {
                 columns={leftColumns}
                 rows={bottomRows}
                 showLeftBorder
+                borderWidth={borderWidth}
+                devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ position: 'sticky', bottom: 0, zIndex: 1, gridRow: '3', gridColumn: '2' }}
@@ -225,15 +265,28 @@ function DashJsGrid(props) {
                 rows={bottomRows}
                 scrollLeft={scrollRect.left}
                 scrollWidth={scrollRect.width}
+                borderWidth={borderWidth}
+                devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ position: 'sticky', right: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '3' }}
                 cells={bottomRightCell}
                 columns={rightColumns}
                 rows={bottomRows}
+                borderWidth={borderWidth}
+                devicePixelRatio={devicePixelRatio}
             />
 
-            <GridInteractions style={{ gridRow: '1 / 4', gridColumn: '1 / 4', zIndex: 3 }} leftColumns={leftColumns} middleColumns={middleColumns} rightColumns={rightColumns} topRows={topRows} middleRows={middleRows} bottomRows={bottomRows} />
+            <GridInteractions
+                container={container}
+                leftColumns={leftColumns}
+                middleColumns={middleColumns}
+                rightColumns={rightColumns}
+                topRows={topRows}
+                middleRows={middleRows}
+                bottomRows={bottomRows}
+                borderWidth={borderWidth}
+            />
         </div>
     );
 };
