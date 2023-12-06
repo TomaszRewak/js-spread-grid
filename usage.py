@@ -80,16 +80,12 @@ app.layout = html.Div([
                 'style': '{borderLeft: {width: 5}}'
             },
             {
-                'column': {'index': 6},
-                'style': '{borderRight: {width: 5}}'
-            },
-            {
                 'column': {'index': 1},
-                'style': '{borderRight: {width: 5}, background: "lightgrey"}'
+                'style': '{borderRight: {width: 5, color: "red"}, background: "lightgrey"}'
             },
             {
                 'column': {'index': 6},
-                'style': '{borderLeft: {width: 5}, background: "lightgrey"}'
+                'style': '{borderLeft: {width: 5, dash: [15, 15]}, borderRight: {width: 5, dash: [15, 15]}, background: "lightgrey"}'
             }
         ],
     ),
