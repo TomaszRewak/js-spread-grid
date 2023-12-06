@@ -44,6 +44,7 @@ function useResolvedFormatting(formatting) {
 }
 
 function useResolvedProps(props) {
+    const setProps = props.setProps;
     const data = props.data;
     const columns = useResolvedColumns(props.columns);
     const columnsLeft = useResolvedColumns(props.columnsLeft);
@@ -53,8 +54,10 @@ function useResolvedProps(props) {
     const rowsBottom = useResolvedRows(props.rowsBottom);
     const valueSelector = useResolvedValueSelector(props.valueSelector);
     const formatting = useResolvedFormatting(props.formatting);
+    const hoverCell = props.hoverCell;
 
     return {
+        setProps,
         data,
         columns,
         columnsLeft,
@@ -63,14 +66,19 @@ function useResolvedProps(props) {
         rowsTop,
         rowsBottom,
         valueSelector,
-        formatting
+        formatting,
+        hoverCell
     }
 }
 
 // TODO: move somewhere else
 // TODO: resolve the full style only for the cells in view
-function useCells(data, columns, rows, valueSelector, styleResolver) {
+function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell) {
     return useMemo(() => {
+        // TODO: This can be moved outside this memo block, into its own
+        const hoveredColumnKey = hoverCell ? stringifyId(hoverCell.columnId) : null;
+        const hoveredRowKey = hoverCell ? stringifyId(hoverCell.rowId) : null;
+
         return rows.map(row => {
             // TODO: Don't treat the header separately
             if (row.type === 'header')
@@ -80,13 +88,19 @@ function useCells(data, columns, rows, valueSelector, styleResolver) {
                 const value = valueSelector(data, row.id, column.id);
                 const style = styleResolver.resolve(column.key, column.index, row.key, row.index, value);
 
+                // TODO: Don't modify the original object
+                if (hoveredColumnKey === column.key && hoveredRowKey === row.key)
+                    style.highlight = '#81948188';
+                else if (hoveredColumnKey === column.key || hoveredRowKey === row.key)
+                    style.highlight = '#81948133';
+
                 return {
                     value,
                     style
                 };
             });
         });
-    }, [data, columns, rows, valueSelector, styleResolver]);
+    }, [data, columns, rows, valueSelector, styleResolver, hoverCell]);
 }
 
 // TODO: Move elsewhere
@@ -139,7 +153,7 @@ function DashJsGrid(props) {
     // TODO: Sorting: [{columnId: 'col1', headerId: 'default' , direction: 'ASC'}]
     // TODO: Use headers (as well as fixed area boundaries) as separators and sort data only in between them
 
-    const { data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, valueSelector, formatting } = useResolvedProps(props);
+    const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, valueSelector, formatting, hoverCell } = useResolvedProps(props);
     const [container, setContainer] = useState(null);
     const [fixedTop, setFixedTop] = useState(null);
     const [fixedBottom, setFixedBottom] = useState(null);
@@ -162,15 +176,15 @@ function DashJsGrid(props) {
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
-    const topLeftCell = useCells(data, leftColumns, topRows, valueSelector, styleResolver);
-    const topMiddleCell = useCells(data, middleColumns, topRows, valueSelector, styleResolver);
-    const topRightCell = useCells(data, rightColumns, topRows, valueSelector, styleResolver);
-    const middleLeftCell = useCells(data, leftColumns, middleRows, valueSelector, styleResolver);
-    const middleMiddleCell = useCells(data, middleColumns, middleRows, valueSelector, styleResolver);
-    const middleRightCell = useCells(data, rightColumns, middleRows, valueSelector, styleResolver);
-    const bottomLeftCell = useCells(data, leftColumns, bottomRows, valueSelector, styleResolver);
-    const bottomMiddleCell = useCells(data, middleColumns, bottomRows, valueSelector, styleResolver);
-    const bottomRightCell = useCells(data, rightColumns, bottomRows, valueSelector, styleResolver);
+    const topLeftCell = useCells(data, leftColumns, topRows, valueSelector, styleResolver, hoverCell);
+    const topMiddleCell = useCells(data, middleColumns, topRows, valueSelector, styleResolver, hoverCell);
+    const topRightCell = useCells(data, rightColumns, topRows, valueSelector, styleResolver, hoverCell);
+    const middleLeftCell = useCells(data, leftColumns, middleRows, valueSelector, styleResolver, hoverCell);
+    const middleMiddleCell = useCells(data, middleColumns, middleRows, valueSelector, styleResolver, hoverCell);
+    const middleRightCell = useCells(data, rightColumns, middleRows, valueSelector, styleResolver, hoverCell);
+    const bottomLeftCell = useCells(data, leftColumns, bottomRows, valueSelector, styleResolver, hoverCell);
+    const bottomMiddleCell = useCells(data, middleColumns, bottomRows, valueSelector, styleResolver, hoverCell);
+    const bottomRightCell = useCells(data, rightColumns, bottomRows, valueSelector, styleResolver, hoverCell);
 
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
     // TODO: Memoize styles
@@ -286,6 +300,8 @@ function DashJsGrid(props) {
                 middleRows={middleRows}
                 bottomRows={bottomRows}
                 borderWidth={borderWidth}
+                hoverCell={hoverCell}
+                setProps={setProps}
             />
         </div>
     );
@@ -327,7 +343,12 @@ DashJsGrid.propTypes = {
             // TODO: Make this also accept style objects
             style: PropTypes.string
         })
-    )
+    ),
+    //
+    hoverCell: PropTypes.shape({
+        rowId: PropTypes.any,
+        columnId: PropTypes.any
+    }),
 };
 
 DashJsGrid.defaultProps = {
@@ -339,7 +360,8 @@ DashJsGrid.defaultProps = {
     rowsTop: [{ type: 'header', height: 20 }],
     rowsBottom: [],
     valueSelector: 'data[rowId][columnId]',
-    formatting: [{ column: { match: 'HEADER' }, style: '{background: "lightgrey"}' }]
+    formatting: [{ column: { match: 'HEADER' }, style: '{background: "lightgrey"}' }],
+    hoverCell: null
 };
 
 export default DashJsGrid;

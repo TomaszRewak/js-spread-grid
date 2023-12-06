@@ -100,6 +100,12 @@ export default function GridCanvas({
 
                     ctx.fillStyle = style.background || 'white';
                     ctx.fillRect(left, top, width, height);
+
+                    if (style.highlight) {
+                        ctx.fillStyle = style.highlight;
+                        ctx.fillRect(left, top, width, height);
+                    }
+
                     ctx.fillStyle = "#000";
                     ctx.fillText(cell.value, left + 5, top + height - 5);
                 });

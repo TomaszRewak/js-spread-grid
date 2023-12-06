@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import stringifyId from '../utils/stringifyId';
 
 function useColumnPlacement(columns, borderWidth) {
     return useMemo(() => {
@@ -213,9 +214,7 @@ function pickRows(topRowPlacement, middleRowPlacement, bottomRowPlacement, y, he
 }
 
 
-export default function GridInteractions({ container, leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth }) {
-    const [hover, setHover] = useState(null);
-
+export default function GridInteractions({ setProps, container, leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth, hoverCell }) {
     const size = useSize(container);
     const mousePosition = useMousePosition(container);
     const scrollOffset = useScrollOffset(container);
@@ -229,7 +228,7 @@ export default function GridInteractions({ container, leftColumns, middleColumns
 
     useEffect(() => {
         if (!mousePosition) {
-            setHover(null);
+            setProps({ hoverCell: null });
             return;
         }
 
@@ -240,7 +239,7 @@ export default function GridInteractions({ container, leftColumns, middleColumns
         const hoverColumnIndex = findColumnIndex(columns, x);
 
         if (hoverRowIndex === -1 || hoverColumnIndex === -1) {
-            setHover(null);
+            setProps({ hoverCell: null });
             return;
         }
 
@@ -252,17 +251,16 @@ export default function GridInteractions({ container, leftColumns, middleColumns
             columnId: hoverColumnId
         };
 
-        setHover(oldHover => {
-            if (oldHover && oldHover.rowId === newHover.rowId && oldHover.columnId === newHover.columnId)
-                return oldHover;
+        // TODO: This effect should not use hoverCell, instead it should do something like setProps(oldProps => { ... }) - to avoid unnecessary rerenders
+        if (stringifyId(hoverCell) === stringifyId(newHover))
+            return;
 
-            console.log('newHover', newHover);
+        // TODO: remove console.log
+        console.log('newHover', newHover);
+        
+        setProps({ hoverCell: newHover });
+    }, [bottomRowPlacement, leftColumnPlacement, middleColumnPlacement, middleColumns, middleRowPlacement, middleRows, mousePosition, rightColumnPlacement, size, scrollOffset, topRowPlacement, setProps, hoverCell]);
 
-            return newHover;
-        });
-    }, [bottomRowPlacement, leftColumnPlacement, middleColumnPlacement, middleColumns, middleRowPlacement, middleRows, mousePosition, rightColumnPlacement, size, scrollOffset, topRowPlacement]);
-
-    // TODO: Memoize style
     return (
         <></>
     );

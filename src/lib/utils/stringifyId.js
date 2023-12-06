@@ -14,6 +14,9 @@ function stringifyArray(array) {
 }
 
 export default function stringifyId(key) {
+    if (key === null)
+        return 'null'
+
     if (Array.isArray(key))
         return stringifyArray(key)
 
