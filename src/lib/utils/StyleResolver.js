@@ -1,4 +1,4 @@
-import stringifyKey from "./stringifyKey";
+import stringifyId from "./stringifyId";
 
 const borderTypes = ['borderTop', 'borderRight', 'borderBottom', 'borderLeft'];
 
@@ -13,12 +13,13 @@ function indexBorders(style, index) {
 }
 
 class StyleGroup {
-    byId = new Map();
+    byKey = new Map();
     byIndex = new Map();
     byMatch = new Map();
 };
 
 // TODO: Optimize by not searching using keys that don't have correlated match rules
+// TODO: Accept both a function and an object as a style (where the object is a resolved style)
 export default class StyleResolver {
     constructor(styles) {
         this.columnLookup = new StyleGroup();
@@ -28,10 +29,10 @@ export default class StyleResolver {
             let row = style.row || { match: 'ANY' };
 
             if ('id' in column)
-                column = { id: stringifyKey(column.id) };
+                column = { key: stringifyId(column.id) };
 
             if ('id' in row)
-                row = { id: stringifyKey(row.id) };
+                row = { key: stringifyId(row.id) };
 
             function addRowStyles(lookup, key) {
                 if (!lookup.has(key))
@@ -48,16 +49,16 @@ export default class StyleResolver {
                 if (!lookup.has(key))
                     lookup.set(key, new StyleGroup());
 
-                if ('id' in row)
-                    addRowStyles(lookup.get(key).byId, row.id);
+                if ('key' in row)
+                    addRowStyles(lookup.get(key).byKey, row.key);
                 if ('index' in row)
                     addRowStyles(lookup.get(key).byIndex, row.index);
                 if ('match' in row)
                     addRowStyles(lookup.get(key).byMatch, row.match);
             }
 
-            if ('id' in column)
-                addColumnStyles(this.columnLookup.byId, column.id);
+            if ('key' in column)
+                addColumnStyles(this.columnLookup.byKey, column.key);
             if ('index' in column)
                 addColumnStyles(this.columnLookup.byIndex, column.index);
             if ('match' in column)
@@ -65,7 +66,7 @@ export default class StyleResolver {
         });
     }
 
-    resolve(columnId, columnIndex, rowId, rowIndex, value) {
+    resolve(columnKey, columnIndex, rowKey, rowIndex, value) {
         const columnLookup = this.columnLookup;
 
         const columnMatch = 'ANY';
@@ -80,16 +81,16 @@ export default class StyleResolver {
         }
 
         function addRowStyles(lookup) {
-            if (lookup.byId.has(rowId))
-                addStyles(lookup.byId.get(rowId));
+            if (lookup.byKey.has(rowKey))
+                addStyles(lookup.byKey.get(rowKey));
             if (lookup.byIndex.has(rowIndex))
                 addStyles(lookup.byIndex.get(rowIndex));
             if (lookup.byMatch.has(rowMatch))
                 addStyles(lookup.byMatch.get(rowMatch));
         }
 
-        if (columnLookup.byId.has(columnId))
-            addRowStyles(columnLookup.byId.get(columnId));
+        if (columnLookup.byKey.has(columnKey))
+            addRowStyles(columnLookup.byKey.get(columnKey));
         if (columnLookup.byIndex.has(columnIndex))
             addRowStyles(columnLookup.byIndex.get(columnIndex));
         if (columnLookup.byMatch.has(columnMatch))

@@ -25,5 +25,3 @@ async def test_grid():
     )
 
     await expect_dash_layout(grid, 'div.dash-js-grid')
-
-

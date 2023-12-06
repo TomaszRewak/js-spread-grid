@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import useDevicePixelRatio from "../hooks/useDevicePixelRatio";
 
 // TODO: Upgrade to react 18 for better performance
 /** TODO: update the arguments to reflect the real props
@@ -23,10 +22,11 @@ export default function GridCanvas({
     scrollLeft,
     scrollTop,
     scrollWidth,
-    scrollHeight
+    scrollHeight,
+    borderWidth,
+    devicePixelRatio
 }) {
     const [canvas, setCanvas] = useState(null);
-    const devicePixelRatio = useDevicePixelRatio();
 
     // TODO: Read and apply: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas?retiredLocale=pl
 
@@ -44,29 +44,28 @@ export default function GridCanvas({
 
             const ctx = canvas.getContext("2d");
             // TODO: Make that "1" configurable as cell spacing
-            const borderWidth = 1 / devicePixelRatio; // Already rounded by definition
             const borderOffset = borderWidth / 2;
             const rowCount = rows.length;
             const columnCount = columns.length;
             const horizontalBorderCount = rowCount + (showTopBorder ? 1 : 0);
             const verticalBorderCount = columnCount + (showLeftBorder ? 1 : 0);
-            const roundedRowHeights = rows.map(row => row.height).map(roundToPixels);
-            const roundedColumnWidths = columns.map(column => column.width).map(roundToPixels);
-            const totalWidth = roundedColumnWidths.reduce((a, b) => a + b, 0) + verticalBorderCount * borderWidth;
-            const totalHeight = roundedRowHeights.reduce((a, b) => a + b, 0) + horizontalBorderCount * borderWidth;
+            const rowHeights = rows.map(row => row.height);
+            const columnWidths = columns.map(column => column.width);
+            const totalWidth = columnWidths.reduce((a, b) => a + b, 0) + verticalBorderCount * borderWidth;
+            const totalHeight = rowHeights.reduce((a, b) => a + b, 0) + horizontalBorderCount * borderWidth;
             const left = (scrollLeft === undefined) ? 0 : scrollLeft;
             const top = (scrollTop === undefined) ? 0 : scrollTop;
             const width = (scrollWidth === undefined) ? totalWidth : scrollWidth;
             const height = (scrollHeight === undefined) ? totalHeight : scrollHeight;
 
             // TODO: Move somewhere else
-            const columnOffsets = roundedColumnWidths.reduce((acc, width, index) => {
+            const columnOffsets = columnWidths.reduce((acc, width, index) => {
                 const prevOffset = acc[index];
                 const offset = prevOffset + width + borderWidth;
                 acc.push(offset);
                 return acc;
             }, [showLeftBorder ? borderWidth : 0]);
-            const rowOffsets = roundedRowHeights.reduce((acc, height, index) => {
+            const rowOffsets = rowHeights.reduce((acc, height, index) => {
                 const prevOffset = acc[index];
                 const offset = prevOffset + height + borderWidth;
                 acc.push(offset);
@@ -86,7 +85,7 @@ export default function GridCanvas({
             ctx.translate(-left, -top);
 
             ctx.clearRect(0, 0, totalWidth, totalHeight);
-            ctx.fillStyle = "#ddd";
+            ctx.fillStyle = "#E9E9E9";
             ctx.fillRect(0, 0, totalWidth, totalHeight);
 
             // Draw cells
@@ -96,11 +95,17 @@ export default function GridCanvas({
                     const style = cell.style;
                     const top = rowOffsets[rowIndex];
                     const left = columnOffsets[columnIndex];
-                    const width = roundedColumnWidths[columnIndex];
-                    const height = roundedRowHeights[rowIndex];
+                    const width = columnWidths[columnIndex];
+                    const height = rowHeights[rowIndex];
 
                     ctx.fillStyle = style.background || 'white';
                     ctx.fillRect(left, top, width, height);
+
+                    if (style.highlight) {
+                        ctx.fillStyle = style.highlight;
+                        ctx.fillRect(left, top, width, height);
+                    }
+
                     ctx.fillStyle = "#000";
                     ctx.fillText(cell.value, left + 5, top + height - 5);
                 });
@@ -145,7 +150,7 @@ export default function GridCanvas({
             }
 
             // TODO: Move somewhere else
-            // TODO: Don't actually combine borders, but use the ctx.lineDashOffset to align them
+            // TODO: Don't actually combine borders, but use the ctx.lineDashOffset to align them (starting from (0, 0))
             for (let horizontalBorderIndex = 0; horizontalBorderIndex < horizontalBorderCount; horizontalBorderIndex++) {
                 const topRowIndex = horizontalBorderIndex - 1 + (showTopBorder ? 0 : 1);
                 const bottomRowIndex = topRowIndex + 1;
@@ -217,7 +222,7 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [cells, canvas, devicePixelRatio, showTopBorder, showLeftBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight]);
+    }, [cells, canvas, devicePixelRatio, showTopBorder, showLeftBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth]);
 
     // TODO: style={{imageRendering: 'pixelated'}} - is this even needed, though?
     // TODO: memoize style
