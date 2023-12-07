@@ -42,7 +42,53 @@ app.layout = html.Div([
             {'type': 'header', 'height': 20, 'fixed': 'bottom'},
         ],
         data=data,
-        formatting=[],
+        formatting=[
+            {
+                'column': {'id': 'column_5'},
+                'style': '{background: "lightgreen"}'
+            },
+            {
+                'row': {'index': 6},
+                'style': '{background: "lightblue"}'
+            },
+            {
+                'row': {'index': 6},
+                'column': {'id': 'column_5'},
+                'style': '{background: "lightcoral"}'
+            },
+            {
+                'row': {'index': 5},
+                'column': {'id': 'column_5'},
+                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderRight: {width: 3}}'
+            },
+            {
+                'row': {'index': 6},
+                'column': {'id': 'column_4'},
+                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderBottom: {width: 3}}'
+            },
+            {
+                'row': {'index': 6},
+                'column': {'id': 'column_6'},
+                'style': '{borderTop: {width: 3}, borderBottom: {width: 3}, borderRight: {width: 3}}'
+            },
+            {
+                'row': {'index': 7},
+                'column': {'id': 'column_5'},
+                'style': '{borderLeft: {width: 3}, borderRight: {width: 3}, borderBottom: {width: 3}}'
+            },
+            {
+                'column': {'index': 0},
+                'style': '{borderLeft: {width: 5}}'
+            },
+            {
+                'column': {'index': 1},
+                'style': '{borderRight: {width: 5, color: "red"}, background: "lightgrey"}'
+            },
+            {
+                'column': {'index': 6},
+                'style': '{borderLeft: {width: 5, dash: [15, 15]}, borderRight: {width: 5, dash: [15, 15]}, background: "lightgrey"}'
+            }
+        ],
     ),
     html.Div(style={'height': '10px'}),
 ])
