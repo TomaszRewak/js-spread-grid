@@ -21,11 +21,11 @@ class StyleGroup {
 // TODO: Rename to FormatResolver
 // TODO: Optimize by not searching using keys that don't have correlated match rules
 // TODO: Accept both a function and an object as a style (where the object is a resolved style)
-export default class StyleResolver {
-    constructor(styles) {
+export default class FormattingResolver {
+    constructor(rules) {
         this.columnLookup = new StyleGroup();
 
-        styles.forEach((style, index) => {
+        rules.forEach((style, index) => {
             let column = style.column || { match: 'ANY' };
             let row = style.row || { match: 'ANY' };
 
@@ -35,7 +35,7 @@ export default class StyleResolver {
             if ('id' in row)
                 row = { key: stringifyId(row.id) };
 
-            function addRowStyles(lookup, key) {
+            function addRowRule(lookup, key) {
                 if (!lookup.has(key))
                     lookup.set(key, []);
 
@@ -46,24 +46,24 @@ export default class StyleResolver {
                 });
             }
 
-            function addColumnStyles(lookup, key) {
+            function addColumnRule(lookup, key) {
                 if (!lookup.has(key))
                     lookup.set(key, new StyleGroup());
 
                 if ('key' in row)
-                    addRowStyles(lookup.get(key).byKey, row.key);
+                    addRowRule(lookup.get(key).byKey, row.key);
                 if ('index' in row)
-                    addRowStyles(lookup.get(key).byIndex, row.index);
+                    addRowRule(lookup.get(key).byIndex, row.index);
                 if ('match' in row)
-                    addRowStyles(lookup.get(key).byMatch, row.match);
+                    addRowRule(lookup.get(key).byMatch, row.match);
             }
 
             if ('key' in column)
-                addColumnStyles(this.columnLookup.byKey, column.key);
+                addColumnRule(this.columnLookup.byKey, column.key);
             if ('index' in column)
-                addColumnStyles(this.columnLookup.byIndex, column.index);
+                addColumnRule(this.columnLookup.byIndex, column.index);
             if ('match' in column)
-                addColumnStyles(this.columnLookup.byMatch, column.match);
+                addColumnRule(this.columnLookup.byMatch, column.match);
         });
     }
 
@@ -73,33 +73,33 @@ export default class StyleResolver {
         const columnMatch = 'ANY';
         const rowMatch = 'ANY';
 
-        const styles = [];
+        const rules = [];
 
-        function addStyles(newStyles) {
-            for (const style of newStyles) 
-                if (style.condition(value))
-                    styles.push(style);
+        function addRules(newRules) {
+            for (const rule of newRules) 
+                if (rule.condition(value))
+                    rules.push(rule);
         }
 
-        function addRowStyles(lookup) {
+        function addRowRules(lookup) {
             if (lookup.byKey.has(rowKey))
-                addStyles(lookup.byKey.get(rowKey));
+                addRules(lookup.byKey.get(rowKey));
             if (lookup.byIndex.has(rowIndex))
-                addStyles(lookup.byIndex.get(rowIndex));
+                addRules(lookup.byIndex.get(rowIndex));
             if (lookup.byMatch.has(rowMatch))
-                addStyles(lookup.byMatch.get(rowMatch));
+                addRules(lookup.byMatch.get(rowMatch));
         }
 
         if (columnLookup.byKey.has(columnKey))
-            addRowStyles(columnLookup.byKey.get(columnKey));
+            addRowRules(columnLookup.byKey.get(columnKey));
         if (columnLookup.byIndex.has(columnIndex))
-            addRowStyles(columnLookup.byIndex.get(columnIndex));
+            addRowRules(columnLookup.byIndex.get(columnIndex));
         if (columnLookup.byMatch.has(columnMatch))
-            addRowStyles(columnLookup.byMatch.get(columnMatch));
+            addRowRules(columnLookup.byMatch.get(columnMatch));
 
-        const style = styles
+        const style = rules
             .sort((a, b) => a.index - b.index)
-            .map(style => indexBorders(style.style(value), style.index))
+            .map(rule => indexBorders(rule.style(value), rule.index))
             .reduce((acc, style) => ({ ...acc, ...style }), {});
 
         return style;

@@ -2,7 +2,7 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
-import StyleResolver from '../utils/StyleResolver';
+import FormattingResolver from '../utils/FormattingResolver';
 import useScrollRect from '../hooks/useScrollRect';
 import stringifyId from '../utils/stringifyId';
 import GridInteractions from '../fragments/GridInteractions.react';
@@ -75,7 +75,7 @@ function useResolvedProps(props) {
 
 // TODO: move somewhere else
 // TODO: resolve the full style only for the cells in view
-function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell, selectedCellsLookup) {
+function useCells(data, columns, rows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup) {
     return useMemo(() => {
         // TODO: This can be moved outside this memo block, into its own
         const hoveredColumnKey = hoverCell ? stringifyId(hoverCell.columnId) : null;
@@ -100,8 +100,9 @@ function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell, 
 
             return columns.map(column => {
                 const value = valueSelector(data, row.id, column.id);
-                const style = styleResolver.resolve(column.key, column.index, row.key, row.index, value);
+                const style = formattingResolver.resolve(column.key, column.index, row.key, row.index, value);
 
+                // TODO: Determine the highlights while rendering
                 // TODO: Don't modify the original object
                 if (hoveredColumnKey === column.key && hoveredRowKey === row.key)
                     style.highlight = '#81948188';
@@ -129,7 +130,7 @@ function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell, 
                 };
             });
         });
-    }, [data, columns, rows, valueSelector, styleResolver, hoverCell, selectedCellsLookup]);
+    }, [data, columns, rows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup]);
 }
 
 // TODO: Move elsewhere
@@ -220,21 +221,21 @@ function DashJsGrid(props) {
     const middleRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rows, [data])), devicePixelRatio);
     const bottomRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rowsBottom, [data])), devicePixelRatio);
 
-    const styleResolver = useMemo(() => {
-        return new StyleResolver(formatting);
+    const formattingResolver = useMemo(() => {
+        return new FormattingResolver(formatting);
     }, [formatting]);
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
-    const topLeftCell = useCells(data, leftColumns, topRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const topMiddleCell = useCells(data, middleColumns, topRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const topRightCell = useCells(data, rightColumns, topRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const middleLeftCell = useCells(data, leftColumns, middleRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const middleMiddleCell = useCells(data, middleColumns, middleRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const middleRightCell = useCells(data, rightColumns, middleRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const bottomLeftCell = useCells(data, leftColumns, bottomRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const bottomMiddleCell = useCells(data, middleColumns, bottomRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const bottomRightCell = useCells(data, rightColumns, bottomRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
+    const topLeftCell = useCells(data, leftColumns, topRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
+    const topMiddleCell = useCells(data, middleColumns, topRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
+    const topRightCell = useCells(data, rightColumns, topRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
+    const middleLeftCell = useCells(data, leftColumns, middleRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
+    const middleMiddleCell = useCells(data, middleColumns, middleRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
+    const middleRightCell = useCells(data, rightColumns, middleRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
+    const bottomLeftCell = useCells(data, leftColumns, bottomRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
+    const bottomMiddleCell = useCells(data, middleColumns, bottomRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
+    const bottomRightCell = useCells(data, rightColumns, bottomRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
 
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
     // TODO: Memoize styles
