@@ -4,7 +4,7 @@ from dash import Dash, callback, html, Input, Output
 app = Dash(__name__)
 
 columns_widths = [100, 80, 80, 111, 73, 173, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 30, 100]
-rows_count = 300
+rows_count = 2300
 
 columns = [
     {'id': f'column_{i}', 'header': f'Column {i}', 'width': columns_widths[i]}
@@ -32,6 +32,7 @@ app.layout = html.Div([
         rowsTop=[
             {'type': 'header', 'height': 20},
             *rows[:2],
+            *rows[8:10],
             {'type': 'header', 'height': 20},
         ],
         rows=rows[2:-2],
@@ -41,53 +42,7 @@ app.layout = html.Div([
             {'type': 'header', 'height': 20, 'fixed': 'bottom'},
         ],
         data=data,
-        formatting=[
-            {
-                'column': {'id': 'column_5'},
-                'style': '{background: "lightgreen"}'
-            },
-            {
-                'row': {'index': 6},
-                'style': '{background: "lightblue"}'
-            },
-            {
-                'row': {'index': 6},
-                'column': {'id': 'column_5'},
-                'style': '{background: "lightcoral"}'
-            },
-            {
-                'row': {'index': 5},
-                'column': {'id': 'column_5'},
-                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderRight: {width: 3}}'
-            },
-            {
-                'row': {'index': 6},
-                'column': {'id': 'column_4'},
-                'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderBottom: {width: 3}}'
-            },
-            {
-                'row': {'index': 6},
-                'column': {'id': 'column_6'},
-                'style': '{borderTop: {width: 3}, borderBottom: {width: 3}, borderRight: {width: 3}}'
-            },
-            {
-                'row': {'index': 7},
-                'column': {'id': 'column_5'},
-                'style': '{borderLeft: {width: 3}, borderRight: {width: 3}, borderBottom: {width: 3}}'
-            },
-            {
-                'column': {'index': 0},
-                'style': '{borderLeft: {width: 5}}'
-            },
-            {
-                'column': {'index': 1},
-                'style': '{borderRight: {width: 5, color: "red"}, background: "lightgrey"}'
-            },
-            {
-                'column': {'index': 6},
-                'style': '{borderLeft: {width: 5, dash: [15, 15]}, borderRight: {width: 5, dash: [15, 15]}, background: "lightgrey"}'
-            }
-        ],
+        formatting=[],
     ),
     html.Div(style={'height': '10px'}),
 ])

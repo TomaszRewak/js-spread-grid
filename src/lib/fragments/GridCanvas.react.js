@@ -38,10 +38,6 @@ export default function GridCanvas({
             // Checking how often this is called
             console.log('draw');
 
-            const roundToPixels = (value) => {
-                return Math.round(value * devicePixelRatio) / devicePixelRatio;
-            }
-
             const ctx = canvas.getContext("2d");
             // TODO: Make that "1" configurable as cell spacing
             const borderOffset = borderWidth / 2;
@@ -59,18 +55,31 @@ export default function GridCanvas({
             const height = (scrollHeight === undefined) ? totalHeight : scrollHeight;
 
             // TODO: Move somewhere else
-            const columnOffsets = columnWidths.reduce((acc, width, index) => {
+            const horizontalOffsets = columnWidths.reduce((acc, width, index) => {
                 const prevOffset = acc[index];
                 const offset = prevOffset + width + borderWidth;
                 acc.push(offset);
                 return acc;
             }, [showLeftBorder ? borderWidth : 0]);
-            const rowOffsets = rowHeights.reduce((acc, height, index) => {
+            const verticalOffsets = rowHeights.reduce((acc, height, index) => {
                 const prevOffset = acc[index];
                 const offset = prevOffset + height + borderWidth;
                 acc.push(offset);
                 return acc;
             }, [showTopBorder ? borderWidth : 0]);
+
+            const columnOffsets = horizontalOffsets.slice(0, -1);
+            const rowOffsets = verticalOffsets.slice(0, -1);
+
+            const minVisibleColumnIndex = Math.max(columnOffsets.findLastIndex(offset => offset <= left), 0);
+            const maxVisibleColumnIndex = Math.max(columnOffsets.findLastIndex(offset => offset <= left + width), 0);
+            const minVisibleRowIndex = Math.max(rowOffsets.findLastIndex(offset => offset <= top), 0);
+            const maxVisibleRowIndex = Math.max(rowOffsets.findLastIndex(offset => offset <= top + height), 0);
+
+            const minVisibleVerticalBorderIndex = Math.max(minVisibleColumnIndex, showLeftBorder ? 0 : 1);
+            const maxVisibleVerticalBorderIndex = maxVisibleColumnIndex + 1; // TODO: showRightBorder
+            const minVisibleHorizontalBorderIndex = Math.max(minVisibleRowIndex, showTopBorder ? 0 : 1);
+            const maxVisibleHorizontalBorderIndex = maxVisibleRowIndex + 1; // TODO: showBottomBorder
 
             canvas.width = Math.round(width * devicePixelRatio);
             canvas.height = Math.round(height * devicePixelRatio);
@@ -89,12 +98,12 @@ export default function GridCanvas({
             ctx.fillRect(0, 0, totalWidth, totalHeight);
 
             // Draw cells
-            columns.forEach((_, columnIndex) => {
-                rows.forEach((_, rowIndex) => {
+            for (let columnIndex = minVisibleColumnIndex; columnIndex <= maxVisibleColumnIndex; columnIndex++) {
+                for (let rowIndex = minVisibleRowIndex; rowIndex <= maxVisibleRowIndex; rowIndex++) {
                     const cell = cells[rowIndex][columnIndex];
                     const style = cell.style;
-                    const top = rowOffsets[rowIndex];
-                    const left = columnOffsets[columnIndex];
+                    const top = verticalOffsets[rowIndex];
+                    const left = horizontalOffsets[columnIndex];
                     const width = columnWidths[columnIndex];
                     const height = rowHeights[rowIndex];
 
@@ -108,8 +117,8 @@ export default function GridCanvas({
 
                     ctx.fillStyle = "#000";
                     ctx.fillText(cell.value, left + 5, top + height - 5);
-                });
-            });
+                }
+            }
 
             // Draw borders
 
@@ -159,42 +168,41 @@ export default function GridCanvas({
                 return borderStyleB;
             }
 
-            // TODO: Move somewhere else
-            // TODO: Don't actually combine borders, but use the ctx.lineDashOffset to align them (starting from (0, 0))
-            for (let horizontalBorderIndex = 0; horizontalBorderIndex < horizontalBorderCount; horizontalBorderIndex++) {
-                const topRowIndex = horizontalBorderIndex - 1 + (showTopBorder ? 0 : 1);
-                const bottomRowIndex = topRowIndex + 1;
+            // TODO: Move somewhere else (?)
+            for (let horizontalBorderIndex = minVisibleHorizontalBorderIndex; horizontalBorderIndex <= maxVisibleHorizontalBorderIndex; horizontalBorderIndex++) {
+                const topRowIndex = horizontalBorderIndex - 1;
+                const bottomRowIndex = horizontalBorderIndex;
 
-                for (let columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+                for (let columnIndex = minVisibleColumnIndex; columnIndex <= maxVisibleColumnIndex; columnIndex++) {
                     const topBorderStyle = topRowIndex >= 0 ? cells[topRowIndex][columnIndex].style.borderBottom : null;
                     const bottomBorderStyle = bottomRowIndex < rowCount ? cells[bottomRowIndex][columnIndex].style.borderTop : null;
 
                     const borderStyle = selectBorder(topBorderStyle, bottomBorderStyle);
 
                     drawBorder(
-                        columnOffsets[columnIndex] - borderOffset,
-                        rowOffsets[bottomRowIndex] - borderOffset,
-                        columnOffsets[columnIndex + 1] - borderOffset,
-                        rowOffsets[bottomRowIndex] - borderOffset,
+                        horizontalOffsets[columnIndex] - borderOffset,
+                        verticalOffsets[bottomRowIndex] - borderOffset,
+                        horizontalOffsets[columnIndex + 1] - borderOffset,
+                        verticalOffsets[bottomRowIndex] - borderOffset,
                         borderStyle);
                 }
             }
 
-            for (let verticalBorderIndex = 0; verticalBorderIndex < verticalBorderCount; verticalBorderIndex++) {
-                const leftColumnIndex = verticalBorderIndex - 1 + (showLeftBorder ? 0 : 1);
-                const rightColumnIndex = leftColumnIndex + 1;
+            for (let verticalBorderIndex = minVisibleVerticalBorderIndex; verticalBorderIndex <= maxVisibleVerticalBorderIndex; verticalBorderIndex++) {
+                const leftColumnIndex = verticalBorderIndex - 1;
+                const rightColumnIndex = verticalBorderIndex;
 
-                for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+                for (let rowIndex = minVisibleRowIndex; rowIndex <= maxVisibleRowIndex; rowIndex++) {
                     const leftBorderStyle = leftColumnIndex >= 0 ? cells[rowIndex][leftColumnIndex].style.borderRight : null;
                     const rightBorderStyle = rightColumnIndex < columnCount ? cells[rowIndex][rightColumnIndex].style.borderLeft : null;
 
                     const borderStyle = selectBorder(leftBorderStyle, rightBorderStyle);
 
                     drawBorder(
-                        columnOffsets[rightColumnIndex] - borderOffset,
-                        rowOffsets[rowIndex] - borderOffset,
-                        columnOffsets[rightColumnIndex] - borderOffset,
-                        rowOffsets[rowIndex + 1] - borderOffset,
+                        horizontalOffsets[rightColumnIndex] - borderOffset,
+                        verticalOffsets[rowIndex] - borderOffset,
+                        horizontalOffsets[rightColumnIndex] - borderOffset,
+                        verticalOffsets[rowIndex + 1] - borderOffset,
                         borderStyle);
                 }
             }

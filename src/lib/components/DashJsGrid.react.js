@@ -112,6 +112,7 @@ function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell, 
                 {
                     style.highlight = '#81948199';
 
+                    // TODO: Add lastSelectedCell to props and don't highlight the cell if it is the last selected one
                     if (!isSelected(row.index - 1, column.index))
                         style.borderTop = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
                     if (!isSelected(row.index + 1, column.index))
@@ -198,6 +199,7 @@ function DashJsGrid(props) {
     // TODO: Selected cells: [{rowId: 'row1', columnId: 'col1'}]
     // TODO: Sorting: [{columnId: 'col1', headerId: 'default' , direction: 'ASC'}]
     // TODO: Use headers (as well as fixed area boundaries) as separators and sort data only in between them
+    // TODO: Allow rows/columns to have parentId (or groupId?) to group them together and filter/sort them as a group
 
     const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, valueSelector, formatting, hoverCell, selectedCells } = useResolvedProps(props);
     const [container, setContainer] = useState(null);
@@ -206,6 +208,7 @@ function DashJsGrid(props) {
     const [fixedLeft, setFixedLeft] = useState(null);
     const [fixedRight, setFixedRight] = useState(null);
 
+    // TODO: Borders still seem to be blurry for large number of rows/columns
     const devicePixelRatio = useDevicePixelRatio();
     const borderWidth = 1 / devicePixelRatio;
     const selectedCellsLookup = useSelectedCellsLookup(selectedCells);
@@ -236,6 +239,7 @@ function DashJsGrid(props) {
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
     // TODO: Memoize styles
     // TODO: Remove hardcoded width/height
+    // TODO: Wrap the grid in another grid and set that grid's max width/height to the 100 vw/vh
     return (
         <div
             className='dash-js-grid'
