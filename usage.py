@@ -30,16 +30,16 @@ app.layout = html.Div([
         columns=columns[2:-1],
         columnsRight=columns[-1:],
         rowsTop=[
-            {'type': 'header', 'height': 20},
+            {'type': 'HEADER', 'height': 20},
             *rows[:2],
             *rows[8:10],
-            {'type': 'header', 'height': 20},
+            {'type': 'HEADER', 'height': 20},
         ],
         rows=rows[2:-2],
         rowsBottom=[
-            {'type': 'header', 'height': 20, 'fixed': 'bottom'},
+            {'type': 'HEADER', 'height': 20, 'fixed': 'bottom'},
             *rows[-2:],
-            {'type': 'header', 'height': 20, 'fixed': 'bottom'},
+            {'type': 'HEADER', 'height': 20, 'fixed': 'bottom'},
         ],
         data=data,
         formatting=[
@@ -87,6 +87,10 @@ app.layout = html.Div([
             {
                 'column': {'index': 6},
                 'style': '{borderLeft: {width: 5, dash: [15, 15]}, borderRight: {width: 5, dash: [15, 15]}, background: "lightgrey"}'
+            },
+            {
+                'condition': 'value < 100',
+                'value': '"SMALL"'
             }
         ],
     ),

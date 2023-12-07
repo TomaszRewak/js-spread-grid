@@ -18,90 +18,108 @@ class StyleGroup {
     byMatch = new Map();
 };
 
+const matchMapping = {
+    'HEADER': ['HEADER'],
+    'DATA': ['DATA'],
+    'ANY': ['HEADER', 'DATA'],
+    undefined: []
+};
+
 // TODO: Rename to FormatResolver
 // TODO: Optimize by not searching using keys that don't have correlated match rules
 // TODO: Accept both a function and an object as a style (where the object is a resolved style)
 export default class FormattingResolver {
     constructor(rules) {
         this.columnLookup = new StyleGroup();
+        this.rulesCount = 0;
 
-        rules.forEach((style, index) => {
-            let column = style.column || { match: 'ANY' };
-            let row = style.row || { match: 'ANY' };
-
-            if ('id' in column)
-                column = { key: stringifyId(column.id) };
-
-            if ('id' in row)
-                row = { key: stringifyId(row.id) };
-
-            function addRowRule(lookup, key) {
-                if (!lookup.has(key))
-                    lookup.set(key, []);
-
-                lookup.get(key).push({
-                    index,
-                    condition: style.condition,
-                    style: style.style
-                });
-            }
-
-            function addColumnRule(lookup, key) {
-                if (!lookup.has(key))
-                    lookup.set(key, new StyleGroup());
-
-                if ('key' in row)
-                    addRowRule(lookup.get(key).byKey, row.key);
-                if ('index' in row)
-                    addRowRule(lookup.get(key).byIndex, row.index);
-                if ('match' in row)
-                    addRowRule(lookup.get(key).byMatch, row.match);
-            }
-
-            if ('key' in column)
-                addColumnRule(this.columnLookup.byKey, column.key);
-            if ('index' in column)
-                addColumnRule(this.columnLookup.byIndex, column.index);
-            if ('match' in column)
-                addColumnRule(this.columnLookup.byMatch, column.match);
-        });
+        for (const rule of rules)
+            this.addRule(rule);
     }
 
-    resolve(columnKey, columnIndex, rowKey, rowIndex, value) {
+    addRule(rule) {
+        const columnLookup = this.columnLookup;
+        const index = this.rulesCount++;
+
+        const column = 'id' in rule.column
+            ? { key: stringifyId(rule.column.id) }
+            : rule.column;
+        const row = 'id' in rule.row
+            ? { key: stringifyId(rule.row.id) }
+            : rule.row;
+
+        function addRowRule(lookup, key) {
+            if (!lookup.has(key))
+                lookup.set(key, []);
+
+            lookup.get(key).push({
+                index: index,
+                condition: rule.condition,
+                style: rule.style,
+                value: rule.value
+            });
+        }
+
+        function addColumnRule(lookup, key) {
+            if (!lookup.has(key))
+                lookup.set(key, new StyleGroup());
+
+            if ('key' in row)
+                addRowRule(lookup.get(key).byKey, row.key);
+            if ('index' in row)
+                addRowRule(lookup.get(key).byIndex, row.index);
+            for (const match of matchMapping[row.match])
+                addRowRule(lookup.get(key).byMatch, match);
+        }
+
+        if ('key' in column)
+            addColumnRule(columnLookup.byKey, column.key);
+        if ('index' in column)
+            addColumnRule(columnLookup.byIndex, column.index);
+        for (const match of matchMapping[column.match])
+            addColumnRule(columnLookup.byMatch, match);
+    }
+
+    resolve(data, rows, columns, row, column) {
         const columnLookup = this.columnLookup;
 
-        const columnMatch = 'ANY';
-        const rowMatch = 'ANY';
+        const columnMatch = column.type === 'HEADER' ? 'HEADER' : 'DATA';
+        const rowMatch = row.type === 'HEADER' ? 'HEADER' : 'DATA';
 
-        const rules = [];
+        let value = null;
+        let style = {};
 
-        function addRules(newRules) {
-            for (const rule of newRules) 
-                if (rule.condition(value))
-                    rules.push(rule);
+        function resolveRule(rule) {
+            if (rule.condition && !rule.condition(data, rows, columns, row, column, value))
+                return;
+
+            if (rule.style)
+                style = { ...style, ...indexBorders(rule.style(data, rows, columns, row, column, value), rule.index) };
+            if (rule.value)
+                value = rule.value(data, rows, columns, row, column, value);
         }
 
-        function addRowRules(lookup) {
-            if (lookup.byKey.has(rowKey))
-                addRules(lookup.byKey.get(rowKey));
-            if (lookup.byIndex.has(rowIndex))
-                addRules(lookup.byIndex.get(rowIndex));
+        function resolveRules(newRules) {
+            for (const rule of newRules)
+                resolveRule(rule);
+        }
+
+        function resolveRowRules(lookup) {
+            if (lookup.byKey.has(row.key))
+                resolveRules(lookup.byKey.get(row.key));
+            if (lookup.byIndex.has(row.index))
+                resolveRules(lookup.byIndex.get(row.index));
             if (lookup.byMatch.has(rowMatch))
-                addRules(lookup.byMatch.get(rowMatch));
+                resolveRules(lookup.byMatch.get(rowMatch));
         }
 
-        if (columnLookup.byKey.has(columnKey))
-            addRowRules(columnLookup.byKey.get(columnKey));
-        if (columnLookup.byIndex.has(columnIndex))
-            addRowRules(columnLookup.byIndex.get(columnIndex));
+        if (columnLookup.byKey.has(column.key))
+            resolveRowRules(columnLookup.byKey.get(column.key));
+        if (columnLookup.byIndex.has(column.index))
+            resolveRowRules(columnLookup.byIndex.get(column.index));
         if (columnLookup.byMatch.has(columnMatch))
-            addRowRules(columnLookup.byMatch.get(columnMatch));
+            resolveRowRules(columnLookup.byMatch.get(columnMatch));
 
-        const style = rules
-            .sort((a, b) => a.index - b.index)
-            .map(rule => indexBorders(rule.style(value), rule.index))
-            .reduce((acc, style) => ({ ...acc, ...style }), {});
-
-        return style;
+        return { value, style };
     }
 }

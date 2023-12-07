@@ -8,12 +8,6 @@ import stringifyId from '../utils/stringifyId';
 import GridInteractions from '../fragments/GridInteractions.react';
 import useDevicePixelRatio from '../hooks/useDevicePixelRatio';
 
-function useResolvedValueSelector(valueSelector) {
-    return useMemo(() => {
-        return eval(`(data, rowId, columnId) => (${valueSelector})`);
-    }, [valueSelector])
-}
-
 function useResolvedColumns(columns) {
     return useMemo(() => {
         if (typeof columns !== 'string')
@@ -34,11 +28,12 @@ function useResolvedRows(rows) {
 
 function useResolvedFormatting(formatting) {
     return useMemo(() => {
-        return formatting.map(style => ({
-            column: style.column,
-            row: style.row,
-            condition: eval(`(value) => (${style.condition || 'true'})`),
-            style: eval(`(value) => (${style.style})`)
+        return formatting.map(rule => ({
+            column: rule.column || { match: 'DATA' },
+            row: rule.row || { match: 'DATA' },
+            condition: rule.condition ? eval(`(data, rows, columns, row, column, value) => (${rule.condition})`) : null,
+            style: rule.style ? eval(`(data, rows, columns, row, column, value) => (${rule.style})`) : null,
+            value: rule.value ? eval(`(data, rows, columns, row, column, value) => (${rule.value})`) : null
         }));
     }, [formatting]);
 }
@@ -52,7 +47,7 @@ function useResolvedProps(props) {
     const rows = useResolvedRows(props.rows);
     const rowsTop = useResolvedRows(props.rowsTop);
     const rowsBottom = useResolvedRows(props.rowsBottom);
-    const valueSelector = useResolvedValueSelector(props.valueSelector);
+    const defaultFormatting = useResolvedFormatting(props.defaultFormatting);
     const formatting = useResolvedFormatting(props.formatting);
     const hoverCell = props.hoverCell;
     const selectedCells = props.selectedCells;
@@ -66,7 +61,7 @@ function useResolvedProps(props) {
         rows,
         rowsTop,
         rowsBottom,
-        valueSelector,
+        defaultFormatting,
         formatting,
         hoverCell,
         selectedCells
@@ -75,7 +70,7 @@ function useResolvedProps(props) {
 
 // TODO: move somewhere else
 // TODO: resolve the full style only for the cells in view
-function useCells(data, columns, rows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup) {
+function useCells(data, columns, rows, formattingResolver, hoverCell, selectedCellsLookup) {
     return useMemo(() => {
         // TODO: This can be moved outside this memo block, into its own
         const hoveredColumnKey = hoverCell ? stringifyId(hoverCell.columnId) : null;
@@ -94,43 +89,34 @@ function useCells(data, columns, rows, valueSelector, formattingResolver, hoverC
         };
 
         return rows.map(row => {
-            // TODO: Don't treat the header separately
-            if (row.type === 'header')
-                return columns.map(column => ({ value: column.header, style: { background: '#F5F5F5' } }));
-
             return columns.map(column => {
-                const value = valueSelector(data, row.id, column.id);
-                const style = formattingResolver.resolve(column.key, column.index, row.key, row.index, value);
+                const format = formattingResolver.resolve(data, rows, columns, row, column);
 
                 // TODO: Determine the highlights while rendering
                 // TODO: Don't modify the original object
                 if (hoveredColumnKey === column.key && hoveredRowKey === row.key)
-                    style.highlight = '#81948188';
+                    format.style.highlight = '#81948188';
                 else if (hoveredColumnKey === column.key || hoveredRowKey === row.key)
-                    style.highlight = '#81948133';
+                    format.style.highlight = '#81948133';
 
-                if (isSelected(row.index, column.index))
-                {
-                    style.highlight = '#81948199';
+                if (isSelected(row.index, column.index)) {
+                    format.style.highlight = '#81948199';
 
                     // TODO: Add lastSelectedCell to props and don't highlight the cell if it is the last selected one
                     if (!isSelected(row.index - 1, column.index))
-                        style.borderTop = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
+                        format.style.borderTop = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
                     if (!isSelected(row.index + 1, column.index))
-                        style.borderBottom = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
+                        format.style.borderBottom = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
                     if (!isSelected(row.index, column.index - 1))
-                        style.borderLeft = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
+                        format.style.borderLeft = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
                     if (!isSelected(row.index, column.index + 1))
-                        style.borderRight = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
+                        format.style.borderRight = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
                 }
 
-                return {
-                    value,
-                    style
-                };
+                return format;
             });
         });
-    }, [data, columns, rows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup]);
+    }, [data, columns, rows, formattingResolver, hoverCell, selectedCellsLookup]);
 }
 
 // TODO: Move elsewhere
@@ -202,7 +188,7 @@ function DashJsGrid(props) {
     // TODO: Use headers (as well as fixed area boundaries) as separators and sort data only in between them
     // TODO: Allow rows/columns to have parentId (or groupId?) to group them together and filter/sort them as a group
 
-    const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, valueSelector, formatting, hoverCell, selectedCells } = useResolvedProps(props);
+    const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, defaultFormatting, formatting, hoverCell, selectedCells } = useResolvedProps(props);
     const [container, setContainer] = useState(null);
     const [fixedTop, setFixedTop] = useState(null);
     const [fixedBottom, setFixedBottom] = useState(null);
@@ -222,20 +208,20 @@ function DashJsGrid(props) {
     const bottomRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rowsBottom, [data])), devicePixelRatio);
 
     const formattingResolver = useMemo(() => {
-        return new FormattingResolver(formatting);
-    }, [formatting]);
+        return new FormattingResolver([...defaultFormatting, ...formatting]);
+    }, [defaultFormatting, formatting]);
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
-    const topLeftCell = useCells(data, leftColumns, topRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
-    const topMiddleCell = useCells(data, middleColumns, topRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
-    const topRightCell = useCells(data, rightColumns, topRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
-    const middleLeftCell = useCells(data, leftColumns, middleRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
-    const middleMiddleCell = useCells(data, middleColumns, middleRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
-    const middleRightCell = useCells(data, rightColumns, middleRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
-    const bottomLeftCell = useCells(data, leftColumns, bottomRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
-    const bottomMiddleCell = useCells(data, middleColumns, bottomRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
-    const bottomRightCell = useCells(data, rightColumns, bottomRows, valueSelector, formattingResolver, hoverCell, selectedCellsLookup);
+    const topLeftCell = useCells(data, leftColumns, topRows, formattingResolver, hoverCell, selectedCellsLookup);
+    const topMiddleCell = useCells(data, middleColumns, topRows, formattingResolver, hoverCell, selectedCellsLookup);
+    const topRightCell = useCells(data, rightColumns, topRows, formattingResolver, hoverCell, selectedCellsLookup);
+    const middleLeftCell = useCells(data, leftColumns, middleRows, formattingResolver, hoverCell, selectedCellsLookup);
+    const middleMiddleCell = useCells(data, middleColumns, middleRows, formattingResolver, hoverCell, selectedCellsLookup);
+    const middleRightCell = useCells(data, rightColumns, middleRows, formattingResolver, hoverCell, selectedCellsLookup);
+    const bottomLeftCell = useCells(data, leftColumns, bottomRows, formattingResolver, hoverCell, selectedCellsLookup);
+    const bottomMiddleCell = useCells(data, middleColumns, bottomRows, formattingResolver, hoverCell, selectedCellsLookup);
+    const bottomRightCell = useCells(data, rightColumns, bottomRows, formattingResolver, hoverCell, selectedCellsLookup);
 
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
     // TODO: Memoize styles
@@ -379,8 +365,6 @@ DashJsGrid.propTypes = {
     //
     rowsBottom: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     //
-    valueSelector: PropTypes.string,
-    //
     formatting: PropTypes.arrayOf(
         PropTypes.shape({
             column: PropTypes.oneOfType([
@@ -395,7 +379,8 @@ DashJsGrid.propTypes = {
             ]),
             condition: PropTypes.string,
             // TODO: Make this also accept style objects
-            style: PropTypes.string
+            style: PropTypes.string,
+            text: PropTypes.string
         })
     ),
     //
@@ -418,10 +403,14 @@ DashJsGrid.defaultProps = {
     columnsLeft: [],
     columnsRight: [],
     rows: 'data.map((_, index) => ({id: index, height: 20}))',
-    rowsTop: [{ type: 'header', height: 20 }],
+    rowsTop: [{ type: 'HEADER', height: 20 }],
     rowsBottom: [],
-    valueSelector: 'data[rowId][columnId]',
-    formatting: [{ column: { match: 'HEADER' }, style: '{background: "lightgrey"}' }],
+    defaultFormatting: [
+        { column: { match: 'ANY' }, row: { match: 'HEADER' }, style: '{background: "#F5F5F5"}', value: 'column.header' },
+        // TODO: Make sure that rules with "value" don't have any other fields
+        { value: 'data[row.id][column.id]' }
+    ],
+    formatting: [],
     hoverCell: null,
     selectedCells: []
 };
