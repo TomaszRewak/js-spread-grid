@@ -86,39 +86,43 @@ export default class FormattingResolver {
         const columnMatch = column.type === 'HEADER' ? 'HEADER' : 'DATA';
         const rowMatch = row.type === 'HEADER' ? 'HEADER' : 'DATA';
 
-        let value = null;
-        let style = {};
+        const rules = [];
 
-        function resolveRule(rule) {
-            if (rule.condition && !rule.condition(data, rows, columns, row, column, value))
-                return;
-
-            if (rule.style)
-                style = { ...style, ...indexBorders(rule.style(data, rows, columns, row, column, value), rule.index) };
-            if (rule.value)
-                value = rule.value(data, rows, columns, row, column, value);
-        }
-
-        function resolveRules(newRules) {
+        function gatherRules(newRules) {
             for (const rule of newRules)
-                resolveRule(rule);
+                rules.push(rule);
         }
 
-        function resolveRowRules(lookup) {
+        function gatherRowRules(lookup) {
             if (lookup.byKey.has(row.key))
-                resolveRules(lookup.byKey.get(row.key));
+                gatherRules(lookup.byKey.get(row.key));
             if (lookup.byIndex.has(row.index))
-                resolveRules(lookup.byIndex.get(row.index));
+                gatherRules(lookup.byIndex.get(row.index));
             if (lookup.byMatch.has(rowMatch))
-                resolveRules(lookup.byMatch.get(rowMatch));
+                gatherRules(lookup.byMatch.get(rowMatch));
         }
 
         if (columnLookup.byKey.has(column.key))
-            resolveRowRules(columnLookup.byKey.get(column.key));
+            gatherRowRules(columnLookup.byKey.get(column.key));
         if (columnLookup.byIndex.has(column.index))
-            resolveRowRules(columnLookup.byIndex.get(column.index));
+            gatherRowRules(columnLookup.byIndex.get(column.index));
         if (columnLookup.byMatch.has(columnMatch))
-            resolveRowRules(columnLookup.byMatch.get(columnMatch));
+            gatherRowRules(columnLookup.byMatch.get(columnMatch));
+
+        rules.sort((a, b) => a.index - b.index);
+
+        let value = null;
+        let style = {};
+
+        for (const rule of rules) {
+            if (rule.condition && !rule.condition(data, rows, columns, row, column, value))
+                continue;
+
+            if (rule.value)
+                value = rule.value(data, rows, columns, row, column, value);
+            if (rule.style)
+                style = { ...style, ...indexBorders(rule.style(data, rows, columns, row, column, value), rule.index) };
+        }
 
         return { value, style };
     }
