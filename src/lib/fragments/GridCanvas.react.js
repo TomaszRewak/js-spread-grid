@@ -80,9 +80,9 @@ export default function GridCanvas({
             const maxVisibleRowIndex = rowOffsets.findLastIndex(offset => offset <= top + height);
 
             const minVisibleVerticalBorderIndex = Math.max(minVisibleColumnIndex, showLeftBorder ? 0 : 1);
-            const maxVisibleVerticalBorderIndex = maxVisibleColumnIndex + showRightBorder ? 1 : 0;
+            const maxVisibleVerticalBorderIndex = maxVisibleColumnIndex + (showRightBorder ? 1 : 0);
             const minVisibleHorizontalBorderIndex = Math.max(minVisibleRowIndex, showTopBorder ? 0 : 1);
-            const maxVisibleHorizontalBorderIndex = maxVisibleRowIndex + showBottomBorder ? 1 : 0;
+            const maxVisibleHorizontalBorderIndex = maxVisibleRowIndex + (showBottomBorder ? 1 : 0);
 
             const cells = Array.from({ length: maxVisibleRowIndex - minVisibleRowIndex + 1 }, (_, rowIndex) => {
                 const row = rows[rowIndex + minVisibleRowIndex];
