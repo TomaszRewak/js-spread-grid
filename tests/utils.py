@@ -5,9 +5,13 @@ import os
 import sys
 from pathlib import Path
 
+# TODO: not the best idea to spam ports. Figure out a way to kill the server after the test is done.
+port = 8099
+
+
 def start_server(app, port):
     def run_server():
-        app.run_server(host='localhost', port=port)
+        app.run_server(host='localhost', port=port, debug=False)
 
     thread = threading.Thread(target=run_server)
     thread.daemon = True
@@ -20,6 +24,7 @@ async def start_browser():
 
 async def start_page(browser, port):
     page = await browser.newPage()
+    await page.setViewport({'width': 2000, 'height': 2000})
     await page.goto(f'http://localhost:{port}')
     return page
 
@@ -31,7 +36,7 @@ def get_target_file_path(extension):
     current_file = Path(frame.f_code.co_filename).stem
     current_folder = os.path.dirname(os.path.abspath(frame.f_code.co_filename))
 
-    return os.path.join(current_folder, 'screenshots', f'{current_file}_{current_function_name}.{extension}')
+    return os.path.join(current_folder, 'screenshots', current_file, f'{current_function_name}.{extension}')
 
 async def wait_for_element(page, element_selector):
     await page.waitForSelector(element_selector, timeout=2_000)
@@ -62,16 +67,21 @@ def expect_image(image):
             expected_image = f.read()
         assert expected_image == image
 
+        os.remove(screenshot_latest_path)
+
 
 async def expect_dash_layout(layout, element_selector):
     app = Dash(__name__)
     app.layout = layout
 
-    start_server(app, 8099)
+    global port
+    port = port + 1
+
+    start_server(app, port)
 
     try:
         browser = await start_browser()
-        page = await start_page(browser, 8099)
+        page = await start_page(browser, port)
 
         await wait_for_element(page, element_selector)
 

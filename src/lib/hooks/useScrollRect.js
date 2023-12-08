@@ -12,12 +12,12 @@ const emptyRect = {
     height: 0
 };
 
-function getBounds(element) {
+function getBounds(fixedLeft, fixedTop) {
     return {
         left: 0,
         top: 0,
-        width: element.scrollWidth,
-        height: element.scrollHeight
+        width: fixedTop ? fixedTop.getBoundingClientRect().width : 0,
+        height: fixedLeft ? fixedLeft.getBoundingClientRect().height : 0
     };
 }
 
@@ -25,17 +25,17 @@ function getScrollRect(element) {
     return {
         left: element.scrollLeft,
         top: element.scrollTop,
-        width: element.clientWidth,
-        height: element.clientHeight
+        width: element.getBoundingClientRect().width,
+        height: element.getBoundingClientRect().height
     };
 }
 
 function getFixedMargin(fixedLeft, fixedTop, fixedRight, fixedBottom) {
     return {
-        left: fixedLeft ? fixedLeft.clientWidth : 0,
-        top: fixedTop ? fixedTop.clientHeight : 0,
-        right: fixedRight ? fixedRight.clientWidth : 0,
-        bottom: fixedBottom ? fixedBottom.clientHeight : 0
+        left: fixedLeft ? fixedLeft.getBoundingClientRect().width : 0,
+        top: fixedTop ? fixedTop.getBoundingClientRect().height : 0,
+        right: fixedRight ? fixedRight.getBoundingClientRect().width : 0,
+        bottom: fixedBottom ? fixedBottom.getBoundingClientRect().height : 0
     };
 }
 
@@ -52,7 +52,7 @@ export default function useScrollRect(container, fixedLeft, fixedTop, fixedRight
         const updateScrollRect = () => {
             setScrollRect(prevScrollRect => {
                 const fixedMargin = getFixedMargin(fixedLeft, fixedTop, fixedRight, fixedBottom);
-                const bounds = subtract(getBounds(container), fixedMargin);
+                const bounds = subtract(getBounds(fixedLeft, fixedTop), fixedMargin);
                 const scrollRect = subtract(getScrollRect(container), fixedMargin);
                 const requiredScrollRect = clip(bounds, expand(scrollRect, requiredMargin));
                 const preloadedScrollRect = clip(bounds, expand(scrollRect, preloadedMargin));

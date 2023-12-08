@@ -7,12 +7,11 @@ from tests.utils import expect_dash_layout
 async def test_grid():
     grid = DashJsGrid(
         columns=[
-            {"id": "col1", "HEADER": "Column 1", "width": 100},
-            {"id": "col2", "HEADER": "Column 2", "width": 100},
-            {"id": "col3", "HEADER": "Column 3", "width": 100}
+            {"id": "col1", "header": "Column 1", "width": 100},
+            {"id": "col2", "header": "Column 2", "width": 100},
+            {"id": "col3", "header": "Column 3", "width": 100}
         ],
         rows=[
-            {'type': 'HEADER', 'height': 20, 'fixed': 'top'},
             {"id": 0, "height": 20},
             {"id": 1, "height": 20},
             {"id": 2, "height": 20}
