@@ -225,7 +225,7 @@ function DashJsGrid(props) {
         <div
             className='dash-js-grid'
             ref={setContainer}
-            style={{ height: '50vh', width: '60vw', maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', position: 'relative', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
+            style={{ maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', position: 'relative', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
         >
             <div ref={setFixedLeft} style={{ gridRow: '1 / 4', gridColumn: '1' }} />
             <div ref={setFixedRight} style={{ gridRow: '1 / 4', gridColumn: '3' }} />

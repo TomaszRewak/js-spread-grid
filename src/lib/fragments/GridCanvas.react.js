@@ -73,9 +73,9 @@ export default function GridCanvas({
             const rowOffsets = verticalOffsets.slice(0, -1);
 
             const minVisibleColumnIndex = Math.max(columnOffsets.findLastIndex(offset => offset <= left), 0);
-            const maxVisibleColumnIndex = Math.max(columnOffsets.findLastIndex(offset => offset <= left + width), 0);
+            const maxVisibleColumnIndex = columnOffsets.findLastIndex(offset => offset <= left + width);
             const minVisibleRowIndex = Math.max(rowOffsets.findLastIndex(offset => offset <= top), 0);
-            const maxVisibleRowIndex = Math.max(rowOffsets.findLastIndex(offset => offset <= top + height), 0);
+            const maxVisibleRowIndex = rowOffsets.findLastIndex(offset => offset <= top + height);
 
             const minVisibleVerticalBorderIndex = Math.max(minVisibleColumnIndex, showLeftBorder ? 0 : 1);
             const maxVisibleVerticalBorderIndex = maxVisibleColumnIndex + 1; // TODO: showRightBorder
