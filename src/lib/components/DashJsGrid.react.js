@@ -7,6 +7,7 @@ import useScrollRect from '../hooks/useScrollRect';
 import stringifyId from '../utils/stringifyId';
 import GridInteractions from '../fragments/GridInteractions.react';
 import useDevicePixelRatio from '../hooks/useDevicePixelRatio';
+import Conditional from '../fragments/Conditional.react';
 
 function useResolvedColumns(columns) {
     return useMemo(() => {
@@ -191,7 +192,7 @@ function DashJsGrid(props) {
                 column: { match: 'ANY' },
                 row: { match: 'ANY' },
                 condition: (data, rows, columns, row, column, value) => isSelected(rows, columns, row.index, column.index),
-                style: (data, rows, columns, row, column, value) => ({ 
+                style: (data, rows, columns, row, column, value) => ({
                     ...(!isSelected(rows, columns, row.index - 1, column.index) ? { borderTop: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
                     ...(!isSelected(rows, columns, row.index + 1, column.index) ? { borderBottom: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
                     ...(!isSelected(rows, columns, row.index, column.index - 1) ? { borderLeft: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
@@ -217,6 +218,13 @@ function DashJsGrid(props) {
     const bottomMiddleFormatting = formattingResolver;
     const bottomRightFormatting = formattingResolver;
 
+    const hasLeftColumns = leftColumns.length > 0;
+    const hasMiddleColumns = middleColumns.length > 0;
+    const hasRightColumns = rightColumns.length > 0;
+    const hasTopRows = topRows.length > 0;
+    const hasMiddleRows = middleRows.length > 0;
+    const hasBottomRows = bottomRows.length > 0;
+
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
     // TODO: Memoize styles
     // TODO: Remove hardcoded width/height
@@ -232,105 +240,161 @@ function DashJsGrid(props) {
             <div ref={setFixedTop} style={{ gridRow: '1', gridColumn: '1 / 4' }} />
             <div ref={setFixedBottom} style={{ gridRow: '3', gridColumn: '1 / 4' }} />
 
-            <GridCanvas
-                style={{ position: 'sticky', left: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '1' }}
-                data={data}
-                columns={leftColumns}
-                rows={topRows}
-                formattingResolver={topLeftFormatting}
-                showLeftBorder
-                showTopBorder
-                borderWidth={borderWidth}
-                devicePixelRatio={devicePixelRatio}
-            />
-            <GridCanvas
-                style={{ position: 'sticky', top: 0, zIndex: 1, gridRow: '1', gridColumn: '2' }}
-                data={data}
-                columns={middleColumns}
-                rows={topRows}
-                formattingResolver={topMiddleFormatting}
-                showTopBorder
-                scrollLeft={scrollRect.left}
-                scrollWidth={scrollRect.width}
-                borderWidth={borderWidth}
-                devicePixelRatio={devicePixelRatio}
-            />
-            <GridCanvas
-                style={{ position: 'sticky', right: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '3' }}
-                data={data}
-                columns={rightColumns}
-                rows={topRows}
-                formattingResolver={topRightFormatting}
-                showTopBorder
-                borderWidth={borderWidth}
-                devicePixelRatio={devicePixelRatio}
-            />
-            <GridCanvas
-                style={{ position: 'sticky', left: 0, zIndex: 1, gridRow: '2', gridColumn: '1' }}
-                data={data}
-                columns={leftColumns}
-                rows={middleRows}
-                formattingResolver={middleLeftFormatting}
-                showLeftBorder
-                scrollTop={scrollRect.top}
-                scrollHeight={scrollRect.height}
-                borderWidth={borderWidth}
-                devicePixelRatio={devicePixelRatio}
-            />
-            <GridCanvas
-                style={{ gridRow: '2', gridColumn: '2' }}
-                data={data}
-                columns={middleColumns}
-                rows={middleRows}
-                formattingResolver={middleMiddleFormatting}
-                scrollLeft={scrollRect.left}
-                scrollTop={scrollRect.top}
-                scrollWidth={scrollRect.width}
-                scrollHeight={scrollRect.height}
-                borderWidth={borderWidth}
-                devicePixelRatio={devicePixelRatio}
-            />
-            <GridCanvas
-                style={{ position: 'sticky', right: 0, zIndex: 1, gridRow: '2', gridColumn: '3' }}
-                data={data}
-                columns={rightColumns}
-                rows={middleRows}
-                formattingResolver={middleRightFormatting}
-                scrollTop={scrollRect.top}
-                scrollHeight={scrollRect.height}
-                borderWidth={borderWidth}
-                devicePixelRatio={devicePixelRatio}
-            />
-            <GridCanvas
-                style={{ position: 'sticky', left: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '1' }}
-                data={data}
-                columns={leftColumns}
-                rows={bottomRows}
-                formattingResolver={bottomLeftFormatting}
-                showLeftBorder
-                borderWidth={borderWidth}
-                devicePixelRatio={devicePixelRatio}
-            />
-            <GridCanvas
-                style={{ position: 'sticky', bottom: 0, zIndex: 1, gridRow: '3', gridColumn: '2' }}
-                data={data}
-                columns={middleColumns}
-                rows={bottomRows}
-                formattingResolver={bottomMiddleFormatting}
-                scrollLeft={scrollRect.left}
-                scrollWidth={scrollRect.width}
-                borderWidth={borderWidth}
-                devicePixelRatio={devicePixelRatio}
-            />
-            <GridCanvas
-                style={{ position: 'sticky', right: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '3' }}
-                data={data}
-                columns={rightColumns}
-                rows={bottomRows}
-                formattingResolver={bottomRightFormatting}
-                borderWidth={borderWidth}
-                devicePixelRatio={devicePixelRatio}
-            />
+            <Conditional condition={hasLeftColumns && hasTopRows}>
+                <GridCanvas
+                    style={{ position: 'sticky', left: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '1' }}
+                    data={data}
+                    columns={leftColumns}
+                    rows={topRows}
+                    formattingResolver={topLeftFormatting}
+                    showLeftBorder={true}
+                    showTopBorder={true}
+                    showRightBorder={true}
+                    showBottomBorder={true}
+                    borderWidth={borderWidth}
+                    devicePixelRatio={devicePixelRatio}
+                />
+            </Conditional>
+
+            <Conditional condition={hasMiddleColumns && hasTopRows}>
+                <GridCanvas
+                    style={{ position: 'sticky', top: 0, zIndex: 1, gridRow: '1', gridColumn: '2' }}
+                    data={data}
+                    columns={middleColumns}
+                    rows={topRows}
+                    formattingResolver={topMiddleFormatting}
+                    showLeftBorder={!hasLeftColumns}
+                    showTopBorder={true}
+                    showRightBorder={!hasRightColumns}
+                    showBottomBorder={true}
+                    scrollLeft={scrollRect.left}
+                    scrollWidth={scrollRect.width}
+                    borderWidth={borderWidth}
+                    devicePixelRatio={devicePixelRatio}
+                />
+            </Conditional>
+
+            <Conditional condition={hasRightColumns && hasTopRows}>
+                <GridCanvas
+                    style={{ position: 'sticky', right: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '3' }}
+                    data={data}
+                    columns={rightColumns}
+                    rows={topRows}
+                    formattingResolver={topRightFormatting}
+                    showLeftBorder={hasMiddleColumns || !hasLeftColumns}
+                    showTopBorder={true}
+                    showRightBorder={true}
+                    showBottomBorder={true}
+                    borderWidth={borderWidth}
+                    devicePixelRatio={devicePixelRatio}
+                />
+            </Conditional>
+
+            <Conditional condition={hasLeftColumns && hasMiddleRows}>
+                <GridCanvas
+                    style={{ position: 'sticky', left: 0, zIndex: 1, gridRow: '2', gridColumn: '1' }}
+                    data={data}
+                    columns={leftColumns}
+                    rows={middleRows}
+                    formattingResolver={middleLeftFormatting}
+                    showLeftBorder={true}
+                    showTopBorder={!hasTopRows}
+                    showRightBorder={true}
+                    showBottomBorder={!hasBottomRows}
+                    scrollTop={scrollRect.top}
+                    scrollHeight={scrollRect.height}
+                    borderWidth={borderWidth}
+                    devicePixelRatio={devicePixelRatio}
+                />
+            </Conditional>
+
+            <Conditional condition={hasMiddleColumns && hasMiddleRows}>
+                <GridCanvas
+                    style={{ gridRow: '2', gridColumn: '2' }}
+                    data={data}
+                    columns={middleColumns}
+                    rows={middleRows}
+                    formattingResolver={middleMiddleFormatting}
+                    showLeftBorder={!hasLeftColumns}
+                    showTopBorder={!hasTopRows}
+                    showRightBorder={!hasRightColumns}
+                    showBottomBorder={!hasBottomRows}
+                    scrollLeft={scrollRect.left}
+                    scrollTop={scrollRect.top}
+                    scrollWidth={scrollRect.width}
+                    scrollHeight={scrollRect.height}
+                    borderWidth={borderWidth}
+                    devicePixelRatio={devicePixelRatio}
+                />
+            </Conditional>
+
+            <Conditional condition={hasRightColumns && hasMiddleRows}>
+                <GridCanvas
+                    style={{ position: 'sticky', right: 0, zIndex: 1, gridRow: '2', gridColumn: '3' }}
+                    data={data}
+                    columns={rightColumns}
+                    rows={middleRows}
+                    formattingResolver={middleRightFormatting}
+                    showLeftBorder={hasMiddleColumns || !hasLeftColumns}
+                    showTopBorder={!hasTopRows}
+                    showRightBorder={true}
+                    showBottomBorder={!hasBottomRows}
+                    scrollTop={scrollRect.top}
+                    scrollHeight={scrollRect.height}
+                    borderWidth={borderWidth}
+                    devicePixelRatio={devicePixelRatio}
+                />
+            </Conditional>
+
+            <Conditional condition={hasLeftColumns && hasBottomRows}>
+                <GridCanvas
+                    style={{ position: 'sticky', left: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '1' }}
+                    data={data}
+                    columns={leftColumns}
+                    rows={bottomRows}
+                    formattingResolver={bottomLeftFormatting}
+                    showLeftBorder={true}
+                    showTopBorder={hasMiddleRows || !hasTopRows}
+                    showRightBorder={true}
+                    showBottomBorder={true}
+                    borderWidth={borderWidth}
+                    devicePixelRatio={devicePixelRatio}
+                />
+            </Conditional>
+
+            <Conditional condition={hasMiddleColumns && hasBottomRows}>
+                <GridCanvas
+                    style={{ position: 'sticky', bottom: 0, zIndex: 1, gridRow: '3', gridColumn: '2' }}
+                    data={data}
+                    columns={middleColumns}
+                    rows={bottomRows}
+                    formattingResolver={bottomMiddleFormatting}
+                    showLeftBorder={!hasLeftColumns}
+                    showTopBorder={hasMiddleRows || !hasTopRows}
+                    showRightBorder={!hasRightColumns}
+                    showBottomBorder={true}
+                    scrollLeft={scrollRect.left}
+                    scrollWidth={scrollRect.width}
+                    borderWidth={borderWidth}
+                    devicePixelRatio={devicePixelRatio}
+                />
+            </Conditional>
+
+            <Conditional condition={hasRightColumns && hasBottomRows}>
+                <GridCanvas
+                    style={{ position: 'sticky', right: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '3' }}
+                    data={data}
+                    columns={rightColumns}
+                    rows={bottomRows}
+                    formattingResolver={bottomRightFormatting}
+                    showLeftBorder={hasMiddleColumns || !hasLeftColumns}
+                    showTopBorder={hasMiddleRows || !hasTopRows}
+                    showRightBorder={true}
+                    showBottomBorder={true}
+                    borderWidth={borderWidth}
+                    devicePixelRatio={devicePixelRatio}
+                />
+            </Conditional>
 
             <GridInteractions
                 container={container}

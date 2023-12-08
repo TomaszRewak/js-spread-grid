@@ -19,6 +19,8 @@ export default function GridCanvas({
     formattingResolver,
     showLeftBorder,
     showTopBorder,
+    showRightBorder,
+    showBottomBorder,
     style,
     scrollLeft,
     scrollTop,
@@ -44,8 +46,8 @@ export default function GridCanvas({
             const borderOffset = borderWidth / 2;
             const rowCount = rows.length;
             const columnCount = columns.length;
-            const horizontalBorderCount = rowCount + (showTopBorder ? 1 : 0);
-            const verticalBorderCount = columnCount + (showLeftBorder ? 1 : 0);
+            const horizontalBorderCount = rowCount - 1 + (showTopBorder ? 1 : 0) + (showBottomBorder ? 1 : 0);
+            const verticalBorderCount = columnCount - 1 + (showLeftBorder ? 1 : 0) + (showRightBorder ? 1 : 0);
             const rowHeights = rows.map(row => row.height);
             const columnWidths = columns.map(column => column.width);
             const totalWidth = columnWidths.reduce((a, b) => a + b, 0) + verticalBorderCount * borderWidth;
@@ -78,9 +80,9 @@ export default function GridCanvas({
             const maxVisibleRowIndex = rowOffsets.findLastIndex(offset => offset <= top + height);
 
             const minVisibleVerticalBorderIndex = Math.max(minVisibleColumnIndex, showLeftBorder ? 0 : 1);
-            const maxVisibleVerticalBorderIndex = maxVisibleColumnIndex + 1; // TODO: showRightBorder
+            const maxVisibleVerticalBorderIndex = maxVisibleColumnIndex + showRightBorder ? 1 : 0;
             const minVisibleHorizontalBorderIndex = Math.max(minVisibleRowIndex, showTopBorder ? 0 : 1);
-            const maxVisibleHorizontalBorderIndex = maxVisibleRowIndex + 1; // TODO: showBottomBorder
+            const maxVisibleHorizontalBorderIndex = maxVisibleRowIndex + showBottomBorder ? 1 : 0;
 
             const cells = Array.from({ length: maxVisibleRowIndex - minVisibleRowIndex + 1 }, (_, rowIndex) => {
                 const row = rows[rowIndex + minVisibleRowIndex];
@@ -220,7 +222,7 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth, formattingResolver, data]);
+    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, showRightBorder, showBottomBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth, formattingResolver, data]);
 
     // TODO: style={{imageRendering: 'pixelated'}} - is this even needed, though?
     // TODO: memoize style
