@@ -200,7 +200,9 @@ function pickColumns(leftColumnPlacement, middleColumnPlacement, rightColumnPlac
     if (rightColumnPlacement.length && x >= width - rightColumnPlacement.at(-1).right)
         return [x - width + rightColumnPlacement.at(-1).right, rightColumnPlacement];
 
-    return [x - leftColumnPlacement.at(-1).right + scrollOffset, middleColumnPlacement];
+    const leftOffset = leftColumnPlacement.length ? leftColumnPlacement.at(-1).right : 0;
+
+    return [x - leftOffset + scrollOffset, middleColumnPlacement];
 }
 
 function pickRows(topRowPlacement, middleRowPlacement, bottomRowPlacement, y, height, scrollOffset) {
@@ -210,7 +212,9 @@ function pickRows(topRowPlacement, middleRowPlacement, bottomRowPlacement, y, he
     if (bottomRowPlacement.length && y >= height - bottomRowPlacement.at(-1).bottom)
         return [y - height + bottomRowPlacement.at(-1).bottom, bottomRowPlacement];
 
-    return [y - topRowPlacement.at(-1).bottom + scrollOffset, middleRowPlacement];
+    const topOffset = topRowPlacement.length ? topRowPlacement.at(-1).bottom : 0;
+
+    return [y - topOffset + scrollOffset, middleRowPlacement];
 }
 
 

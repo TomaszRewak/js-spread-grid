@@ -2,17 +2,11 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
-import StyleResolver from '../utils/StyleResolver';
+import FormattingResolver from '../utils/FormattingResolver';
 import useScrollRect from '../hooks/useScrollRect';
 import stringifyId from '../utils/stringifyId';
 import GridInteractions from '../fragments/GridInteractions.react';
 import useDevicePixelRatio from '../hooks/useDevicePixelRatio';
-
-function useResolvedValueSelector(valueSelector) {
-    return useMemo(() => {
-        return eval(`(data, rowId, columnId) => (${valueSelector})`);
-    }, [valueSelector])
-}
 
 function useResolvedColumns(columns) {
     return useMemo(() => {
@@ -34,11 +28,12 @@ function useResolvedRows(rows) {
 
 function useResolvedFormatting(formatting) {
     return useMemo(() => {
-        return formatting.map(style => ({
-            column: style.column,
-            row: style.row,
-            condition: eval(`(value) => (${style.condition || 'true'})`),
-            style: eval(`(value) => (${style.style})`)
+        return formatting.map(rule => ({
+            column: rule.column || { match: 'DATA' },
+            row: rule.row || { match: 'DATA' },
+            condition: rule.condition ? eval(`(data, rows, columns, row, column, value) => (${rule.condition})`) : null,
+            style: rule.style ? eval(`(data, rows, columns, row, column, value) => (${rule.style})`) : null,
+            value: rule.value ? eval(`(data, rows, columns, row, column, value) => (${rule.value})`) : null
         }));
     }, [formatting]);
 }
@@ -52,7 +47,7 @@ function useResolvedProps(props) {
     const rows = useResolvedRows(props.rows);
     const rowsTop = useResolvedRows(props.rowsTop);
     const rowsBottom = useResolvedRows(props.rowsBottom);
-    const valueSelector = useResolvedValueSelector(props.valueSelector);
+    const defaultFormatting = useResolvedFormatting(props.defaultFormatting);
     const formatting = useResolvedFormatting(props.formatting);
     const hoverCell = props.hoverCell;
     const selectedCells = props.selectedCells;
@@ -66,69 +61,11 @@ function useResolvedProps(props) {
         rows,
         rowsTop,
         rowsBottom,
-        valueSelector,
+        defaultFormatting,
         formatting,
         hoverCell,
         selectedCells
     }
-}
-
-// TODO: move somewhere else
-// TODO: resolve the full style only for the cells in view
-function useCells(data, columns, rows, valueSelector, styleResolver, hoverCell, selectedCellsLookup) {
-    return useMemo(() => {
-        // TODO: This can be moved outside this memo block, into its own
-        const hoveredColumnKey = hoverCell ? stringifyId(hoverCell.columnId) : null;
-        const hoveredRowKey = hoverCell ? stringifyId(hoverCell.rowId) : null;
-
-        const isSelected = (rowIndex, columnIndex) => {
-            if (rowIndex < 0 || rowIndex >= rows.length)
-                return false;
-            if (columnIndex < 0 || columnIndex >= columns.length)
-                return false;
-
-            const rowKey = rows[rowIndex].key;
-            const columnKey = columns[columnIndex].key;
-
-            return selectedCellsLookup.has(rowKey) && selectedCellsLookup.get(rowKey).has(columnKey);
-        };
-
-        return rows.map(row => {
-            // TODO: Don't treat the header separately
-            if (row.type === 'header')
-                return columns.map(column => ({ value: column.header, style: { background: '#F5F5F5' } }));
-
-            return columns.map(column => {
-                const value = valueSelector(data, row.id, column.id);
-                const style = styleResolver.resolve(column.key, column.index, row.key, row.index, value);
-
-                // TODO: Don't modify the original object
-                if (hoveredColumnKey === column.key && hoveredRowKey === row.key)
-                    style.highlight = '#81948188';
-                else if (hoveredColumnKey === column.key || hoveredRowKey === row.key)
-                    style.highlight = '#81948133';
-
-                if (isSelected(row.index, column.index))
-                {
-                    style.highlight = '#81948199';
-
-                    if (!isSelected(row.index - 1, column.index))
-                        style.borderTop = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
-                    if (!isSelected(row.index + 1, column.index))
-                        style.borderBottom = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
-                    if (!isSelected(row.index, column.index - 1))
-                        style.borderLeft = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
-                    if (!isSelected(row.index, column.index + 1))
-                        style.borderRight = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
-                }
-
-                return {
-                    value,
-                    style
-                };
-            });
-        });
-    }, [data, columns, rows, valueSelector, styleResolver, hoverCell, selectedCellsLookup]);
 }
 
 // TODO: Move elsewhere
@@ -198,14 +135,16 @@ function DashJsGrid(props) {
     // TODO: Selected cells: [{rowId: 'row1', columnId: 'col1'}]
     // TODO: Sorting: [{columnId: 'col1', headerId: 'default' , direction: 'ASC'}]
     // TODO: Use headers (as well as fixed area boundaries) as separators and sort data only in between them
+    // TODO: Allow rows/columns to have parentId (or groupId?) to group them together and filter/sort them as a group
 
-    const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, valueSelector, formatting, hoverCell, selectedCells } = useResolvedProps(props);
+    const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, defaultFormatting, formatting, hoverCell, selectedCells } = useResolvedProps(props);
     const [container, setContainer] = useState(null);
     const [fixedTop, setFixedTop] = useState(null);
     const [fixedBottom, setFixedBottom] = useState(null);
     const [fixedLeft, setFixedLeft] = useState(null);
     const [fixedRight, setFixedRight] = useState(null);
 
+    // TODO: Borders still seem to be blurry for large number of rows/columns
     const devicePixelRatio = useDevicePixelRatio();
     const borderWidth = 1 / devicePixelRatio;
     const selectedCellsLookup = useSelectedCellsLookup(selectedCells);
@@ -217,30 +156,76 @@ function DashJsGrid(props) {
     const middleRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rows, [data])), devicePixelRatio);
     const bottomRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rowsBottom, [data])), devicePixelRatio);
 
-    const styleResolver = useMemo(() => {
-        return new StyleResolver(formatting);
-    }, [formatting]);
+    const formattingResolver = useMemo(() => {
+        const hoveredColumnKey = hoverCell ? stringifyId(hoverCell.columnId) : null;
+        const hoveredRowKey = hoverCell ? stringifyId(hoverCell.rowId) : null;
+
+        const isSelected = (rows, columns, rowIndex, columnIndex) => {
+            if (rowIndex < 0 || rowIndex >= rows.length)
+                return false;
+            if (columnIndex < 0 || columnIndex >= columns.length)
+                return false;
+
+            const rowKey = rows[rowIndex].key;
+            const columnKey = columns[columnIndex].key;
+
+            return selectedCellsLookup.has(rowKey) && selectedCellsLookup.get(rowKey).has(columnKey);
+        };
+
+        const allRules = [
+            ...defaultFormatting,
+            ...formatting,
+            {
+                column: { match: 'ANY' },
+                row: { match: 'ANY' },
+                condition: (data, rows, columns, row, column, value) => hoveredColumnKey === column.key || hoveredRowKey === row.key,
+                style: () => ({ highlight: "#81948133" }),
+            },
+            {
+                column: { match: 'ANY' },
+                row: { match: 'ANY' },
+                condition: (data, rows, columns, row, column, value) => hoveredColumnKey === column.key && hoveredRowKey === row.key,
+                style: () => ({ highlight: "#81948188" }),
+            },
+            {
+                column: { match: 'ANY' },
+                row: { match: 'ANY' },
+                condition: (data, rows, columns, row, column, value) => isSelected(rows, columns, row.index, column.index),
+                style: (data, rows, columns, row, column, value) => ({ 
+                    ...(!isSelected(rows, columns, row.index - 1, column.index) ? { borderTop: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
+                    ...(!isSelected(rows, columns, row.index + 1, column.index) ? { borderBottom: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
+                    ...(!isSelected(rows, columns, row.index, column.index - 1) ? { borderLeft: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
+                    ...(!isSelected(rows, columns, row.index, column.index + 1) ? { borderRight: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
+                    highlight: "#81948199"
+                }),
+            }
+        ];
+
+        return new FormattingResolver(allRules);
+    }, [defaultFormatting, formatting, hoverCell, selectedCellsLookup]);
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
-    const topLeftCell = useCells(data, leftColumns, topRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const topMiddleCell = useCells(data, middleColumns, topRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const topRightCell = useCells(data, rightColumns, topRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const middleLeftCell = useCells(data, leftColumns, middleRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const middleMiddleCell = useCells(data, middleColumns, middleRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const middleRightCell = useCells(data, rightColumns, middleRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const bottomLeftCell = useCells(data, leftColumns, bottomRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const bottomMiddleCell = useCells(data, middleColumns, bottomRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
-    const bottomRightCell = useCells(data, rightColumns, bottomRows, valueSelector, styleResolver, hoverCell, selectedCellsLookup);
+    // TODO: Make sure those formatters are split based on the rule areas
+    const topLeftFormatting = formattingResolver;
+    const topMiddleFormatting = formattingResolver;
+    const topRightFormatting = formattingResolver;
+    const middleLeftFormatting = formattingResolver;
+    const middleMiddleFormatting = formattingResolver;
+    const middleRightFormatting = formattingResolver;
+    const bottomLeftFormatting = formattingResolver;
+    const bottomMiddleFormatting = formattingResolver;
+    const bottomRightFormatting = formattingResolver;
 
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
     // TODO: Memoize styles
     // TODO: Remove hardcoded width/height
+    // TODO: Wrap the grid in another grid and set that grid's max width/height to the 100 vw/vh
     return (
         <div
             className='dash-js-grid'
             ref={setContainer}
-            style={{ height: '50vh', width: '60vw', maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', position: 'relative', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
+            style={{ maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', position: 'relative', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
         >
             <div ref={setFixedLeft} style={{ gridRow: '1 / 4', gridColumn: '1' }} />
             <div ref={setFixedRight} style={{ gridRow: '1 / 4', gridColumn: '3' }} />
@@ -249,9 +234,10 @@ function DashJsGrid(props) {
 
             <GridCanvas
                 style={{ position: 'sticky', left: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '1' }}
-                cells={topLeftCell}
+                data={data}
                 columns={leftColumns}
                 rows={topRows}
+                formattingResolver={topLeftFormatting}
                 showLeftBorder
                 showTopBorder
                 borderWidth={borderWidth}
@@ -259,9 +245,10 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ position: 'sticky', top: 0, zIndex: 1, gridRow: '1', gridColumn: '2' }}
-                cells={topMiddleCell}
+                data={data}
                 columns={middleColumns}
                 rows={topRows}
+                formattingResolver={topMiddleFormatting}
                 showTopBorder
                 scrollLeft={scrollRect.left}
                 scrollWidth={scrollRect.width}
@@ -270,18 +257,20 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ position: 'sticky', right: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '3' }}
-                cells={topRightCell}
+                data={data}
                 columns={rightColumns}
                 rows={topRows}
+                formattingResolver={topRightFormatting}
                 showTopBorder
                 borderWidth={borderWidth}
                 devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ position: 'sticky', left: 0, zIndex: 1, gridRow: '2', gridColumn: '1' }}
-                cells={middleLeftCell}
+                data={data}
                 columns={leftColumns}
                 rows={middleRows}
+                formattingResolver={middleLeftFormatting}
                 showLeftBorder
                 scrollTop={scrollRect.top}
                 scrollHeight={scrollRect.height}
@@ -290,9 +279,10 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ gridRow: '2', gridColumn: '2' }}
-                cells={middleMiddleCell}
+                data={data}
                 columns={middleColumns}
                 rows={middleRows}
+                formattingResolver={middleMiddleFormatting}
                 scrollLeft={scrollRect.left}
                 scrollTop={scrollRect.top}
                 scrollWidth={scrollRect.width}
@@ -302,9 +292,10 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ position: 'sticky', right: 0, zIndex: 1, gridRow: '2', gridColumn: '3' }}
-                cells={middleRightCell}
+                data={data}
                 columns={rightColumns}
                 rows={middleRows}
+                formattingResolver={middleRightFormatting}
                 scrollTop={scrollRect.top}
                 scrollHeight={scrollRect.height}
                 borderWidth={borderWidth}
@@ -312,18 +303,20 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ position: 'sticky', left: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '1' }}
-                cells={bottomLeftCell}
+                data={data}
                 columns={leftColumns}
                 rows={bottomRows}
+                formattingResolver={bottomLeftFormatting}
                 showLeftBorder
                 borderWidth={borderWidth}
                 devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ position: 'sticky', bottom: 0, zIndex: 1, gridRow: '3', gridColumn: '2' }}
-                cells={bottomMiddleCell}
+                data={data}
                 columns={middleColumns}
                 rows={bottomRows}
+                formattingResolver={bottomMiddleFormatting}
                 scrollLeft={scrollRect.left}
                 scrollWidth={scrollRect.width}
                 borderWidth={borderWidth}
@@ -331,9 +324,10 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ position: 'sticky', right: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '3' }}
-                cells={bottomRightCell}
+                data={data}
                 columns={rightColumns}
                 rows={bottomRows}
+                formattingResolver={bottomRightFormatting}
                 borderWidth={borderWidth}
                 devicePixelRatio={devicePixelRatio}
             />
@@ -374,7 +368,7 @@ DashJsGrid.propTypes = {
     //
     rowsBottom: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     //
-    valueSelector: PropTypes.string,
+    defaultFormatting: PropTypes.arrayOf(PropTypes.any), // TODO: Fix type
     //
     formatting: PropTypes.arrayOf(
         PropTypes.shape({
@@ -390,7 +384,8 @@ DashJsGrid.propTypes = {
             ]),
             condition: PropTypes.string,
             // TODO: Make this also accept style objects
-            style: PropTypes.string
+            style: PropTypes.string,
+            text: PropTypes.string
         })
     ),
     //
@@ -413,10 +408,14 @@ DashJsGrid.defaultProps = {
     columnsLeft: [],
     columnsRight: [],
     rows: 'data.map((_, index) => ({id: index, height: 20}))',
-    rowsTop: [{ type: 'header', height: 20 }],
+    rowsTop: [{ type: 'HEADER', height: 20 }],
     rowsBottom: [],
-    valueSelector: 'data[rowId][columnId]',
-    formatting: [{ column: { match: 'HEADER' }, style: '{background: "lightgrey"}' }],
+    defaultFormatting: [
+        { column: { match: 'ANY' }, row: { match: 'HEADER' }, style: '{background: "#F5F5F5"}', value: 'column.header' },
+        // TODO: Make sure that rules with "value" don't have any other fields
+        { value: 'data[row.id][column.id]' }
+    ],
+    formatting: [],
     hoverCell: null,
     selectedCells: []
 };
