@@ -24,7 +24,7 @@ data = [
     for i in range(rows_count)
 ]
 
-app.layout = html.Div(style={'max-height': '80vh', 'display': 'flex'}, children=[
+app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
     dash_js_grid.DashJsGrid(
         columnsLeft=columns[:2],
         columns=columns[2:-1],
