@@ -68,57 +68,6 @@ function useResolvedProps(props) {
     }
 }
 
-// TODO: move somewhere else
-// TODO: resolve the full style only for the cells in view
-function useCells(data, columns, rows, formattingResolver, hoverCell, selectedCellsLookup) {
-    return useMemo(() => {
-        // TODO: This can be moved outside this memo block, into its own
-        const hoveredColumnKey = hoverCell ? stringifyId(hoverCell.columnId) : null;
-        const hoveredRowKey = hoverCell ? stringifyId(hoverCell.rowId) : null;
-
-        const isSelected = (rowIndex, columnIndex) => {
-            if (rowIndex < 0 || rowIndex >= rows.length)
-                return false;
-            if (columnIndex < 0 || columnIndex >= columns.length)
-                return false;
-
-            const rowKey = rows[rowIndex].key;
-            const columnKey = columns[columnIndex].key;
-
-            return selectedCellsLookup.has(rowKey) && selectedCellsLookup.get(rowKey).has(columnKey);
-        };
-
-        return rows.map(row => {
-            return columns.map(column => {
-                const format = formattingResolver.resolve(data, rows, columns, row, column);
-
-                // TODO: Determine the highlights while rendering
-                // TODO: Don't modify the original object
-                if (hoveredColumnKey === column.key && hoveredRowKey === row.key)
-                    format.style.highlight = '#81948188';
-                else if (hoveredColumnKey === column.key || hoveredRowKey === row.key)
-                    format.style.highlight = '#81948133';
-
-                if (isSelected(row.index, column.index)) {
-                    format.style.highlight = '#81948199';
-
-                    // TODO: Add lastSelectedCell to props and don't highlight the cell if it is the last selected one
-                    if (!isSelected(row.index - 1, column.index))
-                        format.style.borderTop = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
-                    if (!isSelected(row.index + 1, column.index))
-                        format.style.borderBottom = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
-                    if (!isSelected(row.index, column.index - 1))
-                        format.style.borderLeft = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
-                    if (!isSelected(row.index, column.index + 1))
-                        format.style.borderRight = { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER };
-                }
-
-                return format;
-            });
-        });
-    }, [data, columns, rows, formattingResolver, hoverCell, selectedCellsLookup]);
-}
-
 // TODO: Move elsewhere
 function useInvoked(expression, args) {
     return useMemo(() => {
@@ -208,20 +157,65 @@ function DashJsGrid(props) {
     const bottomRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rowsBottom, [data])), devicePixelRatio);
 
     const formattingResolver = useMemo(() => {
-        return new FormattingResolver([...defaultFormatting, ...formatting]);
-    }, [defaultFormatting, formatting]);
+        const hoveredColumnKey = hoverCell ? stringifyId(hoverCell.columnId) : null;
+        const hoveredRowKey = hoverCell ? stringifyId(hoverCell.rowId) : null;
+
+        const isSelected = (rows, columns, rowIndex, columnIndex) => {
+            if (rowIndex < 0 || rowIndex >= rows.length)
+                return false;
+            if (columnIndex < 0 || columnIndex >= columns.length)
+                return false;
+
+            const rowKey = rows[rowIndex].key;
+            const columnKey = columns[columnIndex].key;
+
+            return selectedCellsLookup.has(rowKey) && selectedCellsLookup.get(rowKey).has(columnKey);
+        };
+
+        const allRules = [
+            ...defaultFormatting,
+            ...formatting,
+            {
+                column: { match: 'ANY' },
+                row: { match: 'ANY' },
+                condition: (data, rows, columns, row, column, value) => hoveredColumnKey === column.key || hoveredRowKey === row.key,
+                style: () => ({ highlight: "#81948133" }),
+            },
+            {
+                column: { match: 'ANY' },
+                row: { match: 'ANY' },
+                condition: (data, rows, columns, row, column, value) => hoveredColumnKey === column.key && hoveredRowKey === row.key,
+                style: () => ({ highlight: "#81948188" }),
+            },
+            {
+                column: { match: 'ANY' },
+                row: { match: 'ANY' },
+                condition: (data, rows, columns, row, column, value) => isSelected(rows, columns, row.index, column.index),
+                style: (data, rows, columns, row, column, value) => ({ 
+                    ...(!isSelected(rows, columns, row.index - 1, column.index) ? { borderTop: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
+                    ...(!isSelected(rows, columns, row.index + 1, column.index) ? { borderBottom: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
+                    ...(!isSelected(rows, columns, row.index, column.index - 1) ? { borderLeft: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
+                    ...(!isSelected(rows, columns, row.index, column.index + 1) ? { borderRight: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
+                    highlight: "#81948199"
+                }),
+            }
+        ];
+
+        return new FormattingResolver(allRules);
+    }, [defaultFormatting, formatting, hoverCell, selectedCellsLookup]);
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
-    const topLeftCell = useCells(data, leftColumns, topRows, formattingResolver, hoverCell, selectedCellsLookup);
-    const topMiddleCell = useCells(data, middleColumns, topRows, formattingResolver, hoverCell, selectedCellsLookup);
-    const topRightCell = useCells(data, rightColumns, topRows, formattingResolver, hoverCell, selectedCellsLookup);
-    const middleLeftCell = useCells(data, leftColumns, middleRows, formattingResolver, hoverCell, selectedCellsLookup);
-    const middleMiddleCell = useCells(data, middleColumns, middleRows, formattingResolver, hoverCell, selectedCellsLookup);
-    const middleRightCell = useCells(data, rightColumns, middleRows, formattingResolver, hoverCell, selectedCellsLookup);
-    const bottomLeftCell = useCells(data, leftColumns, bottomRows, formattingResolver, hoverCell, selectedCellsLookup);
-    const bottomMiddleCell = useCells(data, middleColumns, bottomRows, formattingResolver, hoverCell, selectedCellsLookup);
-    const bottomRightCell = useCells(data, rightColumns, bottomRows, formattingResolver, hoverCell, selectedCellsLookup);
+    // TODO: Make sure those formatters are split based on the rule areas
+    const topLeftFormatting = formattingResolver;
+    const topMiddleFormatting = formattingResolver;
+    const topRightFormatting = formattingResolver;
+    const middleLeftFormatting = formattingResolver;
+    const middleMiddleFormatting = formattingResolver;
+    const middleRightFormatting = formattingResolver;
+    const bottomLeftFormatting = formattingResolver;
+    const bottomMiddleFormatting = formattingResolver;
+    const bottomRightFormatting = formattingResolver;
 
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
     // TODO: Memoize styles
@@ -240,9 +234,10 @@ function DashJsGrid(props) {
 
             <GridCanvas
                 style={{ position: 'sticky', left: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '1' }}
-                cells={topLeftCell}
+                data={data}
                 columns={leftColumns}
                 rows={topRows}
+                formattingResolver={topLeftFormatting}
                 showLeftBorder
                 showTopBorder
                 borderWidth={borderWidth}
@@ -250,9 +245,10 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ position: 'sticky', top: 0, zIndex: 1, gridRow: '1', gridColumn: '2' }}
-                cells={topMiddleCell}
+                data={data}
                 columns={middleColumns}
                 rows={topRows}
+                formattingResolver={topMiddleFormatting}
                 showTopBorder
                 scrollLeft={scrollRect.left}
                 scrollWidth={scrollRect.width}
@@ -261,18 +257,20 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ position: 'sticky', right: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '3' }}
-                cells={topRightCell}
+                data={data}
                 columns={rightColumns}
                 rows={topRows}
+                formattingResolver={topRightFormatting}
                 showTopBorder
                 borderWidth={borderWidth}
                 devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ position: 'sticky', left: 0, zIndex: 1, gridRow: '2', gridColumn: '1' }}
-                cells={middleLeftCell}
+                data={data}
                 columns={leftColumns}
                 rows={middleRows}
+                formattingResolver={middleLeftFormatting}
                 showLeftBorder
                 scrollTop={scrollRect.top}
                 scrollHeight={scrollRect.height}
@@ -281,9 +279,10 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ gridRow: '2', gridColumn: '2' }}
-                cells={middleMiddleCell}
+                data={data}
                 columns={middleColumns}
                 rows={middleRows}
+                formattingResolver={middleMiddleFormatting}
                 scrollLeft={scrollRect.left}
                 scrollTop={scrollRect.top}
                 scrollWidth={scrollRect.width}
@@ -293,9 +292,10 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ position: 'sticky', right: 0, zIndex: 1, gridRow: '2', gridColumn: '3' }}
-                cells={middleRightCell}
+                data={data}
                 columns={rightColumns}
                 rows={middleRows}
+                formattingResolver={middleRightFormatting}
                 scrollTop={scrollRect.top}
                 scrollHeight={scrollRect.height}
                 borderWidth={borderWidth}
@@ -303,18 +303,20 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ position: 'sticky', left: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '1' }}
-                cells={bottomLeftCell}
+                data={data}
                 columns={leftColumns}
                 rows={bottomRows}
+                formattingResolver={bottomLeftFormatting}
                 showLeftBorder
                 borderWidth={borderWidth}
                 devicePixelRatio={devicePixelRatio}
             />
             <GridCanvas
                 style={{ position: 'sticky', bottom: 0, zIndex: 1, gridRow: '3', gridColumn: '2' }}
-                cells={bottomMiddleCell}
+                data={data}
                 columns={middleColumns}
                 rows={bottomRows}
+                formattingResolver={bottomMiddleFormatting}
                 scrollLeft={scrollRect.left}
                 scrollWidth={scrollRect.width}
                 borderWidth={borderWidth}
@@ -322,9 +324,10 @@ function DashJsGrid(props) {
             />
             <GridCanvas
                 style={{ position: 'sticky', right: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '3' }}
-                cells={bottomRightCell}
+                data={data}
                 columns={rightColumns}
                 rows={bottomRows}
+                formattingResolver={bottomRightFormatting}
                 borderWidth={borderWidth}
                 devicePixelRatio={devicePixelRatio}
             />
@@ -364,6 +367,8 @@ DashJsGrid.propTypes = {
     rowsTop: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     //
     rowsBottom: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
+    //
+    defaultFormatting: PropTypes.arrayOf(PropTypes.any), // TODO: Fix type
     //
     formatting: PropTypes.arrayOf(
         PropTypes.shape({

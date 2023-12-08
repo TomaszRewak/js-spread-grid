@@ -13,9 +13,10 @@ import React, { useEffect, useState } from "react"
  * }} props
  */
 export default function GridCanvas({
-    cells,
+    data,
     columns,
     rows,
+    formattingResolver,
     showLeftBorder,
     showTopBorder,
     style,
@@ -81,6 +82,15 @@ export default function GridCanvas({
             const minVisibleHorizontalBorderIndex = Math.max(minVisibleRowIndex, showTopBorder ? 0 : 1);
             const maxVisibleHorizontalBorderIndex = maxVisibleRowIndex + 1; // TODO: showBottomBorder
 
+            const cells = Array.from({ length: maxVisibleRowIndex - minVisibleRowIndex + 1 }, (_, rowIndex) => {
+                const row = rows[rowIndex + minVisibleRowIndex];
+                return Array.from({ length: maxVisibleColumnIndex - minVisibleColumnIndex + 1 }, (_, columnIndex) => {
+                    const column = columns[columnIndex + minVisibleColumnIndex];
+                    return formattingResolver.resolve(data, rows, columns, row, column);
+                });
+            });
+            const getCell = (rowIndex, columnIndex) => cells[rowIndex - minVisibleRowIndex][columnIndex - minVisibleColumnIndex];
+
             canvas.width = Math.round(width * devicePixelRatio);
             canvas.height = Math.round(height * devicePixelRatio);
             canvas.style.width = `${width}px`;
@@ -100,7 +110,7 @@ export default function GridCanvas({
             // Draw cells
             for (let columnIndex = minVisibleColumnIndex; columnIndex <= maxVisibleColumnIndex; columnIndex++) {
                 for (let rowIndex = minVisibleRowIndex; rowIndex <= maxVisibleRowIndex; rowIndex++) {
-                    const cell = cells[rowIndex][columnIndex];
+                    const cell = getCell(rowIndex, columnIndex);
                     const style = cell.style;
                     const top = verticalOffsets[rowIndex];
                     const left = horizontalOffsets[columnIndex];
@@ -139,13 +149,11 @@ export default function GridCanvas({
                 ctx.strokeStyle = style.color || 'black'; // TODO: resolve this color earlier
                 ctx.lineWidth = width;
 
-                if (style.dash)
-                {
+                if (style.dash) {
                     ctx.setLineDash(style.dash.map(value => value / devicePixelRatio));
                     ctx.lineDashOffset = (isHorizontal ? xa : ya);
                 }
-                else
-                {
+                else {
                     ctx.setLineDash([]);
                 }
 
@@ -158,7 +166,7 @@ export default function GridCanvas({
             const selectBorder = (borderStyleA, borderStyleB) => {
                 if (!borderStyleA)
                     return borderStyleB;
-                
+
                 if (!borderStyleB)
                     return borderStyleA;
 
@@ -174,8 +182,8 @@ export default function GridCanvas({
                 const bottomRowIndex = horizontalBorderIndex;
 
                 for (let columnIndex = minVisibleColumnIndex; columnIndex <= maxVisibleColumnIndex; columnIndex++) {
-                    const topBorderStyle = topRowIndex >= 0 ? cells[topRowIndex][columnIndex].style.borderBottom : null;
-                    const bottomBorderStyle = bottomRowIndex < rowCount ? cells[bottomRowIndex][columnIndex].style.borderTop : null;
+                    const topBorderStyle = topRowIndex >= minVisibleRowIndex ? getCell(topRowIndex, columnIndex).style.borderBottom : null;
+                    const bottomBorderStyle = bottomRowIndex <= maxVisibleRowIndex ? getCell(bottomRowIndex, columnIndex).style.borderTop : null;
 
                     const borderStyle = selectBorder(topBorderStyle, bottomBorderStyle);
 
@@ -193,8 +201,8 @@ export default function GridCanvas({
                 const rightColumnIndex = verticalBorderIndex;
 
                 for (let rowIndex = minVisibleRowIndex; rowIndex <= maxVisibleRowIndex; rowIndex++) {
-                    const leftBorderStyle = leftColumnIndex >= 0 ? cells[rowIndex][leftColumnIndex].style.borderRight : null;
-                    const rightBorderStyle = rightColumnIndex < columnCount ? cells[rowIndex][rightColumnIndex].style.borderLeft : null;
+                    const leftBorderStyle = leftColumnIndex >= minVisibleColumnIndex ? getCell(rowIndex, leftColumnIndex).style.borderRight : null;
+                    const rightBorderStyle = rightColumnIndex <= maxVisibleColumnIndex ? getCell(rowIndex, rightColumnIndex).style.borderLeft : null;
 
                     const borderStyle = selectBorder(leftBorderStyle, rightBorderStyle);
 
@@ -212,7 +220,7 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [cells, canvas, devicePixelRatio, showTopBorder, showLeftBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth]);
+    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth, formattingResolver, data]);
 
     // TODO: style={{imageRendering: 'pixelated'}} - is this even needed, though?
     // TODO: memoize style

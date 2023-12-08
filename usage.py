@@ -48,31 +48,31 @@ app.layout = html.Div([
                 'style': '{background: "lightgreen"}'
             },
             {
-                'row': {'index': 6},
+                'row': {'id': 6},
                 'style': '{background: "lightblue"}'
             },
             {
-                'row': {'index': 6},
+                'row': {'id': 6},
                 'column': {'id': 'column_5'},
                 'style': '{background: "lightcoral"}'
             },
             {
-                'row': {'index': 5},
+                'row': {'id': 5},
                 'column': {'id': 'column_5'},
                 'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderRight: {width: 3}}'
             },
             {
-                'row': {'index': 6},
+                'row': {'id': 6},
                 'column': {'id': 'column_4'},
                 'style': '{borderLeft: {width: 3}, borderTop: {width: 3}, borderBottom: {width: 3}}'
             },
             {
-                'row': {'index': 6},
+                'row': {'id': 6},
                 'column': {'id': 'column_6'},
                 'style': '{borderTop: {width: 3}, borderBottom: {width: 3}, borderRight: {width: 3}}'
             },
             {
-                'row': {'index': 7},
+                'row': {'id': 7},
                 'column': {'id': 'column_5'},
                 'style': '{borderLeft: {width: 3}, borderRight: {width: 3}, borderBottom: {width: 3}}'
             },
