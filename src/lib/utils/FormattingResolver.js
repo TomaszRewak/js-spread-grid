@@ -5,6 +5,13 @@ const borderTypes = ['borderTop', 'borderRight', 'borderBottom', 'borderLeft'];
 function indexBorders(style, index) {
     const newStyle = { ...style };
 
+    if ('border' in newStyle)
+    {
+        for (const borderType of borderTypes)
+            newStyle[borderType] = newStyle.border;
+        delete newStyle.border;
+    }
+
     for (const borderType of borderTypes)
         if (borderType in newStyle)
             newStyle[borderType] = { ...newStyle[borderType], index };
