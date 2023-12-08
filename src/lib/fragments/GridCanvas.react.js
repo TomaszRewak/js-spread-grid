@@ -32,7 +32,7 @@ export default function GridCanvas({
     const [canvas, setCanvas] = useState(null);
 
     // TODO: Read and apply: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas?retiredLocale=pl
-
+    // TODO: Redraw only the cells that have actually changed
     useEffect(() => {
         const draw = () => {
             if (!canvas)
@@ -118,23 +118,54 @@ export default function GridCanvas({
                     const left = horizontalOffsets[columnIndex];
                     const width = columnWidths[columnIndex];
                     const height = rowHeights[rowIndex];
+                    const text = `X${cell.value}`;
+                    const textAlign = style.textAlign || 'left';
+                    const textBaseline = style.textBaseline || 'middle';
+
+                    // TODO: Check what's the best place to save and restore the context (before or after setting the clip text parameters)
+                    ctx.save();
+                    ctx.translate(left, top);
+                    ctx.beginPath();
+                    ctx.rect(0, 0, width, height);
+                    ctx.clip();
 
                     ctx.fillStyle = style.background || 'white';
-                    ctx.fillRect(left, top, width, height);
+                    ctx.fillRect(0, 0, width, height);
 
                     if (style.highlight) {
                         ctx.fillStyle = style.highlight;
-                        ctx.fillRect(left, top, width, height);
+                        ctx.fillRect(0, 0, width, height);
                     }
 
                     ctx.fillStyle = "#000";
-                    ctx.fillText(cell.value, left + 5, top + height - 5);
+                    ctx.font = "12px Calibri";
+
+                    ctx.textAlign = textAlign;
+                    // TODO: Measure 'X' character to find the actual middle baseline
+                    ctx.textBaseline = textBaseline;
+
+                    const textX = 
+                        textAlign === 'left' ? 5 :
+                        textAlign === 'center' ? width / 2 :
+                        textAlign === 'right' ? width - 5 :
+                        0;
+
+                    const textY =
+                        textBaseline === 'top' ? 5 :
+                        textBaseline === 'middle' ? height / 2 :
+                        textBaseline === 'bottom' ? height - 5 :
+                        0;
+
+                    ctx.fillText(text, textX, textY);
+
+                    ctx.restore();
                 }
             }
 
             // Draw borders
 
-            // TODO: memo/move somewhere
+            // TODO: clip drawing area to the middle of neighboring columns/rows (might be useful for redrawing only the changed cells)
+            // TODO: move somewhere (?)
             const drawBorder = (x1, y1, x2, y2, style) => {
                 if (!style)
                     return;

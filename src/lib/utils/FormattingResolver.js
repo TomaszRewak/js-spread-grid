@@ -2,11 +2,11 @@ import stringifyId from "./stringifyId";
 
 const borderTypes = ['borderTop', 'borderRight', 'borderBottom', 'borderLeft'];
 
+// TODO: Don't recreate styles if they haven't changed
 function indexBorders(style, index) {
     const newStyle = { ...style };
 
-    if ('border' in newStyle)
-    {
+    if ('border' in newStyle) {
         for (const borderType of borderTypes)
             newStyle[borderType] = newStyle.border;
         delete newStyle.border;

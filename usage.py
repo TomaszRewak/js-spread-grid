@@ -91,6 +91,18 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
             {
                 'condition': 'value < 100',
                 'value': '"SMALL"'
+            },
+            {
+                'row': {'id': 20},
+                'value': '"ABCDEFGHIJKLMNOPQRSTUVXYZ"'
+            },
+            {
+                'column': {'id': 'column_5'},
+                'style': '{textAlign: "right"}'
+            },
+            {
+                'column': {'id': 'column_3'},
+                'style': '{textAlign: "center", textBaseline: "bottom"}'
             }
         ],
     ),
