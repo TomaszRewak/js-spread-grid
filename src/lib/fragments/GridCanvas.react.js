@@ -16,7 +16,7 @@ export default function GridCanvas({
     data,
     columns,
     rows,
-    formattingResolver,
+    formatResolver,
     showLeftBorder,
     showTopBorder,
     showRightBorder,
@@ -88,7 +88,7 @@ export default function GridCanvas({
                 const row = rows[rowIndex + minVisibleRowIndex];
                 return Array.from({ length: maxVisibleColumnIndex - minVisibleColumnIndex + 1 }, (_, columnIndex) => {
                     const column = columns[columnIndex + minVisibleColumnIndex];
-                    return formattingResolver.resolve(data, rows, columns, row, column);
+                    return formatResolver.resolve(data, rows, columns, row, column);
                 });
             });
             const getCell = (rowIndex, columnIndex) => cells[rowIndex - minVisibleRowIndex][columnIndex - minVisibleColumnIndex];
@@ -260,7 +260,7 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, showRightBorder, showBottomBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth, formattingResolver, data]);
+    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, showRightBorder, showBottomBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth, formatResolver, data]);
 
     // TODO: style={{imageRendering: 'pixelated'}} - is this even needed, though?
     // TODO: memoize style

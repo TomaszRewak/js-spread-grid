@@ -2,7 +2,7 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import GridCanvas from '../fragments/GridCanvas.react';
-import FormattingResolver from '../utils/FormattingResolver';
+import FormatResolver from '../utils/FormatResolver';
 import useScrollRect from '../hooks/useScrollRect';
 import stringifyId from '../utils/stringifyId';
 import GridInteractions from '../fragments/GridInteractions.react';
@@ -157,7 +157,7 @@ function DashJsGrid(props) {
     const middleRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rows, [data])), devicePixelRatio);
     const bottomRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rowsBottom, [data])), devicePixelRatio);
 
-    const formattingResolver = useMemo(() => {
+    const formatResolver = useMemo(() => {
         const hoveredColumnKey = hoverCell ? stringifyId(hoverCell.columnId) : null;
         const hoveredRowKey = hoverCell ? stringifyId(hoverCell.rowId) : null;
 
@@ -202,21 +202,21 @@ function DashJsGrid(props) {
             }
         ];
 
-        return new FormattingResolver(allRules);
+        return new FormatResolver(allRules);
     }, [defaultFormatting, formatting, hoverCell, selectedCellsLookup]);
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
     // TODO: Make sure those formatters are split based on the rule areas
-    const topLeftFormatting = formattingResolver;
-    const topMiddleFormatting = formattingResolver;
-    const topRightFormatting = formattingResolver;
-    const middleLeftFormatting = formattingResolver;
-    const middleMiddleFormatting = formattingResolver;
-    const middleRightFormatting = formattingResolver;
-    const bottomLeftFormatting = formattingResolver;
-    const bottomMiddleFormatting = formattingResolver;
-    const bottomRightFormatting = formattingResolver;
+    const topLeftFormatResolver = formatResolver;
+    const topMiddleFormatResolver = formatResolver;
+    const topRightFormatResolver = formatResolver;
+    const middleLeftFormatResolver = formatResolver;
+    const middleMiddleFormatResolver = formatResolver;
+    const middleRightFormatResolver = formatResolver;
+    const bottomLeftFormatResolver = formatResolver;
+    const bottomMiddleFormatResolver = formatResolver;
+    const bottomRightFormatResolver = formatResolver;
 
     const hasLeftColumns = leftColumns.length > 0;
     const hasMiddleColumns = middleColumns.length > 0;
@@ -246,7 +246,7 @@ function DashJsGrid(props) {
                     data={data}
                     columns={leftColumns}
                     rows={topRows}
-                    formattingResolver={topLeftFormatting}
+                    formatResolver={topLeftFormatResolver}
                     showLeftBorder={true}
                     showTopBorder={true}
                     showRightBorder={true}
@@ -262,7 +262,7 @@ function DashJsGrid(props) {
                     data={data}
                     columns={middleColumns}
                     rows={topRows}
-                    formattingResolver={topMiddleFormatting}
+                    formatResolver={topMiddleFormatResolver}
                     showLeftBorder={!hasLeftColumns}
                     showTopBorder={true}
                     showRightBorder={!hasRightColumns}
@@ -280,7 +280,7 @@ function DashJsGrid(props) {
                     data={data}
                     columns={rightColumns}
                     rows={topRows}
-                    formattingResolver={topRightFormatting}
+                    formatResolver={topRightFormatResolver}
                     showLeftBorder={hasMiddleColumns || !hasLeftColumns}
                     showTopBorder={true}
                     showRightBorder={true}
@@ -296,7 +296,7 @@ function DashJsGrid(props) {
                     data={data}
                     columns={leftColumns}
                     rows={middleRows}
-                    formattingResolver={middleLeftFormatting}
+                    formatResolver={middleLeftFormatResolver}
                     showLeftBorder={true}
                     showTopBorder={!hasTopRows}
                     showRightBorder={true}
@@ -314,7 +314,7 @@ function DashJsGrid(props) {
                     data={data}
                     columns={middleColumns}
                     rows={middleRows}
-                    formattingResolver={middleMiddleFormatting}
+                    formatResolver={middleMiddleFormatResolver}
                     showLeftBorder={!hasLeftColumns}
                     showTopBorder={!hasTopRows}
                     showRightBorder={!hasRightColumns}
@@ -334,7 +334,7 @@ function DashJsGrid(props) {
                     data={data}
                     columns={rightColumns}
                     rows={middleRows}
-                    formattingResolver={middleRightFormatting}
+                    formatResolver={middleRightFormatResolver}
                     showLeftBorder={hasMiddleColumns || !hasLeftColumns}
                     showTopBorder={!hasTopRows}
                     showRightBorder={true}
@@ -352,7 +352,7 @@ function DashJsGrid(props) {
                     data={data}
                     columns={leftColumns}
                     rows={bottomRows}
-                    formattingResolver={bottomLeftFormatting}
+                    formatResolver={bottomLeftFormatResolver}
                     showLeftBorder={true}
                     showTopBorder={hasMiddleRows || !hasTopRows}
                     showRightBorder={true}
@@ -368,7 +368,7 @@ function DashJsGrid(props) {
                     data={data}
                     columns={middleColumns}
                     rows={bottomRows}
-                    formattingResolver={bottomMiddleFormatting}
+                    formatResolver={bottomMiddleFormatResolver}
                     showLeftBorder={!hasLeftColumns}
                     showTopBorder={hasMiddleRows || !hasTopRows}
                     showRightBorder={!hasRightColumns}
@@ -386,7 +386,7 @@ function DashJsGrid(props) {
                     data={data}
                     columns={rightColumns}
                     rows={bottomRows}
-                    formattingResolver={bottomRightFormatting}
+                    formatResolver={bottomRightFormatResolver}
                     showLeftBorder={hasMiddleColumns || !hasLeftColumns}
                     showTopBorder={hasMiddleRows || !hasTopRows}
                     showRightBorder={true}

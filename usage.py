@@ -32,14 +32,15 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
         rowsTop=[
             {'type': 'HEADER', 'height': 20},
             *rows[:2],
+            {'id': 100, 'height': 7},
             *rows[8:10],
             {'type': 'HEADER', 'height': 20},
         ],
         rows=rows[2:-2],
         rowsBottom=[
-            {'type': 'HEADER', 'height': 20, 'fixed': 'bottom'},
+            {'type': 'HEADER', 'height': 20},
             *rows[-2:],
-            {'type': 'HEADER', 'height': 20, 'fixed': 'bottom'},
+            {'type': 'HEADER', 'height': 20},
         ],
         data=data,
         formatting=[
