@@ -216,6 +216,7 @@ export default function GridCanvas({
 
                 const isHorizontal = y1 === y2;
 
+                // TODO: Don't add offset if the border is not continued
                 const xa = x1 - (isHorizontal ? width / 2 : 0);
                 const ya = y1 - (!isHorizontal ? width / 2 : 0);
                 const xb = x2 + (isHorizontal ? width / 2 : 0);

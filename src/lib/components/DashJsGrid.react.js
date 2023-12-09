@@ -133,6 +133,7 @@ function DashJsGrid(props) {
     // TODO: Sorting: [{columnId: 'col1', headerId: 'default' , direction: 'ASC'}]
     // TODO: Use headers (as well as fixed area boundaries) as separators and sort data only in between them
     // TODO: Allow rows/columns to have parentId (or groupId?) to group them together and filter/sort them as a group
+    // TODO: wrap props into a function so that you can do setProps(prevProps => ...)
 
     const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, defaultFormatting, formatting, hoverCell, selectedCells } = useResolvedProps(props);
     const [container, setContainer] = useState(null);
@@ -471,7 +472,7 @@ DashJsGrid.defaultProps = {
     rowsTop: [{ type: 'HEADER', height: 20 }],
     rowsBottom: [],
     defaultFormatting: [
-        { column: { match: 'ANY' }, row: { match: 'HEADER' }, style: '{background: "#F5F5F5"}', value: 'column.header' },
+        { column: { match: 'ANY' }, row: { match: 'HEADER' }, style: '{background: "#F5F5F5", border: {width: 1, color: "gray"}}', value: 'column.header' },
         // TODO: Make sure that rules with "value" don't have any other fields
         { value: 'data[row.id][column.id]' }
     ],

@@ -48,6 +48,10 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
         data=data,
         formatting=[
             {
+                'condition': 'row.index % 2 == 0',
+                'style': '{background: "#fdfdfd"}'
+            },
+            {
                 'column': {'id': 'column_5'},
                 'style': '{background: "lightgreen"}'
             },
@@ -82,11 +86,11 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
             },
             {
                 'column': {'index': 0},
-                'style': '{borderLeft: {width: 5}}'
+                'style': '{borderLeft: {width: 1}}'
             },
             {
                 'column': {'index': 1},
-                'style': '{borderRight: {width: 5, color: "red"}, background: "lightgrey"}'
+                'style': '{borderRight: {width: 1, color: "red"}, background: "lightgrey"}'
             },
             {
                 'column': {'index': 6},
