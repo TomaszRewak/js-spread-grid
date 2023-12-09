@@ -100,41 +100,45 @@ export default function GridCanvas({
             canvas.style.marginLeft = `${left}px`;
             canvas.style.marginTop = `${top}px`;
             canvas.style.marginRight = `${totalWidth - width - left}px`;
-            canvas.style.marginBottom = `${totalHeight - height - top}px`;
+            canvas.style.marginBottom = `${totalHeight - height - top}px`;;
 
-            ctx.scale(devicePixelRatio, devicePixelRatio);
-            ctx.translate(-left, -top);
-
-            ctx.clearRect(0, 0, totalWidth, totalHeight);
             ctx.fillStyle = "#E9E9E9";
-            ctx.fillRect(0, 0, totalWidth, totalHeight);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const setTransform = (x, y) => {
+                ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, (x - left) * devicePixelRatio, (y - top) * devicePixelRatio);
+            };
+            const setClip = (width, height) => {
+                ctx.beginPath();
+                ctx.rect(0, 0, width, height);
+                ctx.clip();
+            };
 
             // Draw cells
             for (let columnIndex = minVisibleColumnIndex; columnIndex <= maxVisibleColumnIndex; columnIndex++) {
+                ctx.save();
+                setTransform(horizontalOffsets[columnIndex], 0);
+                setClip(columnWidths[columnIndex], totalHeight);
+
                 for (let rowIndex = minVisibleRowIndex; rowIndex <= maxVisibleRowIndex; rowIndex++) {
                     const cell = getCell(rowIndex, columnIndex);
                     const style = cell.style;
-                    const top = verticalOffsets[rowIndex];
-                    const left = horizontalOffsets[columnIndex];
-                    const width = columnWidths[columnIndex];
-                    const height = rowHeights[rowIndex];
+                    const cellTop = verticalOffsets[rowIndex];
+                    const cellLeft = horizontalOffsets[columnIndex];
+                    const cellWidth = columnWidths[columnIndex];
+                    const cellHeight = rowHeights[rowIndex];
                     const text = `X${cell.value}`;
                     const textAlign = style.textAlign || 'left';
                     const textBaseline = style.textBaseline || 'middle';
 
-                    // TODO: Check what's the best place to save and restore the context (before or after setting the clip text parameters)
-                    ctx.save();
-                    ctx.translate(left, top);
-                    ctx.beginPath();
-                    ctx.rect(0, 0, width, height);
-                    ctx.clip();
+                    setTransform(cellLeft, cellTop);
 
                     ctx.fillStyle = style.background || 'white';
-                    ctx.fillRect(0, 0, width, height);
+                    ctx.fillRect(0, 0, cellWidth, cellHeight);
 
                     if (style.highlight) {
                         ctx.fillStyle = style.highlight;
-                        ctx.fillRect(0, 0, width, height);
+                        ctx.fillRect(0, 0, cellWidth, cellHeight);
                     }
 
                     ctx.fillStyle = "#000";
@@ -146,21 +150,24 @@ export default function GridCanvas({
 
                     const textX = 
                         textAlign === 'left' ? 5 :
-                        textAlign === 'center' ? width / 2 :
-                        textAlign === 'right' ? width - 5 :
+                        textAlign === 'center' ? cellWidth / 2 :
+                        textAlign === 'right' ? cellWidth - 5 :
                         0;
 
                     const textY =
                         textBaseline === 'top' ? 5 :
-                        textBaseline === 'middle' ? height / 2 :
-                        textBaseline === 'bottom' ? height - 5 :
+                        textBaseline === 'middle' ? cellHeight / 2 :
+                        textBaseline === 'bottom' ? cellHeight - 5 :
                         0;
 
+                    // TODO: Clip if the text is too high (and draw some indicator if you do)
                     ctx.fillText(text, textX, textY);
-
-                    ctx.restore();
                 }
+
+                ctx.restore();
             }
+
+            setTransform(0, 0);
 
             // Draw borders
 
