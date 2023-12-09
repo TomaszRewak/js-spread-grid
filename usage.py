@@ -33,6 +33,9 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
             {'type': 'HEADER', 'height': 20},
             *rows[:2],
             {'id': 100, 'height': 7},
+            {'id': 101, 'height': 70},
+            {'id': 102, 'height': 70},
+            {'id': 103, 'height': 70},
             *rows[8:10],
             {'type': 'HEADER', 'height': 20},
         ],
@@ -88,6 +91,9 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
             {
                 'column': {'index': 6},
                 'style': '{borderLeft: {width: 5, dash: [15, 15]}, borderRight: {width: 5, dash: [15, 15]}, background: "lightgrey"}'
+            },{
+                'condition': 'value < 70',
+                'value': '"small [jjj]"'
             },
             {
                 'condition': 'value < 100',
@@ -104,6 +110,18 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
             {
                 'column': {'id': 'column_3'},
                 'style': '{textAlign: "center", textBaseline: "bottom"}'
+            },
+            {
+                'row': {'id': 101},
+                'style': '{textBaseline: "top"}'
+            },
+            {
+                'row': {'id': 102},
+                'style': '{textBaseline: "middle"}'
+            },
+            {
+                'row': {'id': 103},
+                'style': '{textBaseline: "bottom"}'
             }
         ],
     ),

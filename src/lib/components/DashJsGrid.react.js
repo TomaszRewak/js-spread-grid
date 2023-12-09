@@ -6,7 +6,7 @@ import FormatResolver from '../utils/FormatResolver';
 import useScrollRect from '../hooks/useScrollRect';
 import stringifyId from '../utils/stringifyId';
 import GridInteractions from '../fragments/GridInteractions.react';
-import useDevicePixelRatio from '../hooks/useDevicePixelRatio';
+import useDevicePixelRatio, { roundToPixels } from '../hooks/useDevicePixelRatio';
 import Conditional from '../fragments/Conditional.react';
 
 function useResolvedColumns(columns) {
@@ -87,10 +87,6 @@ function useIndexedDefinitions(definitions) {
             key: stringifyId(definition.id),
         }));
     }, [definitions]);
-}
-
-function roundToPixels(value, devicePixelRatio) {
-    return Math.round(value * devicePixelRatio) / devicePixelRatio;
 }
 
 function useDefinitionWithRoundedWidth(columnDefinitions, devicePixelRatio) {
