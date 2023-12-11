@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
+import TextResolver from "../utils/TextResolver";
+import { roundToPixels } from "../hooks/useDevicePixelRatio";
 
 // TODO: Upgrade to react 18 for better performance
 /** TODO: update the arguments to reflect the real props
@@ -16,7 +18,7 @@ export default function GridCanvas({
     data,
     columns,
     rows,
-    formattingResolver,
+    formatResolver,
     showLeftBorder,
     showTopBorder,
     showRightBorder,
@@ -30,9 +32,10 @@ export default function GridCanvas({
     devicePixelRatio
 }) {
     const [canvas, setCanvas] = useState(null);
+    const textResolver = useMemo(() => new TextResolver(), []);
 
     // TODO: Read and apply: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas?retiredLocale=pl
-
+    // TODO: Redraw only the cells that have actually changed
     useEffect(() => {
         const draw = () => {
             if (!canvas)
@@ -40,6 +43,8 @@ export default function GridCanvas({
 
             // Checking how often this is called
             console.log('draw');
+
+            // TODO: Borders are still blurry after scrolling at high zoom-out levels
 
             const ctx = canvas.getContext("2d");
             // TODO: Make that "1" configurable as cell spacing
@@ -88,7 +93,7 @@ export default function GridCanvas({
                 const row = rows[rowIndex + minVisibleRowIndex];
                 return Array.from({ length: maxVisibleColumnIndex - minVisibleColumnIndex + 1 }, (_, columnIndex) => {
                     const column = columns[columnIndex + minVisibleColumnIndex];
-                    return formattingResolver.resolve(data, rows, columns, row, column);
+                    return formatResolver.resolve(data, rows, columns, row, column);
                 });
             });
             const getCell = (rowIndex, columnIndex) => cells[rowIndex - minVisibleRowIndex][columnIndex - minVisibleColumnIndex];
@@ -100,41 +105,109 @@ export default function GridCanvas({
             canvas.style.marginLeft = `${left}px`;
             canvas.style.marginTop = `${top}px`;
             canvas.style.marginRight = `${totalWidth - width - left}px`;
-            canvas.style.marginBottom = `${totalHeight - height - top}px`;
+            canvas.style.marginBottom = `${totalHeight - height - top}px`;;
 
-            ctx.scale(devicePixelRatio, devicePixelRatio);
-            ctx.translate(-left, -top);
-
-            ctx.clearRect(0, 0, totalWidth, totalHeight);
             ctx.fillStyle = "#E9E9E9";
-            ctx.fillRect(0, 0, totalWidth, totalHeight);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const setTransform = (x, y) => {
+                ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, (x - left) * devicePixelRatio, (y - top) * devicePixelRatio);
+            };
+            const setClip = (x, y, width, height) => {
+                ctx.beginPath();
+                ctx.rect(x, y, width, height);
+                ctx.clip();
+            };
 
             // Draw cells
             for (let columnIndex = minVisibleColumnIndex; columnIndex <= maxVisibleColumnIndex; columnIndex++) {
+                ctx.save();
+                setTransform(horizontalOffsets[columnIndex], 0);
+                setClip(0, 0, columnWidths[columnIndex], totalHeight);
+
                 for (let rowIndex = minVisibleRowIndex; rowIndex <= maxVisibleRowIndex; rowIndex++) {
                     const cell = getCell(rowIndex, columnIndex);
                     const style = cell.style;
-                    const top = verticalOffsets[rowIndex];
-                    const left = horizontalOffsets[columnIndex];
-                    const width = columnWidths[columnIndex];
-                    const height = rowHeights[rowIndex];
+                    const cellTop = verticalOffsets[rowIndex];
+                    const cellLeft = horizontalOffsets[columnIndex];
+                    const cellWidth = columnWidths[columnIndex];
+                    const cellHeight = rowHeights[rowIndex];
+                    const text = `${cell.value}`;
+                    const textAlign = style.textAlign || 'left';
+                    const textBaseline = style.textBaseline || 'middle';
+                    const paddingLeft = 'paddingLeft' in style ? style.paddingLeft : 5;
+                    const paddingRight = 'paddingRight' in style ? style.paddingRight : 5;
+                    const paddingTop = 'paddingTop' in style ? style.paddingTop : 2;
+                    const paddingBottom = 'paddingBottom' in style ? style.paddingBottom : 2;
+
+                    setTransform(cellLeft, cellTop);
 
                     ctx.fillStyle = style.background || 'white';
-                    ctx.fillRect(left, top, width, height);
+                    ctx.fillRect(0, 0, cellWidth, cellHeight);
 
                     if (style.highlight) {
                         ctx.fillStyle = style.highlight;
-                        ctx.fillRect(left, top, width, height);
+                        ctx.fillRect(0, 0, cellWidth, cellHeight);
                     }
 
                     ctx.fillStyle = "#000";
-                    ctx.fillText(cell.value, left + 5, top + height - 5);
+                    ctx.font = style.font || '12px Calibri';
+                    ctx.textAlign = textAlign;
+
+                    const fontMetrics = textResolver.getFontMetrics(ctx.font);
+
+                    // TODO: Make sure that values are rounded using devicePixelRatio
+                    const textX = roundToPixels(
+                        textAlign === 'left' ? paddingLeft :
+                        textAlign === 'center' ? cellWidth / 2 :
+                        textAlign === 'right' ? cellWidth - paddingRight :
+                        0,
+                        devicePixelRatio
+                    );
+
+                    const textY = roundToPixels(
+                        textBaseline === 'top' ? fontMetrics.middle + fontMetrics.topOffset + paddingTop :
+                        textBaseline === 'middle' ? cellHeight / 2 + fontMetrics.middle :
+                        textBaseline === 'bottom' ? cellHeight + fontMetrics.middle - fontMetrics.bottomOffset - paddingBottom :
+                        0,
+                        devicePixelRatio
+                    );
+
+                    const fitsVertically = textY - fontMetrics.middle - fontMetrics.topOffset >= 0 && textY - fontMetrics.middle + fontMetrics.bottomOffset <= cellHeight;
+
+                    if (fitsVertically) {
+                        ctx.fillText(text, textX, textY);
+                    }
+                    else {
+                        // TODO: Clip if the text is too high (and draw some indicator if you do)
+                        ctx.strokeStyle = '#E9E9E9';
+                        ctx.lineWidth = borderWidth;
+
+                        ctx.beginPath();
+                        ctx.moveTo(0, borderWidth + borderOffset);
+                        ctx.lineTo(cellWidth, borderWidth + borderOffset);
+                        ctx.moveTo(0, cellHeight - borderWidth - borderOffset);
+                        ctx.lineTo(cellWidth, cellHeight - borderWidth - borderOffset);
+                        ctx.stroke();
+
+                        ctx.save();
+                        setClip(0, 2 * borderWidth, cellWidth, cellHeight - 4 * borderWidth);
+                        
+                        ctx.fillText(text, textX, textY);
+
+                        ctx.restore();
+                    }
                 }
+
+                ctx.restore();
             }
+
+            setTransform(0, 0);
 
             // Draw borders
 
-            // TODO: memo/move somewhere
+            // TODO: clip drawing area to the middle of neighboring columns/rows (might be useful for redrawing only the changed cells)
+            // TODO: move somewhere (?)
             const drawBorder = (x1, y1, x2, y2, style) => {
                 if (!style)
                     return;
@@ -143,6 +216,7 @@ export default function GridCanvas({
 
                 const isHorizontal = y1 === y2;
 
+                // TODO: Don't add offset if the border is not continued
                 const xa = x1 - (isHorizontal ? width / 2 : 0);
                 const ya = y1 - (!isHorizontal ? width / 2 : 0);
                 const xb = x2 + (isHorizontal ? width / 2 : 0);
@@ -222,7 +296,7 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, showRightBorder, showBottomBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth, formattingResolver, data]);
+    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, showRightBorder, showBottomBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth, formatResolver, data, textResolver]);
 
     // TODO: style={{imageRendering: 'pixelated'}} - is this even needed, though?
     // TODO: memoize style

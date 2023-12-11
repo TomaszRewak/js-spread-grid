@@ -32,17 +32,25 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
         rowsTop=[
             {'type': 'HEADER', 'height': 20},
             *rows[:2],
+            {'id': 100, 'height': 7},
+            {'id': 101, 'height': 70},
+            {'id': 102, 'height': 70},
+            {'id': 103, 'height': 70},
             *rows[8:10],
             {'type': 'HEADER', 'height': 20},
         ],
         rows=rows[2:-2],
         rowsBottom=[
-            {'type': 'HEADER', 'height': 20, 'fixed': 'bottom'},
+            {'type': 'HEADER', 'height': 20},
             *rows[-2:],
-            {'type': 'HEADER', 'height': 20, 'fixed': 'bottom'},
+            {'type': 'HEADER', 'height': 20},
         ],
         data=data,
         formatting=[
+            {
+                'condition': 'row.index % 2 == 0',
+                'style': '{background: "#fdfdfd"}'
+            },
             {
                 'column': {'id': 'column_5'},
                 'style': '{background: "lightgreen"}'
@@ -78,19 +86,46 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
             },
             {
                 'column': {'index': 0},
-                'style': '{borderLeft: {width: 5}}'
+                'style': '{borderLeft: {width: 1}}'
             },
             {
                 'column': {'index': 1},
-                'style': '{borderRight: {width: 5, color: "red"}, background: "lightgrey"}'
+                'style': '{borderRight: {width: 1, color: "red"}, background: "lightgrey"}'
             },
             {
                 'column': {'index': 6},
                 'style': '{borderLeft: {width: 5, dash: [15, 15]}, borderRight: {width: 5, dash: [15, 15]}, background: "lightgrey"}'
+            },{
+                'condition': 'value < 70',
+                'value': '"small [jjj]"'
             },
             {
                 'condition': 'value < 100',
                 'value': '"SMALL"'
+            },
+            {
+                'row': {'id': 20},
+                'value': '"ABCDEFGHIJKLMNOPQRSTUVXYZ"'
+            },
+            {
+                'column': {'id': 'column_5'},
+                'style': '{textAlign: "right"}'
+            },
+            {
+                'column': {'id': 'column_3'},
+                'style': '{textAlign: "center", textBaseline: "bottom"}'
+            },
+            {
+                'row': {'id': 101},
+                'style': '{textBaseline: "top"}'
+            },
+            {
+                'row': {'id': 102},
+                'style': '{textBaseline: "middle"}'
+            },
+            {
+                'row': {'id': 103},
+                'style': '{textBaseline: "bottom"}'
             }
         ],
     ),
