@@ -9,6 +9,10 @@ import GridInteractions from '../fragments/GridInteractions.react';
 import useDevicePixelRatio, { roundToPixels } from '../hooks/useDevicePixelRatio';
 import Conditional from '../fragments/Conditional.react';
 
+function isString(value) {
+    return typeof value === 'string' || value instanceof String;
+}
+
 function useResolvedColumns(columns) {
     return useMemo(() => {
         if (typeof columns !== 'string')
@@ -29,13 +33,22 @@ function useResolvedRows(rows) {
 
 function useResolvedFormatting(formatting) {
     return useMemo(() => {
-        return formatting.map(rule => ({
-            column: rule.column || { match: 'DATA' },
-            row: rule.row || { match: 'DATA' },
-            condition: rule.condition ? eval(`(data, rows, columns, row, column, value) => (${rule.condition})`) : null,
-            style: rule.style ? eval(`(data, rows, columns, row, column, value) => (${rule.style})`) : null,
-            value: rule.value ? eval(`(data, rows, columns, row, column, value) => (${rule.value})`) : null
-        }));
+        return formatting.map(rule => {
+            const mappedRule = {};
+
+            if ('column' in rule)
+                mappedRule.column = rule.column;
+            if ('row' in rule)
+                mappedRule.row = rule.row;
+            if ('condition' in rule)
+                mappedRule.condition = eval(`(data, rows, columns, row, column, value) => (${rule.condition})`);
+            if ('style' in rule)
+                mappedRule.style = isString(rule.style) ? eval(`(data, rows, columns, row, column, value) => (${rule.style})`) : rule.style;
+            if ('value' in rule)
+                mappedRule.value = eval(`(data, rows, columns, row, column, value) => (${rule.value})`);
+
+            return mappedRule;
+        });
     }, [formatting]);
 }
 

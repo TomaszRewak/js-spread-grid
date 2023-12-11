@@ -49,12 +49,24 @@ export default class FormatResolver {
         const columnLookup = this.columnLookup;
         const index = this.rulesCount++;
 
-        const column = 'id' in rule.column
-            ? { key: stringifyId(rule.column.id) }
-            : rule.column;
-        const row = 'id' in rule.row
-            ? { key: stringifyId(rule.row.id) }
-            : rule.row;
+        const column = 'column' in rule
+            ? 'id' in rule.column
+                ? { key: stringifyId(rule.column.id) }
+                : rule.column
+            : { match: 'DATA' };
+        const row = 'row' in rule
+            ? 'id' in rule.row
+                ? { key: stringifyId(rule.row.id) }
+                : rule.row
+            : { match: 'DATA' };
+
+        const entry = {};
+        if ('condition' in rule)
+            entry.condition = rule.condition;
+        if ('style' in rule)
+            entry.style = typeof rule.style === 'function' ? rule.style : () => rule.style;
+        if ('value' in rule)
+            entry.value = typeof rule.value === 'function' ? rule.value : () => rule.value;
 
         function addRowRule(lookup, key) {
             if (!lookup.has(key))
@@ -62,9 +74,7 @@ export default class FormatResolver {
 
             lookup.get(key).push({
                 index: index,
-                condition: rule.condition,
-                style: rule.style,
-                value: rule.value
+                ...entry
             });
         }
 
@@ -123,12 +133,12 @@ export default class FormatResolver {
         let style = {};
 
         for (const rule of rules) {
-            if (rule.condition && !rule.condition(data, rows, columns, row, column, value))
+            if ('condition' in rule && !rule.condition(data, rows, columns, row, column, value))
                 continue;
 
-            if (rule.value)
+            if ('value' in rule)
                 value = rule.value(data, rows, columns, row, column, value);
-            if (rule.style)
+            if ('style' in rule)
                 style = { ...style, ...indexBorders(rule.style(data, rows, columns, row, column, value), rule.index) };
         }
 
