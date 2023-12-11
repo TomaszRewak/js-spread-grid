@@ -63,7 +63,7 @@ function useResolvedProps(props) {
     const rowsBottom = useResolvedRows(props.rowsBottom);
     const defaultFormatting = useResolvedFormatting(props.defaultFormatting);
     const formatting = useResolvedFormatting(props.formatting);
-    const hoverCell = props.hoverCell;
+    const hoveredCell = props.hoveredCell;
     const selectedCells = props.selectedCells;
 
     return {
@@ -77,7 +77,7 @@ function useResolvedProps(props) {
         rowsBottom,
         defaultFormatting,
         formatting,
-        hoverCell,
+        hoveredCell,
         selectedCells
     }
 }
@@ -148,7 +148,7 @@ function DashJsGrid(props) {
     // TODO: Allow rows/columns to have parentId (or groupId?) to group them together and filter/sort them as a group
     // TODO: wrap props into a function so that you can do setProps(prevProps => ...)
 
-    const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, defaultFormatting, formatting, hoverCell, selectedCells } = useResolvedProps(props);
+    const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, defaultFormatting, formatting, hoveredCell, selectedCells } = useResolvedProps(props);
     const [container, setContainer] = useState(null);
     const [fixedTop, setFixedTop] = useState(null);
     const [fixedBottom, setFixedBottom] = useState(null);
@@ -168,8 +168,8 @@ function DashJsGrid(props) {
     const bottomRows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useInvoked(rowsBottom, [data])), devicePixelRatio);
 
     const formatResolver = useMemo(() => {
-        const hoveredColumnKey = hoverCell ? stringifyId(hoverCell.columnId) : null;
-        const hoveredRowKey = hoverCell ? stringifyId(hoverCell.rowId) : null;
+        const hoveredColumnKey = hoveredCell ? stringifyId(hoveredCell.columnId) : null;
+        const hoveredRowKey = hoveredCell ? stringifyId(hoveredCell.rowId) : null;
 
         const isSelected = (rows, columns, rowIndex, columnIndex) => {
             if (rowIndex < 0 || rowIndex >= rows.length)
@@ -213,7 +213,7 @@ function DashJsGrid(props) {
         ];
 
         return new FormatResolver(allRules);
-    }, [defaultFormatting, formatting, hoverCell, selectedCellsLookup]);
+    }, [defaultFormatting, formatting, hoveredCell, selectedCellsLookup]);
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
@@ -415,7 +415,7 @@ function DashJsGrid(props) {
                 middleRows={middleRows}
                 bottomRows={bottomRows}
                 borderWidth={borderWidth}
-                hoverCell={hoverCell}
+                hoveredCell={hoveredCell}
                 selectedCells={selectedCells}
                 selectedCellsLookup={selectedCellsLookup}
                 setProps={setProps}
@@ -463,7 +463,7 @@ DashJsGrid.propTypes = {
         })
     ),
     //
-    hoverCell: PropTypes.shape({
+    hoveredCell: PropTypes.shape({
         rowId: PropTypes.any,
         columnId: PropTypes.any
     }),
@@ -490,7 +490,8 @@ DashJsGrid.defaultProps = {
         { value: 'data[row.id][column.id]' }
     ],
     formatting: [],
-    hoverCell: null,
+    hoveredCell: null,
+    highlightedCell: null,
     selectedCells: []
 };
 

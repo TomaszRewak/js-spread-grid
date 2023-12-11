@@ -218,7 +218,7 @@ function pickRows(topRowPlacement, middleRowPlacement, bottomRowPlacement, y, he
 }
 
 
-export default function GridInteractions({ setProps, container, leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth, hoverCell, selectedCells, selectedCellsLookup }) {
+export default function GridInteractions({ setProps, container, leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth, hoveredCell, selectedCells, selectedCellsLookup }) {
     const size = useSize(container);
     const mousePosition = useMousePosition(container);
     const scrollOffset = useScrollOffset(container);
@@ -232,7 +232,7 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
 
     useEffect(() => {
         if (!mousePosition) {
-            setProps({ hoverCell: null });
+            setProps({ hoveredCell: null });
             return;
         }
 
@@ -243,7 +243,7 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
         const hoverColumnIndex = findColumnIndex(columns, x);
 
         if (hoverRowIndex === -1 || hoverColumnIndex === -1) {
-            setProps({ hoverCell: null });
+            setProps({ hoveredCell: null });
             return;
         }
 
@@ -255,25 +255,25 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
             columnId: hoverColumnId
         };
 
-        // TODO: This effect should not use hoverCell, instead it should do something like setProps(oldProps => { ... }) - to avoid unnecessary rerenders
-        if (stringifyId(hoverCell) === stringifyId(newHover))
+        // TODO: This effect should not use hoveredCell, instead it should do something like setProps(oldProps => { ... }) - to avoid unnecessary rerenders
+        if (stringifyId(hoveredCell) === stringifyId(newHover))
             return;
 
         // TODO: remove console.log
         console.log('newHover', newHover);
         
-        setProps({ hoverCell: newHover });
-    }, [bottomRowPlacement, leftColumnPlacement, middleColumnPlacement, middleColumns, middleRowPlacement, middleRows, mousePosition, rightColumnPlacement, size, scrollOffset, topRowPlacement, setProps, hoverCell]);
+        setProps({ hoveredCell: newHover });
+    }, [bottomRowPlacement, leftColumnPlacement, middleColumnPlacement, middleColumns, middleRowPlacement, middleRows, mousePosition, rightColumnPlacement, size, scrollOffset, topRowPlacement, setProps, hoveredCell]);
 
     useEffect(() => {
         if (!container)
             return () => { };
 
         const onClick = () => {
-            const hoverRowKey = stringifyId(hoverCell.rowId);
-            const hoverColumnKey = stringifyId(hoverCell.columnId);
+            const hoverRowKey = stringifyId(hoveredCell.rowId);
+            const hoverColumnKey = stringifyId(hoveredCell.columnId);
 
-            if (!hoverCell)
+            if (!hoveredCell)
                 return;
 
             if (selectedCellsLookup.has(hoverRowKey) && selectedCellsLookup.get(hoverRowKey).has(hoverColumnKey))
@@ -282,14 +282,14 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
             console.log(selectedCells);
 
             setProps({
-                selectedCells: [...selectedCells, hoverCell]
+                selectedCells: [...selectedCells, hoveredCell]
             });
         };
 
         container.addEventListener('click', onClick);
 
         return () => container.removeEventListener('click', onClick);
-    }, [container, hoverCell, selectedCells, selectedCellsLookup, setProps]);
+    }, [container, hoveredCell, selectedCells, selectedCellsLookup, setProps]);
 
     return (
         <></>
