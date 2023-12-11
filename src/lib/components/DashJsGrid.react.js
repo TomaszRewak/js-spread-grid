@@ -64,7 +64,9 @@ function useResolvedProps(props) {
     const defaultFormatting = useResolvedFormatting(props.defaultFormatting);
     const formatting = useResolvedFormatting(props.formatting);
     const hoveredCell = props.hoveredCell;
+    const focusedCell = props.focusedCell;
     const selectedCells = props.selectedCells;
+    const highlightedCells = props.highlightedCells;
 
     return {
         setProps,
@@ -78,7 +80,9 @@ function useResolvedProps(props) {
         defaultFormatting,
         formatting,
         hoveredCell,
-        selectedCells
+        focusedCell,
+        selectedCells,
+        highlightedCells
     }
 }
 
@@ -139,6 +143,7 @@ function useSelectedCellsLookup(selectedCells) {
 }
 
 // TODO: Write description
+// TODO: Rename to DashSpreadGrid
 function DashJsGrid(props) {
     // TODO: Use intersection observer to only render the grid if it is in view
     // TODO: Selected columns (selected rows): [{columnId: 'col1', headerId: 'default'}]
@@ -148,7 +153,7 @@ function DashJsGrid(props) {
     // TODO: Allow rows/columns to have parentId (or groupId?) to group them together and filter/sort them as a group
     // TODO: wrap props into a function so that you can do setProps(prevProps => ...)
 
-    const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, defaultFormatting, formatting, hoveredCell, selectedCells } = useResolvedProps(props);
+    const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, defaultFormatting, formatting, hoveredCell, focusedCell, selectedCells, highlightedCells } = useResolvedProps(props);
     const [container, setContainer] = useState(null);
     const [fixedTop, setFixedTop] = useState(null);
     const [fixedBottom, setFixedBottom] = useState(null);
@@ -158,6 +163,7 @@ function DashJsGrid(props) {
     // TODO: Borders still seem to be blurry for large number of rows/columns
     const devicePixelRatio = useDevicePixelRatio();
     const borderWidth = 1 / devicePixelRatio;
+    // TODO: Use something better than a map of maps (it's annoying to work with)
     const selectedCellsLookup = useSelectedCellsLookup(selectedCells);
 
     const leftColumns = useDefinitionWithRoundedWidth(useIndexedDefinitions(useInvoked(columnsLeft, [data])), devicePixelRatio);
@@ -170,6 +176,9 @@ function DashJsGrid(props) {
     const formatResolver = useMemo(() => {
         const hoveredColumnKey = hoveredCell ? stringifyId(hoveredCell.columnId) : null;
         const hoveredRowKey = hoveredCell ? stringifyId(hoveredCell.rowId) : null;
+
+        const focusedColumnKey = focusedCell ? stringifyId(focusedCell.columnId) : null;
+        const focusedRowKey = focusedCell ? stringifyId(focusedCell.rowId) : null;
 
         const isSelected = (rows, columns, rowIndex, columnIndex) => {
             if (rowIndex < 0 || rowIndex >= rows.length)
@@ -190,13 +199,13 @@ function DashJsGrid(props) {
                 column: { match: 'ANY' },
                 row: { match: 'ANY' },
                 condition: (data, rows, columns, row, column, value) => hoveredColumnKey === column.key || hoveredRowKey === row.key,
-                style: () => ({ highlight: "#81948133" }),
+                style: { highlight: "#81948133" },
             },
             {
                 column: { match: 'ANY' },
                 row: { match: 'ANY' },
                 condition: (data, rows, columns, row, column, value) => hoveredColumnKey === column.key && hoveredRowKey === row.key,
-                style: () => ({ highlight: "#81948188" }),
+                style: { highlight: "#81948188" },
             },
             {
                 column: { match: 'ANY' },
@@ -207,13 +216,19 @@ function DashJsGrid(props) {
                     ...(!isSelected(rows, columns, row.index + 1, column.index) ? { borderBottom: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
                     ...(!isSelected(rows, columns, row.index, column.index - 1) ? { borderLeft: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
                     ...(!isSelected(rows, columns, row.index, column.index + 1) ? { borderRight: { width: 5, color: '#596959', index: Number.MAX_SAFE_INTEGER } } : {}),
-                    highlight: "#81948199"
+                    highlight: focusedColumnKey !== column.key || focusedRowKey !== row.key ? "#81948199" : null // TODO: Maybe set while background for the focused cell?
                 }),
+            },
+            {
+                column: { match: 'ANY' },
+                row: { match: 'ANY' },
+                condition: (data, rows, columns, row, column, value) => focusedColumnKey === column.key && focusedRowKey === row.key,
+                style: { background: "white" },
             }
         ];
 
         return new FormatResolver(allRules);
-    }, [defaultFormatting, formatting, hoveredCell, selectedCellsLookup]);
+    }, [defaultFormatting, formatting, hoveredCell, focusedCell, selectedCellsLookup]);
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
@@ -243,7 +258,8 @@ function DashJsGrid(props) {
         <div
             className='dash-js-grid'
             ref={setContainer}
-            style={{ maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', position: 'relative', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto' }}
+            tabIndex={0}
+            style={{ maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', position: 'relative', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto', outline: 'none' }}
         >
             <div ref={setFixedLeft} style={{ gridRow: '1 / 4', gridColumn: '1' }} />
             <div ref={setFixedRight} style={{ gridRow: '1 / 4', gridColumn: '3' }} />
@@ -416,6 +432,7 @@ function DashJsGrid(props) {
                 bottomRows={bottomRows}
                 borderWidth={borderWidth}
                 hoveredCell={hoveredCell}
+                focusedCell={focusedCell}
                 selectedCells={selectedCells}
                 selectedCellsLookup={selectedCellsLookup}
                 setProps={setProps}
@@ -458,7 +475,7 @@ DashJsGrid.propTypes = {
             ]),
             condition: PropTypes.string,
             // TODO: Make this also accept style objects
-            style: PropTypes.string,
+            style: PropTypes.oneOfType([PropTypes.string, PropTypes.any]),
             text: PropTypes.string
         })
     ),
@@ -468,7 +485,19 @@ DashJsGrid.propTypes = {
         columnId: PropTypes.any
     }),
     //
+    focusedCell: PropTypes.shape({
+        rowId: PropTypes.any,
+        columnId: PropTypes.any
+    }),
+    //
     selectedCells: PropTypes.arrayOf(
+        PropTypes.shape({
+            rowId: PropTypes.any,
+            columnId: PropTypes.any
+        })
+    ),
+    //
+    highlightedCells: PropTypes.arrayOf(
         PropTypes.shape({
             rowId: PropTypes.any,
             columnId: PropTypes.any
@@ -491,8 +520,9 @@ DashJsGrid.defaultProps = {
     ],
     formatting: [],
     hoveredCell: null,
-    highlightedCell: null,
-    selectedCells: []
+    focusedCell: null,
+    selectedCells: [],
+    highlightedCells: []
 };
 
 export default DashJsGrid;

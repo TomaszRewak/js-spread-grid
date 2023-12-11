@@ -30,7 +30,7 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
         columns=columns[2:-1],
         columnsRight=columns[-1:],
         rowsTop=[
-            {'type': 'HEADER', 'height': 20},
+            {'id':'top', 'type': 'HEADER', 'height': 20},
             *rows[:2],
             {'id': 100, 'height': 7},
             {'id': 101, 'height': 70},
@@ -49,11 +49,15 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
         formatting=[
             {
                 'condition': 'row.index % 2 == 0',
-                'style': '{background: "#fdfdfd"}'
+                'style': {'background': '#fdfdfd'}
+            },
+            {
+                'column': {'id': 'column_11'},
+                'style': '{background: `rgb(${value % 255}, 100, 100)`}'
             },
             {
                 'column': {'id': 'column_5'},
-                'style': '{background: "lightgreen"}'
+                'style': {'background': 'lightgreen'}
             },
             {
                 'row': {'id': 6},
