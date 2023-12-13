@@ -99,14 +99,6 @@ export function useInteraction(name, handler) {
     useContext(InteractionsContext).interactions.current[name] = handler;
 }
 
-export function useScrollOffset() {
-    return useContext(InteractionsContext).scrollOffset;
-}
-
-export function useMousePosition() {
-    return useContext(InteractionsContext).mousePosition;
-}
-
-export function useSize() {
-    return useContext(InteractionsContext).size;
-}
+export const useScrollOffset = () => useContext(InteractionsContext).scrollOffset;
+export const useMousePosition = () => useContext(InteractionsContext).mousePosition;
+export const useSize = () => useContext(InteractionsContext).size;

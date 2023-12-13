@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
 import { useInteraction, useMousePosition, useScrollOffset, useSize } from '../contexts/InteractionsContext.react';
+import { useAddSelectedCells, useFocusedCell, useHoveredCell, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells } from '../contexts/StateContext.react';
+import Selection from '../utils/Selection';
 
 function useColumnPlacement(columns, borderWidth) {
     return useMemo(() => {
@@ -113,12 +115,19 @@ function pickRows(topRowPlacement, middleRowPlacement, bottomRowPlacement, y, he
 }
 
 
-export default function GridInteractions({ setProps, leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth, hoveredCell, focusedCell, selectedCells, selectedCellsLookup }) {
+export default function GridInteractions({ /*don't remove yet, as the ones in StateContext are not rounded*/leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth }) {
     // console.count('render GridInteractions');
 
     const size = useSize();
     const mousePosition = useMousePosition();
     const scrollOffset = useScrollOffset();
+    const hoveredCell = useHoveredCell();
+    const focusedCell = useFocusedCell();
+
+    const setSelectedCells = useSetSelectedCells();
+    const setHoveredCell = useSetHoveredCell();
+    const setFocusedCell = useSetFocusedCell();
+    const addSelectedCells = useAddSelectedCells();
 
     const leftColumnPlacement = useColumnPlacement(leftColumns, borderWidth);
     const middleColumnPlacement = useColumnPlacement(middleColumns, borderWidth);
@@ -135,7 +144,7 @@ export default function GridInteractions({ setProps, leftColumns, middleColumns,
 
     useEffect(() => {
         if (!mousePosition) {
-            setProps({ hoveredCell: null });
+            setHoveredCell(null);
             return;
         }
 
@@ -146,76 +155,38 @@ export default function GridInteractions({ setProps, leftColumns, middleColumns,
         const hoverColumnIndex = findColumnIndex(columns, x);
 
         if (hoverRowIndex === -1 || hoverColumnIndex === -1) {
-            setProps({ hoveredCell: null });
+            setHoveredCell(null);
             return;
         }
 
-        const hoverRowId = rows[hoverRowIndex].id;
-        const hoverColumnId = columns[hoverColumnIndex].id;
-
-        const newHover = {
-            rowId: hoverRowId,
-            columnId: hoverColumnId
-        };
-
-        if (stringifyId(hoveredCell) === stringifyId(newHover))
-            return;
-
-        // TODO: remove console.log
-        console.log('newHover', newHover);
-
-        setProps({ hoveredCell: newHover });
-    }, [bottomRowPlacement, leftColumnPlacement, middleColumnPlacement, middleColumns, middleRowPlacement, middleRows, mousePosition, rightColumnPlacement, size, scrollOffset, topRowPlacement, setProps, hoveredCell]);
+        setHoveredCell({
+            rowId: rows[hoverRowIndex].id,
+            columnId: columns[hoverColumnIndex].id
+        });
+    }, [bottomRowPlacement, leftColumnPlacement, middleColumnPlacement, middleRowPlacement, mousePosition, rightColumnPlacement, scrollOffset, setHoveredCell, size, topRowPlacement]);
 
     useInteraction('mousedown', event => {
         if (!hoveredCell)
             return;
 
-        const hoverRowKey = stringifyId(hoveredCell.rowId);
-        const hoverColumnKey = stringifyId(hoveredCell.columnId);
+        setFocusedCell(hoveredCell);
 
-        const isAlreadySelected = selectedCellsLookup.has(hoverRowKey) && selectedCellsLookup.get(hoverRowKey).has(hoverColumnKey);
-
-        console.log('selectedCells', selectedCells);
-
-        if (event.ctrlKey) {
-            setProps({
-                focusedCell: hoveredCell,
-                selectedCells: isAlreadySelected
-                    ? selectedCells
-                    : [...selectedCells, hoveredCell]
-            });
-        }
-        else {
-            setProps({
-                focusedCell: hoveredCell,
-                selectedCells: [hoveredCell]
-            });
-        }
+        if (event.ctrlKey)
+            addSelectedCells([hoveredCell]);
+        else
+            setSelectedCells([hoveredCell]);
     });
 
     useInteraction('keydown', event => {
         console.log('onKeyDown', event.key);
 
         const arrowTo = (cell, event) => {
-            if (event.shiftKey) {
-                const columnKey = stringifyId(cell.columnId);
-                const rowKey = stringifyId(cell.rowId);
-                const isAlreadySelected = selectedCellsLookup.has(rowKey) && selectedCellsLookup.get(rowKey).has(columnKey);
+            setFocusedCell(cell);
 
-                setProps({
-                    focusedCell: cell,
-                    selectedCells: isAlreadySelected
-                        ? selectedCells
-                        : [...selectedCells, cell]
-                });
-            }
-            else {
-                setProps({
-                    focusedCell: cell,
-                    selectedCells: [cell]
-                });
-            }
+            if (event.shiftKey)
+                addSelectedCells([cell]);
+            else
+                setSelectedCells([cell]);
         };
 
         const arrowHorizontally = (offset, event) => {
@@ -257,10 +228,8 @@ export default function GridInteractions({ setProps, leftColumns, middleColumns,
         switch (event.key) {
             case 'Escape':
                 {
-                    setProps({
-                        focusedCell: null,
-                        selectedCells: []
-                    });
+                    setFocusedCell(null);
+                    setSelectedCells([]);
                     break;
                 }
             case 'ArrowUp':

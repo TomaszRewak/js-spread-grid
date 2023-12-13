@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react"
 import TextResolver from "../utils/TextResolver";
 import { roundToPixels } from "../hooks/useDevicePixelRatio";
+import { useData, useRenderFormatting } from "../contexts/StateContext.react";
+import FormatResolver from "../utils/FormatResolver";
 
 // TODO: Upgrade to react 18 for better performance
 /** TODO: update the arguments to reflect the real props
@@ -15,10 +17,8 @@ import { roundToPixels } from "../hooks/useDevicePixelRatio";
  * }} props
  */
 export default function GridCanvas({
-    data,
     columns,
     rows,
-    formatResolver,
     showLeftBorder,
     showTopBorder,
     showRightBorder,
@@ -33,6 +33,10 @@ export default function GridCanvas({
 }) {
     const [canvas, setCanvas] = useState(null);
     const textResolver = useMemo(() => new TextResolver(), []);
+    const data = useData();
+    const formatting = useRenderFormatting();
+    // TODO: Make sure those formatters are split based on the rule areas
+    const formatResolver = useMemo(() => new FormatResolver(formatting), [formatting]);
 
     // TODO: Read and apply: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas?retiredLocale=pl
     // TODO: Redraw only the cells that have actually changed
