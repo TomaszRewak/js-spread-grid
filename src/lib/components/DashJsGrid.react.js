@@ -153,6 +153,8 @@ function DashJsGrid(props) {
     // TODO: Allow rows/columns to have parentId (or groupId?) to group them together and filter/sort them as a group
     // TODO: wrap props into a function so that you can do setProps(prevProps => ...)
 
+    console.count('render DashJsGrid');
+
     const { setProps, data, columns, columnsLeft, columnsRight, rows, rowsTop, rowsBottom, defaultFormatting, formatting, hoveredCell, focusedCell, selectedCells, highlightedCells } = useResolvedProps(props);
     const [container, setContainer] = useState(null);
     const [fixedTop, setFixedTop] = useState(null);

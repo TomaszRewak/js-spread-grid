@@ -1,5 +1,7 @@
 import dash_js_grid
-from dash import Dash, callback, html, Input, Output
+from dash import Dash, callback, html, Input, Output, _dash_renderer
+
+_dash_renderer._set_react_version("18.2.0")
 
 app = Dash(__name__)
 
@@ -24,7 +26,7 @@ data = [
     for i in range(rows_count)
 ]
 
-app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
+app.layout = html.Div(style={'maxHeight': '90vh', 'display': 'flex'}, children=[
     dash_js_grid.DashJsGrid(
         columnsLeft=columns[:2],
         columns=columns[2:-1],
@@ -33,9 +35,9 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
             {'id':'top', 'type': 'HEADER', 'height': 20},
             *rows[:2],
             {'id': 100, 'height': 7},
-            {'id': 101, 'height': 70},
-            {'id': 102, 'height': 70},
-            {'id': 103, 'height': 70},
+            {'id': 101, 'height': 50},
+            {'id': 102, 'height': 50},
+            {'id': 103, 'height': 50},
             *rows[8:10],
             {'type': 'HEADER', 'height': 20},
         ],

@@ -219,6 +219,8 @@ function pickRows(topRowPlacement, middleRowPlacement, bottomRowPlacement, y, he
 
 
 export default function GridInteractions({ setProps, container, leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth, hoveredCell, focusedCell, selectedCells, selectedCellsLookup }) {
+    console.count('render GridInteractions');
+
     const size = useSize(container);
     const mousePosition = useMousePosition(container);
     const scrollOffset = useScrollOffset(container);
@@ -275,7 +277,7 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
         if (!container)
             return () => { };
 
-        const onClick = event => {
+        const onMouseDown = event => {
             if (!hoveredCell)
                 return;
 
@@ -303,9 +305,9 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
         };
 
         // TODO: Make sure the event is not re-registered every time one of the dependencies changes
-        container.addEventListener('click', onClick);
+        container.addEventListener('mousedown', onMouseDown);
 
-        return () => container.removeEventListener('click', onClick);
+        return () => container.removeEventListener('mousedown', onMouseDown);
     }, [container, hoveredCell, selectedCells, selectedCellsLookup, setProps]);
 
     useEffect(() => {
@@ -313,8 +315,8 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
             return () => { };
 
         const onKeyDown = (event) => {
-            // event.preventDefault();
-            // event.stopPropagation();
+            event.preventDefault();
+            event.stopPropagation();
 
             console.log('onKeyDown', event.key);
 
@@ -347,9 +349,9 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
                 if (!columnLookup.has(focusedColumnKey))
                     return;
 
-                const focusedColumn = columnLookup.get(focusedColumnKey);
-                const newColumnIndex = focusedColumn.index + offset;
-                if (newColumnIndex < 0 || newColumnIndex >= allColumns.length)
+                const focusedColumnIndex = columnLookup.get(focusedColumnKey).index;
+                const newColumnIndex = Math.max(0, Math.min(allColumns.length - 1, focusedColumnIndex + offset));
+                if (newColumnIndex === focusedColumnIndex)
                     return;
 
                 const newFocusedCell = { rowId: focusedCell.rowId, columnId: allColumns[newColumnIndex].id };
@@ -365,9 +367,9 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
                 if (!rowLookup.has(focusedRowKey))
                     return;
 
-                const focusedRow = rowLookup.get(focusedRowKey);
-                const newRowIndex = focusedRow.index + offset;
-                if (newRowIndex < 0 || newRowIndex >= allRows.length)
+                const focusedRowIndex = rowLookup.get(focusedRowKey).index;
+                const newRowIndex = Math.max(0, Math.min(allRows.length - 1, focusedRowIndex + offset));
+                if (newRowIndex === focusedRowIndex)
                     return;
 
                 const newFocusedCell = { rowId: allRows[newRowIndex].id, columnId: focusedCell.columnId };
@@ -385,16 +387,17 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
                         break;
                     }
                 case 'ArrowUp':
-                    arrowVertically(-1, event);
+                    // TODO: When ctrl and shift are pressed together, select all cells between the focused cell and the new cell
+                    arrowVertically(event.ctrlKey ? -allRows.length : -1, event);
                     break;
                 case 'ArrowDown':
-                    arrowVertically(1, event);
+                    arrowVertically(event.ctrlKey ? allRows.length : 1, event);
                     break;
                 case 'ArrowLeft':
-                    arrowHorizontally(-1, event);
+                    arrowHorizontally(event.ctrlKey ? -allColumns.length : -1, event);
                     break;
                 case 'ArrowRight':
-                    arrowHorizontally(1, event);
+                    arrowHorizontally(event.ctrlKey ? allColumns.length : 1, event);
                     break;
                 default:
                     return;
