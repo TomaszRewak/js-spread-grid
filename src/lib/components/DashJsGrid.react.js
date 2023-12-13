@@ -77,6 +77,7 @@ function DashJsGrid(props) {
     const focusedCell = props.focusedCell;
     const selectedCells = props.selectedCells;
 
+    // eslint-disable-next-line react/prop-types
     const setProps = props.setProps;
 
     const setSelectedCells = useCallback(selectedCells => setProps({ selectedCells }), [setProps]);
@@ -108,6 +109,8 @@ function DashJsGrid(props) {
 // TODO: add descriptions
 // TODO: Fix types
 DashJsGrid.propTypes = {
+    //
+    id: PropTypes.string,
     //
     data: PropTypes.array,
     //
