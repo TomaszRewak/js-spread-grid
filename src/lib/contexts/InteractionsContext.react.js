@@ -65,6 +65,14 @@ export function InteractionsProvider({ element, children }) {
         event.stopPropagation();
     }, []);
 
+    useEventListener(element, 'mouseup', (event) => {
+        if (interactions.current.mouseup)
+            interactions.current.mouseup(event);
+
+        event.preventDefault();
+        event.stopPropagation();
+    }, []);
+
     useEventListener(element, 'keydown', (event) => {
         if (interactions.current.keydown)
             interactions.current.keydown(event);
