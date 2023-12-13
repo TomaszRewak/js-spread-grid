@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useRef } from "react";
 import useDeepState from "../hooks/useDeepState";
 import useEventListener from "../hooks/useEventListener";
 import useDomObserver from "../hooks/useDomObserver";
@@ -18,12 +18,10 @@ function compareSizes(oldSize, newSize) {
 }
 
 export function InteractionsProvider({ element, children }) {
+    const interactions = useRef({});
     const [scrollOffset, setScrollOffset] = useDeepState({ left: 0, top: 0 }, compareScrollOffsets);
     const [mousePosition, setMousePosition] = useDeepState(null, compareMousePositions);
     const [size, setSize] = useDeepState({ width: 0, height: 0 }, compareSizes);
-    const [events, setEvents] = useState([]);
-
-    const popEvents = useCallback(number => setEvents(events => events.slice(number)), [setEvents]);
 
     useEventListener(element, 'scroll', () => {
         setScrollOffset({
@@ -59,41 +57,38 @@ export function InteractionsProvider({ element, children }) {
 
     useEventListener(element, 'mousedown', (event) => {
         element.focus();
-
-        setEvents(events => [...events, {
-            type: 'mousedown',
-            ctrlKey: event.ctrlKey
-        }]);
+        
+        if (interactions.current.mousedown)
+            interactions.current.mousedown(event);
 
         event.preventDefault();
         event.stopPropagation();
-    }, [setEvents]);
+    }, []);
 
     useEventListener(element, 'keydown', (event) => {
-        setEvents(events => [...events, {
-            type: 'keydown',
-            key: event.key,
-            ctrlKey: event.ctrlKey,
-            shiftKey: event.shiftKey
-        }]);
+        if (interactions.current.keydown)
+            interactions.current.keydown(event);
 
         event.preventDefault();
         event.stopPropagation();
-    }, [setEvents]);
+    }, []);
 
     const value = useMemo(() => ({
         scrollOffset,
         mousePosition,
         size,
-        events,
-        popEvents
-    }), [popEvents, events, mousePosition, scrollOffset, size]);
+        interactions
+    }), [mousePosition, scrollOffset, size]);
 
     return (
         <InteractionsContext.Provider value={value}>
             {children}
         </InteractionsContext.Provider>
     );
+}
+
+export function useInteraction(name, handler) {
+    useContext(InteractionsContext).interactions.current[name] = handler;
 }
 
 export function useScrollOffset() {
@@ -106,12 +101,4 @@ export function useMousePosition() {
 
 export function useSize() {
     return useContext(InteractionsContext).size;
-}
-
-export function useEvents() {
-    return useContext(InteractionsContext).events;
-}
-
-export function usePopEvents() {
-    return useContext(InteractionsContext).popEvents;
 }

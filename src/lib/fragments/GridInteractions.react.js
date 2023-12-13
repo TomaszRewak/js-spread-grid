@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
-import { usePopEvents, useEvents, useMousePosition, useScrollOffset, useSize } from '../contexts/InteractionsContext.react';
+import { useInteraction, useMousePosition, useScrollOffset, useSize } from '../contexts/InteractionsContext.react';
 
 function useColumnPlacement(columns, borderWidth) {
     return useMemo(() => {
@@ -119,8 +119,6 @@ export default function GridInteractions({ setProps, leftColumns, middleColumns,
     const size = useSize();
     const mousePosition = useMousePosition();
     const scrollOffset = useScrollOffset();
-    const events = useEvents();
-    const popEvents = usePopEvents();
 
     const leftColumnPlacement = useColumnPlacement(leftColumns, borderWidth);
     const middleColumnPlacement = useColumnPlacement(middleColumns, borderWidth);
@@ -160,7 +158,6 @@ export default function GridInteractions({ setProps, leftColumns, middleColumns,
             columnId: hoverColumnId
         };
 
-        // TODO: This effect should not use hoveredCell, instead it should do something like setProps(oldProps => { ... }) - to avoid unnecessary rerenders
         if (stringifyId(hoveredCell) === stringifyId(newHover))
             return;
 
@@ -170,7 +167,7 @@ export default function GridInteractions({ setProps, leftColumns, middleColumns,
         setProps({ hoveredCell: newHover });
     }, [bottomRowPlacement, leftColumnPlacement, middleColumnPlacement, middleColumns, middleRowPlacement, middleRows, mousePosition, rightColumnPlacement, size, scrollOffset, topRowPlacement, setProps, hoveredCell]);
 
-    const onMouseDown = useCallback(event => {
+    useInteraction('mousedown', event => {
         if (!hoveredCell)
             return;
 
@@ -195,9 +192,9 @@ export default function GridInteractions({ setProps, leftColumns, middleColumns,
                 selectedCells: [hoveredCell]
             });
         }
-    }, [hoveredCell, selectedCells, selectedCellsLookup, setProps]);
+    });
 
-    const onKeyDown = useCallback((event) => {
+    useInteraction('keydown', event => {
         console.log('onKeyDown', event.key);
 
         const arrowTo = (cell, event) => {
@@ -282,28 +279,7 @@ export default function GridInteractions({ setProps, leftColumns, middleColumns,
             default:
                 return;
         }
-    }, [allColumns, allRows, columnLookup, focusedCell, rowLookup, selectedCells, selectedCellsLookup, setProps]);
-
-    useEffect(() => {
-        if (!events.length)
-            return;
-
-        popEvents(events.length);
-
-        for (const event of events) {
-            switch (event.type) {
-                case 'keydown':
-                    onKeyDown(event);
-                    break;
-                case 'mousedown':
-                    onMouseDown(event);
-                    break;
-                default:
-                    break;
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [events, popEvents]);
+    });
 
     return (
         <></>
