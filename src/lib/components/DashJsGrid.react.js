@@ -8,6 +8,7 @@ import stringifyId from '../utils/stringifyId';
 import GridInteractions from '../fragments/GridInteractions.react';
 import useDevicePixelRatio, { roundToPixels } from '../hooks/useDevicePixelRatio';
 import Conditional from '../fragments/Conditional.react';
+import { InteractionsProvider } from '../contexts/InteractionsContext.react';
 
 function isString(value) {
     return typeof value === 'string' || value instanceof String;
@@ -424,21 +425,22 @@ function DashJsGrid(props) {
                 />
             </Conditional>
 
-            <GridInteractions
-                container={container}
-                leftColumns={leftColumns}
-                middleColumns={middleColumns}
-                rightColumns={rightColumns}
-                topRows={topRows}
-                middleRows={middleRows}
-                bottomRows={bottomRows}
-                borderWidth={borderWidth}
-                hoveredCell={hoveredCell}
-                focusedCell={focusedCell}
-                selectedCells={selectedCells}
-                selectedCellsLookup={selectedCellsLookup}
-                setProps={setProps}
-            />
+            <InteractionsProvider element={container}>
+                <GridInteractions
+                    leftColumns={leftColumns}
+                    middleColumns={middleColumns}
+                    rightColumns={rightColumns}
+                    topRows={topRows}
+                    middleRows={middleRows}
+                    bottomRows={bottomRows}
+                    borderWidth={borderWidth}
+                    hoveredCell={hoveredCell}
+                    focusedCell={focusedCell}
+                    selectedCells={selectedCells}
+                    selectedCellsLookup={selectedCellsLookup}
+                    setProps={setProps}
+                />
+            </InteractionsProvider>
         </div>
     );
 };

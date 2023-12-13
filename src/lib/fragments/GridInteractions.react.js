@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
+import { usePopEvents, useEvents, useMousePosition, useScrollOffset, useSize } from '../contexts/InteractionsContext.react';
 
 function useColumnPlacement(columns, borderWidth) {
     return useMemo(() => {
@@ -35,112 +36,6 @@ function useRowPlacement(rows, borderWidth) {
 
         return placement;
     }, [rows, borderWidth]);
-}
-
-function useSize(element) {
-    const [size, setSize] = useState({ width: 0, height: 0 });
-
-    useEffect(() => {
-        if (!element)
-            return () => { };
-
-        const onResize = () => {
-            const newSize = {
-                width: element.clientWidth,
-                height: element.clientHeight
-            };
-
-            setSize(oldSize => {
-                if (oldSize.width === newSize.width && oldSize.height === newSize.height)
-                    return oldSize;
-
-                return newSize;
-            });
-        };
-
-        const observer = new ResizeObserver(onResize);
-        observer.observe(element);
-
-        return () => observer.disconnect();
-    }, [element]);
-
-    return size;
-}
-
-function useMousePosition(element) {
-    const [position, setPosition] = useState(null);
-
-    useEffect(() => {
-        if (!element)
-            return () => { };
-
-        const onMouseMove = (event) => {
-            const newPosition = {
-                x: event.clientX - element.offsetLeft,
-                y: event.clientY - element.offsetTop
-            };
-
-            setPosition(oldPosition => {
-                if (oldPosition && oldPosition.x === newPosition.x && oldPosition.y === newPosition.y)
-                    return oldPosition;
-
-                return newPosition;
-            });
-        };
-
-        element.addEventListener('mousemove', onMouseMove);
-        element.addEventListener('mouseenter', onMouseMove);
-
-        return () => {
-            element.removeEventListener('mousemove', onMouseMove);
-            element.removeEventListener('mouseenter', onMouseMove);
-        };
-    }, [element]);
-
-    useEffect(() => {
-        if (!element)
-            return () => { };
-
-        const onMouseLeave = () => {
-            setPosition(null);
-        };
-
-        element.addEventListener('mouseleave', onMouseLeave);
-
-        return () => element.removeEventListener('mouseleave', onMouseLeave);
-    }, [element]);
-
-    return position;
-}
-
-function useScrollOffset(element) {
-    // TODO: initial scroll - is it ok to set to 0?
-    const [scrollOffset, setScrollOffset] = useState({ left: 0, top: 0 });
-
-    useEffect(() => {
-        if (!element)
-            return () => { };
-
-        const onScroll = () => {
-            const newScrollOffset = {
-                left: element.scrollLeft,
-                top: element.scrollTop
-            };
-
-            setScrollOffset(oldScrollOffset => {
-                if (oldScrollOffset.left === newScrollOffset.left && oldScrollOffset.top === newScrollOffset.top)
-                    return oldScrollOffset;
-
-                return newScrollOffset;
-            });
-        };
-
-        element.addEventListener('scroll', onScroll);
-
-        return () => element.removeEventListener('scroll', onScroll);
-    }, [element]);
-
-    return scrollOffset;
 }
 
 function findColumnIndex(placement, x) {
@@ -218,12 +113,14 @@ function pickRows(topRowPlacement, middleRowPlacement, bottomRowPlacement, y, he
 }
 
 
-export default function GridInteractions({ setProps, container, leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth, hoveredCell, focusedCell, selectedCells, selectedCellsLookup }) {
-    console.count('render GridInteractions');
+export default function GridInteractions({ setProps, leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth, hoveredCell, focusedCell, selectedCells, selectedCellsLookup }) {
+    // console.count('render GridInteractions');
 
-    const size = useSize(container);
-    const mousePosition = useMousePosition(container);
-    const scrollOffset = useScrollOffset(container);
+    const size = useSize();
+    const mousePosition = useMousePosition();
+    const scrollOffset = useScrollOffset();
+    const events = useEvents();
+    const popEvents = usePopEvents();
 
     const leftColumnPlacement = useColumnPlacement(leftColumns, borderWidth);
     const middleColumnPlacement = useColumnPlacement(middleColumns, borderWidth);
@@ -273,142 +170,140 @@ export default function GridInteractions({ setProps, container, leftColumns, mid
         setProps({ hoveredCell: newHover });
     }, [bottomRowPlacement, leftColumnPlacement, middleColumnPlacement, middleColumns, middleRowPlacement, middleRows, mousePosition, rightColumnPlacement, size, scrollOffset, topRowPlacement, setProps, hoveredCell]);
 
-    useEffect(() => {
-        if (!container)
-            return () => { };
+    const onMouseDown = useCallback(event => {
+        if (!hoveredCell)
+            return;
 
-        const onMouseDown = event => {
-            if (!hoveredCell)
-                return;
+        const hoverRowKey = stringifyId(hoveredCell.rowId);
+        const hoverColumnKey = stringifyId(hoveredCell.columnId);
 
-            const hoverRowKey = stringifyId(hoveredCell.rowId);
-            const hoverColumnKey = stringifyId(hoveredCell.columnId);
+        const isAlreadySelected = selectedCellsLookup.has(hoverRowKey) && selectedCellsLookup.get(hoverRowKey).has(hoverColumnKey);
 
-            const isAlreadySelected = selectedCellsLookup.has(hoverRowKey) && selectedCellsLookup.get(hoverRowKey).has(hoverColumnKey);
+        console.log('selectedCells', selectedCells);
 
-            console.log('selectedCells', selectedCells);
+        if (event.ctrlKey) {
+            setProps({
+                focusedCell: hoveredCell,
+                selectedCells: isAlreadySelected
+                    ? selectedCells
+                    : [...selectedCells, hoveredCell]
+            });
+        }
+        else {
+            setProps({
+                focusedCell: hoveredCell,
+                selectedCells: [hoveredCell]
+            });
+        }
+    }, [hoveredCell, selectedCells, selectedCellsLookup, setProps]);
 
-            if (event.ctrlKey) {
+    const onKeyDown = useCallback((event) => {
+        console.log('onKeyDown', event.key);
+
+        const arrowTo = (cell, event) => {
+            if (event.shiftKey) {
+                const columnKey = stringifyId(cell.columnId);
+                const rowKey = stringifyId(cell.rowId);
+                const isAlreadySelected = selectedCellsLookup.has(rowKey) && selectedCellsLookup.get(rowKey).has(columnKey);
+
                 setProps({
-                    focusedCell: hoveredCell,
+                    focusedCell: cell,
                     selectedCells: isAlreadySelected
                         ? selectedCells
-                        : [...selectedCells, hoveredCell]
+                        : [...selectedCells, cell]
                 });
             }
             else {
                 setProps({
-                    focusedCell: hoveredCell,
-                    selectedCells: [hoveredCell]
+                    focusedCell: cell,
+                    selectedCells: [cell]
                 });
             }
         };
 
-        // TODO: Make sure the event is not re-registered every time one of the dependencies changes
-        container.addEventListener('mousedown', onMouseDown);
+        const arrowHorizontally = (offset, event) => {
+            if (!focusedCell)
+                return;
 
-        return () => container.removeEventListener('mousedown', onMouseDown);
-    }, [container, hoveredCell, selectedCells, selectedCellsLookup, setProps]);
+            const focusedColumnKey = stringifyId(focusedCell.columnId);
+            if (!columnLookup.has(focusedColumnKey))
+                return;
+
+            const focusedColumnIndex = columnLookup.get(focusedColumnKey).index;
+            const newColumnIndex = Math.max(0, Math.min(allColumns.length - 1, focusedColumnIndex + offset));
+            if (newColumnIndex === focusedColumnIndex)
+                return;
+
+            const newFocusedCell = { rowId: focusedCell.rowId, columnId: allColumns[newColumnIndex].id };
+
+            arrowTo(newFocusedCell, event);
+        }
+
+        const arrowVertically = (offset, event) => {
+            if (!focusedCell)
+                return;
+
+            const focusedRowKey = stringifyId(focusedCell.rowId);
+            if (!rowLookup.has(focusedRowKey))
+                return;
+
+            const focusedRowIndex = rowLookup.get(focusedRowKey).index;
+            const newRowIndex = Math.max(0, Math.min(allRows.length - 1, focusedRowIndex + offset));
+            if (newRowIndex === focusedRowIndex)
+                return;
+
+            const newFocusedCell = { rowId: allRows[newRowIndex].id, columnId: focusedCell.columnId };
+
+            arrowTo(newFocusedCell, event);
+        }
+
+        switch (event.key) {
+            case 'Escape':
+                {
+                    setProps({
+                        focusedCell: null,
+                        selectedCells: []
+                    });
+                    break;
+                }
+            case 'ArrowUp':
+                // TODO: When ctrl and shift are pressed together, select all cells between the focused cell and the new cell
+                arrowVertically(event.ctrlKey ? -allRows.length : -1, event);
+                break;
+            case 'ArrowDown':
+                arrowVertically(event.ctrlKey ? allRows.length : 1, event);
+                break;
+            case 'ArrowLeft':
+                arrowHorizontally(event.ctrlKey ? -allColumns.length : -1, event);
+                break;
+            case 'ArrowRight':
+                arrowHorizontally(event.ctrlKey ? allColumns.length : 1, event);
+                break;
+            default:
+                return;
+        }
+    }, [allColumns, allRows, columnLookup, focusedCell, rowLookup, selectedCells, selectedCellsLookup, setProps]);
 
     useEffect(() => {
-        if (!container)
-            return () => { };
+        if (!events.length)
+            return;
 
-        const onKeyDown = (event) => {
-            event.preventDefault();
-            event.stopPropagation();
+        popEvents(events.length);
 
-            console.log('onKeyDown', event.key);
-
-            const arrowTo = (cell, event) => {
-                if (event.shiftKey) {
-                    const columnKey = stringifyId(cell.columnId);
-                    const rowKey = stringifyId(cell.rowId);
-                    const isAlreadySelected = selectedCellsLookup.has(rowKey) && selectedCellsLookup.get(rowKey).has(columnKey);
-
-                    setProps({
-                        focusedCell: cell,
-                        selectedCells: isAlreadySelected
-                            ? selectedCells
-                            : [...selectedCells, cell]
-                    });
-                }
-                else {
-                    setProps({
-                        focusedCell: cell,
-                        selectedCells: [cell]
-                    });
-                }
-            };
-
-            const arrowHorizontally = (offset, event) => {
-                if (!focusedCell)
-                    return;
-
-                const focusedColumnKey = stringifyId(focusedCell.columnId);
-                if (!columnLookup.has(focusedColumnKey))
-                    return;
-
-                const focusedColumnIndex = columnLookup.get(focusedColumnKey).index;
-                const newColumnIndex = Math.max(0, Math.min(allColumns.length - 1, focusedColumnIndex + offset));
-                if (newColumnIndex === focusedColumnIndex)
-                    return;
-
-                const newFocusedCell = { rowId: focusedCell.rowId, columnId: allColumns[newColumnIndex].id };
-
-                arrowTo(newFocusedCell, event);
-            }
-
-            const arrowVertically = (offset, event) => {
-                if (!focusedCell)
-                    return;
-
-                const focusedRowKey = stringifyId(focusedCell.rowId);
-                if (!rowLookup.has(focusedRowKey))
-                    return;
-
-                const focusedRowIndex = rowLookup.get(focusedRowKey).index;
-                const newRowIndex = Math.max(0, Math.min(allRows.length - 1, focusedRowIndex + offset));
-                if (newRowIndex === focusedRowIndex)
-                    return;
-
-                const newFocusedCell = { rowId: allRows[newRowIndex].id, columnId: focusedCell.columnId };
-
-                arrowTo(newFocusedCell, event);
-            }
-
-            switch (event.key) {
-                case 'Escape':
-                    {
-                        setProps({
-                            focusedCell: null,
-                            selectedCells: []
-                        });
-                        break;
-                    }
-                case 'ArrowUp':
-                    // TODO: When ctrl and shift are pressed together, select all cells between the focused cell and the new cell
-                    arrowVertically(event.ctrlKey ? -allRows.length : -1, event);
+        for (const event of events) {
+            switch (event.type) {
+                case 'keydown':
+                    onKeyDown(event);
                     break;
-                case 'ArrowDown':
-                    arrowVertically(event.ctrlKey ? allRows.length : 1, event);
-                    break;
-                case 'ArrowLeft':
-                    arrowHorizontally(event.ctrlKey ? -allColumns.length : -1, event);
-                    break;
-                case 'ArrowRight':
-                    arrowHorizontally(event.ctrlKey ? allColumns.length : 1, event);
+                case 'mousedown':
+                    onMouseDown(event);
                     break;
                 default:
-                    return;
+                    break;
             }
-        };
-
-        // TODO: Make sure the event is not re-registered every time one of the dependencies changes
-        container.addEventListener('keydown', onKeyDown);
-
-        return () => container.removeEventListener('keydown', onKeyDown);
-    }, [allColumns, allRows, columnLookup, container, focusedCell, rowLookup, selectedCells, selectedCellsLookup, setProps]);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [events, popEvents]);
 
     return (
         <></>
