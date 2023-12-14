@@ -1,4 +1,4 @@
-import dash_js_grid
+import dash_spread_grid
 from dash import Dash, callback, html, Input, Output, _dash_renderer, dcc, clientside_callback
 
 _dash_renderer._set_react_version("18.2.0")
@@ -27,7 +27,7 @@ data = [
 ]
 
 app.layout = html.Div(style={'maxHeight': '90vh', 'display': 'flex'}, children=[
-    dash_js_grid.DashJsGrid(
+    dash_spread_grid.DashSpreadGrid(
         id='grid',
         columnsLeft=columns[:2],
         columns=columns[2:-1],

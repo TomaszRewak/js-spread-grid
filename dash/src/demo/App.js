@@ -1,7 +1,7 @@
 /* eslint no-magic-numbers: 0 */
 import React, { useState } from 'react';
 
-import { DashJsGrid } from '../lib';
+import { DashSpreadGrid } from '../lib';
 
 const App = () => {
 
@@ -12,7 +12,7 @@ const App = () => {
 
     return (
         <div>
-            <DashJsGrid
+            <DashSpreadGrid
                 setProps={setProps}
                 {...state}
             />

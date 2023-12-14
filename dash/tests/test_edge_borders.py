@@ -1,5 +1,5 @@
 import pytest
-from dash_js_grid import DashJsGrid
+from dash_spread_grid import DashSpreadGrid
 
 from tests.utils import expect_dash_layout
 
@@ -8,7 +8,7 @@ def border(color):
 
 @pytest.mark.asyncio
 async def test_top_rows_left_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -27,11 +27,11 @@ async def test_top_rows_left_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_rows_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -50,11 +50,11 @@ async def test_top_rows_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_rows_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[],
         columnsRight=[
@@ -73,11 +73,11 @@ async def test_top_rows_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_rows_left_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -96,11 +96,11 @@ async def test_middle_rows_left_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_rows_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -119,11 +119,11 @@ async def test_middle_rows_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_rows_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[],
         columnsRight=[
@@ -142,11 +142,11 @@ async def test_middle_rows_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_bottom_rows_left_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -165,11 +165,11 @@ async def test_bottom_rows_left_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_bottom_rows_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -188,11 +188,11 @@ async def test_bottom_rows_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_bottom_rows_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[],
         columnsRight=[
@@ -211,11 +211,11 @@ async def test_bottom_rows_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_middle_rows_left_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -238,11 +238,11 @@ async def test_top_middle_rows_left_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_middle_rows_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -265,11 +265,11 @@ async def test_top_middle_rows_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_middle_rows_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[],
         columnsRight=[
@@ -292,11 +292,11 @@ async def test_top_middle_rows_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_bottom_rows_left_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -319,11 +319,11 @@ async def test_top_bottom_rows_left_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_bottom_rows_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -346,11 +346,11 @@ async def test_top_bottom_rows_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_bottom_rows_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[],
         columnsRight=[
@@ -373,11 +373,11 @@ async def test_top_bottom_rows_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_bottom_rows_left_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -400,11 +400,11 @@ async def test_middle_bottom_rows_left_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_bottom_rows_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -427,11 +427,11 @@ async def test_middle_bottom_rows_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_bottom_rows_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[],
         columnsRight=[
@@ -454,11 +454,11 @@ async def test_middle_bottom_rows_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_all_rows_left_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -485,11 +485,11 @@ async def test_all_rows_left_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_all_rows_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -516,11 +516,11 @@ async def test_all_rows_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_all_rows_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[],
         columnsRight=[
@@ -547,11 +547,11 @@ async def test_all_rows_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_rows_left_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -573,11 +573,11 @@ async def test_top_rows_left_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_rows_left_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -599,11 +599,11 @@ async def test_middle_rows_left_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_bottom_rows_left_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -625,11 +625,11 @@ async def test_bottom_rows_left_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_rows_left_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -651,11 +651,11 @@ async def test_top_rows_left_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_rows_left_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -677,11 +677,11 @@ async def test_middle_rows_left_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_bottom_rows_left_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -703,11 +703,11 @@ async def test_bottom_rows_left_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_rows_middle_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -729,11 +729,11 @@ async def test_top_rows_middle_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_rows_middle_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -755,11 +755,11 @@ async def test_middle_rows_middle_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_bottom_rows_middle_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -781,11 +781,11 @@ async def test_bottom_rows_middle_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_middle_rows_left_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -812,11 +812,11 @@ async def test_top_middle_rows_left_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_middle_rows_left_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -843,11 +843,11 @@ async def test_top_middle_rows_left_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_top_middle_rows_middle_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -874,11 +874,11 @@ async def test_top_middle_rows_middle_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_bottom_rows_left_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -905,11 +905,11 @@ async def test_middle_bottom_rows_left_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_bottom_rows_left_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -936,11 +936,11 @@ async def test_middle_bottom_rows_left_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_middle_bottom_rows_middle_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -967,11 +967,11 @@ async def test_middle_bottom_rows_middle_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_all_rows_left_middle_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -1003,11 +1003,11 @@ async def test_all_rows_left_middle_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_all_rows_left_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -1039,11 +1039,11 @@ async def test_all_rows_left_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_all_rows_middle_right_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[],
         columns=[
             {'id': 0, 'width': 100}
@@ -1075,11 +1075,11 @@ async def test_all_rows_middle_right_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_all_rows_all_columns():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100}
         ],
@@ -1116,11 +1116,11 @@ async def test_all_rows_all_columns():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 @pytest.mark.asyncio
 async def test_all_rows_all_columns_big():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columnsLeft=[
             {'id': 0, 'width': 100},
             {'id': 1, 'width': 100},
@@ -1167,4 +1167,4 @@ async def test_all_rows_all_columns_big():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')

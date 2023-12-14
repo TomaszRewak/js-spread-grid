@@ -1,4 +1,4 @@
 /* eslint-disable import/prefer-default-export */
-import DashJsGrid from './components/DashJsGrid.react';
+import DashSpreadGrid from './components/DashSpreadGrid.react';
 
-export { DashJsGrid };
+export { DashSpreadGrid };

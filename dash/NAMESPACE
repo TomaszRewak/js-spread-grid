@@ -1,4 +1,4 @@
 # AUTO GENERATED FILE - DO NOT EDIT
 
-export(DashJsGrid)
-export(dashJsGrid)
+export(DashSpreadGrid)
+export(dashSpreadGrid)

@@ -280,8 +280,8 @@ Manifest.toml
 JuliaManifest.toml
 
 # Auto-generated files
-dash_js_grid/
-!dash_js_grid/__init__.py
+dash_spread_grid/
+!dash_spread_grid/__init__.py
 deps/
 inst/
 R/

@@ -9,7 +9,7 @@ import sys
 import importlib
 
 
-components_package = 'dash_js_grid'
+components_package = 'dash_spread_grid'
 
 components_lib = importlib.import_module(components_package)
 

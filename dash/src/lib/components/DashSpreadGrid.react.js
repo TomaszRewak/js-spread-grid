@@ -62,8 +62,8 @@ function useCombinedFormatting(defaultFormatting, formatting) {
 
 // TODO: Write description
 // TODO: Rename to DashSpreadGrid
-function DashJsGrid(props) {
-    console.count('render DashJsGrid');
+function DashSpreadGrid(props) {
+    console.count('render DashSpreadGrid');
 
     const data = props.data;
     const columns = useResolvedColumns(props.columns);
@@ -108,7 +108,7 @@ function DashJsGrid(props) {
 
 // TODO: add descriptions
 // TODO: Fix types
-DashJsGrid.propTypes = {
+DashSpreadGrid.propTypes = {
     //
     id: PropTypes.string,
     //
@@ -165,7 +165,7 @@ DashJsGrid.propTypes = {
     )
 };
 
-DashJsGrid.defaultProps = {
+DashSpreadGrid.defaultProps = {
     data: [],
     columns: 'data.length > 0 ? Object.keys(data[0]).map((key) => ({id: key, header: key, width: 100})) : []',
     columnsLeft: [],
@@ -184,4 +184,4 @@ DashJsGrid.defaultProps = {
     selectedCells: []
 };
 
-export default DashJsGrid;
+export default DashSpreadGrid;

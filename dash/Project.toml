@@ -1,6 +1,6 @@
 
-name = "DashJsGrid"
-uuid = "1b08a953-4be3-4667-9a23-ffc119b85d26"
+name = "DashSpreadGrid"
+uuid = "1b08a953-4be3-4667-9a23-1396e3efe802"
 authors = ["Tomasz Rewak <tomasz.rewak@gmail.com>"]
 version = "0.0.1"
 

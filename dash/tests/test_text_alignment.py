@@ -1,12 +1,12 @@
 import pytest
-from dash_js_grid import DashJsGrid
+from dash_spread_grid import DashSpreadGrid
 
 from tests.utils import expect_dash_layout
 
 
 @pytest.mark.asyncio
 async def test_text_alignment_left_top():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columns=[
             {'id': 0, 'width': 100},
             {'id': 1, 'width': 100},
@@ -28,12 +28,12 @@ async def test_text_alignment_left_top():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 
 @pytest.mark.asyncio
 async def test_text_alignment_left_middle():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columns=[
             {'id': 0, 'width': 100},
             {'id': 1, 'width': 100},
@@ -55,12 +55,12 @@ async def test_text_alignment_left_middle():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 
 @pytest.mark.asyncio
 async def test_text_alignment_left_bottom():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columns=[
             {'id': 0, 'width': 100},
             {'id': 1, 'width': 100},
@@ -82,12 +82,12 @@ async def test_text_alignment_left_bottom():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 
 @pytest.mark.asyncio
 async def test_text_alignment_center_top():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columns=[
             {'id': 0, 'width': 100},
             {'id': 1, 'width': 100},
@@ -109,12 +109,12 @@ async def test_text_alignment_center_top():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 
 @pytest.mark.asyncio
 async def test_text_alignment_center_middle():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columns=[
             {'id': 0, 'width': 100},
             {'id': 1, 'width': 100},
@@ -136,12 +136,12 @@ async def test_text_alignment_center_middle():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 
 @pytest.mark.asyncio
 async def test_text_alignment_center_bottom():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columns=[
             {'id': 0, 'width': 100},
             {'id': 1, 'width': 100},
@@ -163,12 +163,12 @@ async def test_text_alignment_center_bottom():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 
 @pytest.mark.asyncio
 async def test_text_alignment_right_top():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columns=[
             {'id': 0, 'width': 100},
             {'id': 1, 'width': 100},
@@ -190,12 +190,12 @@ async def test_text_alignment_right_top():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 
 @pytest.mark.asyncio
 async def test_text_alignment_right_middle():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columns=[
             {'id': 0, 'width': 100},
             {'id': 1, 'width': 100},
@@ -217,12 +217,12 @@ async def test_text_alignment_right_middle():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
 
 
 @pytest.mark.asyncio
 async def test_text_alignment_right_bottom():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columns=[
             {'id': 0, 'width': 100},
             {'id': 1, 'width': 100},
@@ -244,4 +244,4 @@ async def test_text_alignment_right_bottom():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')

@@ -81,7 +81,7 @@ export default function Grid() {
     // TODO: Wrap the grid in another grid and set that grid's max width/height to the 100 vw/vh
     return (
         <div
-            className='dash-js-grid'
+            className='spread-grid'
             ref={setContainer}
             tabIndex={0}
             style={{ maxWidth: 'fit-content', maxHeight: 'fit-content', overflow: 'auto', display: 'grid', position: 'relative', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto auto auto', outline: 'none' }}

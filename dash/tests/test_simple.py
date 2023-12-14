@@ -1,11 +1,11 @@
 import pytest
-from dash_js_grid import DashJsGrid
+from dash_spread_grid import DashSpreadGrid
 
 from tests.utils import expect_dash_layout
 
 @pytest.mark.asyncio
 async def test_grid():
-    grid = DashJsGrid(
+    grid = DashSpreadGrid(
         columns=[
             {"id": "col1", "header": "Column 1", "width": 100},
             {"id": "col2", "header": "Column 2", "width": 100},
@@ -23,4 +23,4 @@ async def test_grid():
         ]
     )
 
-    await expect_dash_layout(grid, 'div.dash-js-grid')
+    await expect_dash_layout(grid, 'div.spread-grid')
