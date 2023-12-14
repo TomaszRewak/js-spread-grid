@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react"
 import TextResolver from "../utils/TextResolver";
 import { roundToPixels } from "../hooks/useDevicePixelRatio";
-import { useData, useRenderFormatting } from "../contexts/StateContext.react";
+import { useData, useRenderFormatting } from "../contexts/StateContext";
 import FormatResolver from "../utils/FormatResolver";
 
 // TODO: Upgrade to react 18 for better performance

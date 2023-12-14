@@ -1,13 +1,13 @@
 /* eslint-disable import/prefer-default-export */
 import React, { useMemo, useState } from 'react';
-import GridCanvas from '../fragments/GridCanvas.react';
+import GridCanvas from './GridCanvas';
 import useScrollRect from '../hooks/useScrollRect';
 import stringifyId from '../utils/stringifyId';
-import GridInteractions from '../fragments/GridInteractions.react';
+import GridInteractions from './GridInteractions';
 import useDevicePixelRatio, { roundToPixels } from '../hooks/useDevicePixelRatio';
-import Conditional from '../fragments/Conditional.react';
-import { InteractionsProvider } from '../contexts/InteractionsContext.react';
-import { useColumns, useColumnsLeft, useColumnsRight, useRows, useRowsBottom, useRowsTop } from '../contexts/StateContext.react';
+import Conditional from './Conditional';
+import { InteractionsProvider } from '../contexts/InteractionsContext';
+import { useColumns, useColumnsLeft, useColumnsRight, useRows, useRowsBottom, useRowsTop } from '../contexts/StateContext';
 
 function useIndexedDefinitions(definitions) {
     return useMemo(() => {

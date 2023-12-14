@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
-import { useInteraction, useMousePosition, useScrollOffset, useSize } from '../contexts/InteractionsContext.react';
-import { useAddSelectedCells, useFocusedCell, useHoveredCell, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells } from '../contexts/StateContext.react';
+import { useInteraction, useMousePosition, useScrollOffset, useSize } from '../contexts/InteractionsContext';
+import { useAddSelectedCells, useFocusedCell, useHoveredCell, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells } from '../contexts/StateContext';
 import Selection from '../utils/Selection';
 
 function useColumnPlacement(columns, borderWidth) {

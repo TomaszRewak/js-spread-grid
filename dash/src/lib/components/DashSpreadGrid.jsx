@@ -2,8 +2,8 @@
 
 import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { StateProvider } from '../contexts/StateContext.react';
-import Grid from '../fragments/Grid.react';
+import { StateProvider } from '../../../../js/contexts/StateContext';
+import Grid from '../../../../js/fragments/Grid';
 
 function isString(value) {
     return typeof value === 'string' || value instanceof String;
