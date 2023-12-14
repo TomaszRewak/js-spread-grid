@@ -40,7 +40,7 @@ export function StateProvider(props) {
     const setSelectedCells = useChangeCallback(props.selectedCells, props.onSelectedCellsChange, compareSelectedCells);
     const setHoveredCell = useChangeCallback(props.hoveredCell, props.onHoveredCellChange, compareCells);
     const setFocusedCell = useChangeCallback(props.focusedCell, props.onFocusedCellChange, compareCells);
-    const addSelectedCells = useCallback(cells => setSelectedCells(oldSelectedCells => {
+    const addSelectedCells = useCallback(cells => setSelectedCells(oldSelectedCells => { // TODO: Should the selected cells include info about the section?
         const selection = new Selection(oldSelectedCells);
         const newSelectedCells = cells.filter(cell => !selection.isIdSelected(cell.rowId, cell.columnId));
         return [...oldSelectedCells, ...newSelectedCells];
