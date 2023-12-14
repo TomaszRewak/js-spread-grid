@@ -2,8 +2,7 @@
 
 import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { StateProvider } from '../../../../src/contexts/StateContext';
-import Grid from '../../../../src/fragments/Grid';
+import SpreadGrid from '../../../../src/components/SpreadGrid';
 
 function isString(value) {
     return typeof value === 'string' || value instanceof String;
@@ -85,7 +84,7 @@ function DashSpreadGrid(props) {
     const setFocusedCell = useCallback(focusedCell => setProps({ focusedCell }), [setProps]);
 
     return (
-        <StateProvider
+        <SpreadGrid
             data={data}
             columnsLeft={columnsLeft}
             columns={columns}
@@ -100,9 +99,7 @@ function DashSpreadGrid(props) {
             onSelectedCellsChange={setSelectedCells}
             onHoveredCellChange={setHoveredCell}
             onFocusedCellChange={setFocusedCell}
-        >
-            <Grid />
-        </StateProvider>
+        />
     );
 };
 

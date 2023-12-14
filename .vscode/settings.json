@@ -1,7 +1,7 @@
 {
   "jest.autoRun": "off",
   "python.testing.pytestArgs": [
-    "dash/tests"
+    "tests"
   ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true
