@@ -1,5 +1,7 @@
 import dash_js_grid
-from dash import Dash, callback, html, Input, Output
+from dash import Dash, callback, html, Input, Output, _dash_renderer, dcc, clientside_callback
+
+_dash_renderer._set_react_version("18.2.0")
 
 app = Dash(__name__)
 
@@ -24,18 +26,19 @@ data = [
     for i in range(rows_count)
 ]
 
-app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
+app.layout = html.Div(style={'maxHeight': '90vh', 'display': 'flex'}, children=[
     dash_js_grid.DashJsGrid(
+        id='grid',
         columnsLeft=columns[:2],
         columns=columns[2:-1],
         columnsRight=columns[-1:],
         rowsTop=[
-            {'type': 'HEADER', 'height': 20},
+            {'id':'top', 'type': 'HEADER', 'height': 20},
             *rows[:2],
             {'id': 100, 'height': 7},
-            {'id': 101, 'height': 70},
-            {'id': 102, 'height': 70},
-            {'id': 103, 'height': 70},
+            {'id': 101, 'height': 50},
+            {'id': 102, 'height': 50},
+            {'id': 103, 'height': 50},
             *rows[8:10],
             {'type': 'HEADER', 'height': 20},
         ],
@@ -49,11 +52,15 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
         formatting=[
             {
                 'condition': 'row.index % 2 == 0',
-                'style': '{background: "#fdfdfd"}'
+                'style': {'background': '#fdfdfd'}
+            },
+            {
+                'column': {'id': 'column_11'},
+                'style': '{background: `rgb(${value % 255}, 100, 100)`}'
             },
             {
                 'column': {'id': 'column_5'},
-                'style': '{background: "lightgreen"}'
+                'style': {'background': 'lightgreen'}
             },
             {
                 'row': {'id': 6},
@@ -130,7 +137,43 @@ app.layout = html.Div(style={'maxHeight': '80vh', 'display': 'flex'}, children=[
         ],
     ),
     html.Div(style={'height': '10px'}),
+    dcc.Interval(id='interval_100', interval=100, n_intervals=0),
+    dcc.Interval(id='interval_1_000', interval=1_000, n_intervals=0),
 ])
+
+# clientside_callback(
+#     """
+#     function(data) {
+#         return data.map(row => {
+#             return {
+#                 ...row,
+#                 column_5: row.column_5 + 1,
+#                 column_7: row.column_7 + 1,
+#                 column_14: row.column_14 + 1,
+#             }
+#         })
+#     }
+#     """,
+#     Output('grid', 'data'),
+#     Input('grid', 'data'),
+#     Input('interval_100', 'n_intervals')
+# )
+
+# clientside_callback(
+#     """
+#     function(data, rows) {
+#         return [
+#             [...data, data[0]],
+#             [{id: data.length, height: 20}, ...rows]
+#         ]
+#     }
+#     """,
+#     Output('grid', 'data'),
+#     Output('grid', 'rows'),
+#     Input('grid', 'data'),
+#     Input('grid', 'rows'),
+#     Input('interval_1_000', 'n_intervals')
+# )
 
 
 # @callback(Output('output', 'children'), Input('input', 'value'))
