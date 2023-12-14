@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import SpreadGrid from './spread-grid/components/SpreadGrid';
 
 function App() {
+    const [props, setProps] = useState({
+        selectedCells: [],
+        focusedCell: null,
+        hoveredCell: null,
+    });
+
     return (
         <SpreadGrid
             data={[
@@ -30,11 +36,11 @@ function App() {
                 { id: 4, height: 20 }
             ]}
             rowsBottom={[]}
-            selectedCells={[]}
             formatting={[]}
-            onSelectedCellsChange={() => { }}
-            onHoveredCellChange={() => { }}
-            onFocusedCellChange={() => { }}
+            onSelectedCellsChange={value => setProps({ ...props, selectedCells: value })}
+            onHoveredCellChange={value => setProps({ ...props, hoveredCell: value })}
+            onFocusedCellChange={value => setProps({ ...props, focusedCell: value })}
+            {...props}
         />
     );
 }
