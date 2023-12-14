@@ -11,11 +11,16 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
+  "devDependencies": {
+    "watch": "^1.0.2"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "copy-src": "rm -rf ./src/spread-grid/ && cp -r ./../src ./src/spread-grid",
+    "watch-src": "watch 'npm run copy-src' ./../src"
   },
   "eslintConfig": {
     "extends": [
