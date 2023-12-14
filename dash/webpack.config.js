@@ -66,7 +66,7 @@ module.exports = (env, argv) => {
                     test: /\.(jsx|js)?$/,
                     include: [
                         path.resolve(__dirname),
-                        path.resolve(__dirname, './../')
+                        path.resolve(__dirname, './../src')
                     ],
                     exclude: /node_modules/,
                     use: {
@@ -80,7 +80,7 @@ module.exports = (env, argv) => {
                     test: /\.css$/,
                     include: [
                         path.resolve(__dirname),
-                        path.resolve(__dirname, './../')
+                        path.resolve(__dirname, './../src')
                     ],
                     exclude: /node_modules/,
                     use: [

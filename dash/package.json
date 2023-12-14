@@ -12,8 +12,8 @@
     "build:backends-activated": "(. venv/bin/activate || venv\\scripts\\activate && npm run build:py_and_r)",
     "build": "npm run build:js && npm run build:backends",
     "build:activated": "npm run build:js && npm run build:backends-activated",
-    "watch": "watch 'npm run build' ./../js",
-    "test": "jest"
+    "watch": "watch 'npm run build' ./../src",
+    "test": "jest ./../src"
   },
   "author": "Tomasz Rewak <tomasz.rewak@gmail.com>",
   "license": "MIT",
