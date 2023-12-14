@@ -9,79 +9,6 @@ import Conditional from '../fragments/Conditional.react';
 import { InteractionsProvider } from '../contexts/InteractionsContext.react';
 import { useColumns, useColumnsLeft, useColumnsRight, useRows, useRowsBottom, useRowsTop } from '../contexts/StateContext.react';
 
-function isString(value) {
-    return typeof value === 'string' || value instanceof String;
-}
-
-function useResolvedColumns(columns) {
-    return useMemo(() => {
-        if (typeof columns !== 'string')
-            return columns;
-
-        return eval(`(data) => (${columns})`);
-    }, [columns]);
-}
-
-function useResolvedRows(rows) {
-    return useMemo(() => {
-        if (typeof rows !== 'string')
-            return rows;
-
-        return eval(`(data) => (${rows})`);
-    }, [rows]);
-}
-
-function useResolvedFormatting(formatting) {
-    return useMemo(() => {
-        return formatting.map(rule => {
-            const mappedRule = {};
-
-            if ('column' in rule)
-                mappedRule.column = rule.column;
-            if ('row' in rule)
-                mappedRule.row = rule.row;
-            if ('condition' in rule)
-                mappedRule.condition = eval(`(data, rows, columns, row, column, value) => (${rule.condition})`);
-            if ('style' in rule)
-                mappedRule.style = isString(rule.style) ? eval(`(data, rows, columns, row, column, value) => (${rule.style})`) : rule.style;
-            if ('value' in rule)
-                mappedRule.value = eval(`(data, rows, columns, row, column, value) => (${rule.value})`);
-
-            return mappedRule;
-        });
-    }, [formatting]);
-}
-
-function useResolvedProps(props) {
-    const setProps = props.setProps;
-    const columns = useResolvedColumns(props.columns);
-    const columnsLeft = useResolvedColumns(props.columnsLeft);
-    const columnsRight = useResolvedColumns(props.columnsRight);
-    const rows = useResolvedRows(props.rows);
-    const rowsTop = useResolvedRows(props.rowsTop);
-    const rowsBottom = useResolvedRows(props.rowsBottom);
-    const defaultFormatting = useResolvedFormatting(props.defaultFormatting);
-    const formatting = useResolvedFormatting(props.formatting);
-    const hoveredCell = props.hoveredCell;
-    const focusedCell = props.focusedCell;
-    const selectedCells = props.selectedCells;
-
-    return {
-        setProps,
-        columns,
-        columnsLeft,
-        columnsRight,
-        rows,
-        rowsTop,
-        rowsBottom,
-        defaultFormatting,
-        formatting,
-        hoveredCell,
-        focusedCell,
-        selectedCells
-    }
-}
-
 function useIndexedDefinitions(definitions) {
     return useMemo(() => {
         return definitions.map((definition, index) => ({
@@ -108,24 +35,6 @@ function useDefinitionWithRoundedHeight(rowDefinitions, devicePixelRatio) {
             height: roundToPixels(definition.height, devicePixelRatio)
         }));
     }, [rowDefinitions, devicePixelRatio]);
-}
-
-function useSelectedCellsLookup(selectedCells) {
-    return useMemo(() => {
-        const lookup = new Map();
-
-        selectedCells.forEach(cell => {
-            const rowKey = stringifyId(cell.rowId);
-            const columnKey = stringifyId(cell.columnId);
-
-            if (!lookup.has(rowKey))
-                lookup.set(rowKey, new Set());
-
-            lookup.get(rowKey).add(columnKey);
-        });
-
-        return lookup;
-    }, [selectedCells]);
 }
 
 // TODO: Write description
