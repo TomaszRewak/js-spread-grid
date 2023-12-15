@@ -14,6 +14,9 @@ export default function useChangeCallback(currentValue, callback, comparator) {
         const comparatorResult = ref.current.value === newValue || (comparator && comparator(ref.current.value, newValue));
 
         if (!comparatorResult)
+        {
+            ref.current.value = newValue;
             ref.current.callback(newValue);
+        }
     }, [comparator]);
 }

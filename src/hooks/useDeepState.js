@@ -15,7 +15,7 @@ export default function useDeepState(initialState, comparator) {
                 return newState;
             });
         };
-    }, [setState, comparator]);
+    }, [comparator]);
 
     return [state, setDeepState];
 }

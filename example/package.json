@@ -15,11 +15,11 @@
     "watch": "^1.0.2"
   },
   "scripts": {
-    "start": "WATCHPACK_POLLING=true react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "copy-src": "rm -rf ./src/spread-grid/ && cp -r ./../src ./src/spread-grid",
+    "copy-src": "rsync -a --delete --exclude 'node_modules' ./../src/ ./src/spread-grid",
     "watch-src": "watch 'npm run copy-src' ./../src"
   },
   "eslintConfig": {
