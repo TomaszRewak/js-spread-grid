@@ -20,6 +20,11 @@ export default function addRenderFormattingRules(formatting, hoveredCell, focuse
     };
 
     return [
+        {
+            column: { match: 'ANY' },
+            row: { match: 'HEADER' },
+            style: { background: "#F5F5F5", border: { width: 1, color: "gray" } }
+        },
         ...formatting,
         {
             column: { match: 'ANY' },

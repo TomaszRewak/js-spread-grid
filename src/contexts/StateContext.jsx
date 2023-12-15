@@ -4,6 +4,7 @@ import addRenderFormattingRules from "../utils/addRenderFormattingRules";
 import Selection from "../utils/Selection";
 import useChangeCallback from "../hooks/useChangeCallback";
 import stringifyId from "../utils/stringifyId";
+import addDataFormattingRules from "../utils/addDataFormattingRules";
 
 function compareCells(oldCell, newCell) {
     return stringifyId(oldCell) === stringifyId(newCell);
@@ -34,7 +35,7 @@ export function StateProvider(props) {
     const selection = useMemo(() => new Selection(props.selectedCells), [props.selectedCells]);
     const hoveredCell = props.hoveredCell;
     const focusedCell = props.focusedCell;
-    const formatting = props.formatting;
+    const formatting = useMemo(() => addDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
     const renderFormatting = useMemo(() => addRenderFormattingRules(formatting, hoveredCell, focusedCell, selection), [formatting, hoveredCell, focusedCell, selection]);
 
     const setSelectedCells = useChangeCallback(props.selectedCells, props.onSelectedCellsChange, compareSelectedCells);
