@@ -46,12 +46,12 @@ function App() {
                 ]}
                 formatting={[
                     {
-                        condition: (data, rows, columns, row, column, value) => row.index % 2 === 0,
-                        style: { background: '#fdfdfd' }
+                        condition: ({row}) => row.index % 2 === 0,
+                        style: { background: '#fbfbfb' }
                     },
                     {
                         column: { id: 'column_11' },
-                        style: (data, rows, columns, row, column, value) => ({ background: `rgb(${value % 255}, 100, 100)` })
+                        style: ({value}) => ({ background: `rgb(${value % 255}, 100, 100)` })
                     },
                     {
                         column: { id: 'column_5' },
@@ -59,76 +59,76 @@ function App() {
                     },
                     {
                         row: { id: 6 },
-                        style: (data, rows, columns, row, column, value) => ({ background: 'lightblue' })
+                        style: { background: 'lightblue' }
                     },
                     {
                         row: { id: 6 },
                         column: { id: 'column_5' },
-                        style: (data, rows, columns, row, column, value) => ({ background: 'lightcoral' })
+                        style: { background: 'lightcoral' }
                     },
                     {
                         row: { id: 5 },
                         column: { id: 'column_5' },
-                        style: (data, rows, columns, row, column, value) => ({ borderLeft: { width: 3 }, borderTop: { width: 3 }, borderRight: { width: 3 } })
+                        style: { borderLeft: { width: 3 }, borderTop: { width: 3 }, borderRight: { width: 3 } }
                     },
                     {
                         row: { id: 6 },
                         column: { id: 'column_4' },
-                        style: (data, rows, columns, row, column, value) => ({ borderLeft: { width: 3 }, borderTop: { width: 3 }, borderBottom: { width: 3 } })
+                        style: { borderLeft: { width: 3 }, borderTop: { width: 3 }, borderBottom: { width: 3 } }
                     },
                     {
                         row: { id: 6 },
                         column: { id: 'column_6' },
-                        style: (data, rows, columns, row, column, value) => ({ borderTop: { width: 3 }, borderBottom: { width: 3 }, borderRight: { width: 3 } })
+                        style: { borderTop: { width: 3 }, borderBottom: { width: 3 }, borderRight: { width: 3 } }
                     },
                     {
                         row: { id: 7 },
                         column: { id: 'column_5' },
-                        style: (data, rows, columns, row, column, value) => ({ borderLeft: { width: 3 }, borderRight: { width: 3 }, borderBottom: { width: 3 } })
+                        style: { borderLeft: { width: 3 }, borderRight: { width: 3 }, borderBottom: { width: 3 } }
                     },
                     {
                         column: { index: 0 },
-                        style: (data, rows, columns, row, column, value) => ({ borderLeft: { width: 1 } })
+                        style: { borderLeft: { width: 1 } }
                     },
                     {
                         column: { index: 1 },
-                        style: (data, rows, columns, row, column, value) => ({ borderRight: { width: 1, color: 'red' }, background: 'lightgrey' })
+                        style: { borderRight: { width: 1, color: 'red' }, background: 'lightgrey' }
                     },
                     {
                         column: { index: 6 },
-                        style: (data, rows, columns, row, column, value) => ({ borderLeft: { width: 5, dash: [15, 15] }, borderRight: { width: 5, dash: [15, 15] }, background: 'lightgrey' })
+                        style: { borderLeft: { width: 5, dash: [15, 15] }, borderRight: { width: 5, dash: [15, 15] }, background: 'lightgrey' }
                     },
                     {
-                        condition: (data, rows, columns, row, column, value) => value < 70,
-                        value: (data, rows, columns, row, column, value) => 'small [jjj]'
+                        condition: ({value}) => value < 70,
+                        value: () => 'small [jjj]'
                     },
                     {
-                        condition: (data, rows, columns, row, column, value) => value < 100,
-                        value: (data, rows, columns, row, column, value) => 'SMALL'
+                        condition: ({value}) => value < 100,
+                        value: () => 'SMALL'
                     },
                     {
                         row: { id: 20 },
-                        value: (data, rows, columns, row, column, value) => 'ABCDEFGHIJKLMNOPQRSTUVXYZ'
+                        value: () => 'ABCDEFGHIJKLMNOPQRSTUVXYZ'
                     },
                     {
                         column: { id: 'column_5' },
-                        style: (data, rows, columns, row, column, value) => ({ textAlign: 'right' })
+                        style: { textAlign: 'right' }
                     },
                     {
                         column: { id: 'column_3' },
-                        style: (data, rows, columns, row, column, value) => ({ textAlign: 'center', textBaseline: 'bottom' })
+                        style: { textAlign: 'center', textBaseline: 'bottom' }
                     },
                     {
                         row: { id: 101 },
-                        style: (data, rows, columns, row, column, value) => ({ textBaseline: 'top' })
+                        style: { textBaseline: 'top' }
                     },
                     {
                         row: { id: 102 },
-                        style: (data, rows, columns, row, column, value) => ({ textBaseline: 'middle' })
+                        style: { textBaseline: 'middle' }
                     },
                     {
                         row: { id: 103 },
-                        style: (data, rows, columns, row, column, value) => ({ textBaseline: 'bottom' })
+                        style: { textBaseline: 'bottom' }
                     }
                 ]}
             />

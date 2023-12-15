@@ -10,7 +10,7 @@ const defaultRowsTop = [];
 const defaultRows = [];
 const defaultRowsBottom = [];
 const defaultFormatting = [];
-const defaultDataSelector = (data, rows, columns, row, column) => data[row.id][column.id];
+const defaultDataSelector = ({data, row, column}) => data[row.id][column.id];
 
 export default function SpreadGrid(props) {
     const [localSelectedCells, setLocalSelectedCells] = useState([]);
