@@ -14,4 +14,10 @@
             "path": "../"
         }
     ],
+    "settings": {
+        "jest.disabledWorkspaceFolders": [
+            "root",
+            "dash"
+        ]
+    },
 }
