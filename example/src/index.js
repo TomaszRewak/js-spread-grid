@@ -22,7 +22,7 @@ function App() {
     }))
 
     return (
-        <div style={{ maxHeight: '90vh', display: 'flex' }}>
+        <div style={{ maxHeight: 'calc(100vh - 20px)', display: 'flex' }}>
             <SpreadGrid
                 data={data}
                 columnsLeft={columns.slice(0, 2)}
