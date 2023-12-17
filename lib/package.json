@@ -20,5 +20,9 @@
             "react-app/jest",
             "plugin:react-hooks/recommended"
         ]
+    },
+    "devDependencies": {
+        "jest-image-snapshot": "^6.4.0",
+        "puppeteer": "^18.1.0"
     }
 }
