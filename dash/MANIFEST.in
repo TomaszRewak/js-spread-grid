@@ -1,0 +1,11 @@
+include dash_spread_grid/dash_spread_grid.min.js
+include dash_spread_grid/dash_spread_grid.min.js.map
+include dash_spread_grid/async-*.js
+include dash_spread_grid/async-*.js.map
+include dash_spread_grid/*-shared.js
+include dash_spread_grid/*-shared.js.map
+include dash_spread_grid/metadata.json
+include dash_spread_grid/package-info.json
+include README.md
+include LICENSE
+include package.json

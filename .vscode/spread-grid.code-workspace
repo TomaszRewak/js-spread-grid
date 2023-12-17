@@ -1,0 +1,23 @@
+{
+    "folders": [
+        {
+            "path": "../lib"
+        },
+        {
+            "path": "../example"
+        },
+        {
+            "path": "../dash"
+        },
+        {
+            "name": "root",
+            "path": "../"
+        }
+    ],
+    "settings": {
+        "jest.disabledWorkspaceFolders": [
+            "root",
+            "dash"
+        ]
+    },
+}

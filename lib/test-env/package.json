@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "prestart": "rsync -a --delete ./../src/ ./src/src",
+    "start": "DISABLE_ESLINT_PLUGIN=true BROWSER=none react-scripts start"
+  },
+  "browserslist": {
+    "development": [
+      "last 1 chrome version"
+    ]
+  }
+}
