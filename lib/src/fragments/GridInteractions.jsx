@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
 import { useInteraction, useMousePosition, useScrollOffset, useSize } from '../contexts/InteractionsContext';
-import { useAddSelectedCells, useFocusedCell, useHoveredCell, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells } from '../contexts/StateContext';
-import Selection from '../utils/Selection';
+import { useAddSelectedCells, useColumns, useFocusedCell, useHoveredCell, usePinnedBottom, usePinnedLeft, usePinnedRight, usePinnedTop, useRows, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells } from '../contexts/StateContext';
 
 function useColumnPlacement(columns, borderWidth) {
     return useMemo(() => {
@@ -90,32 +89,8 @@ function findRowIndex(placement, y) {
     return -1;
 }
 
-function pickColumns(leftColumnPlacement, middleColumnPlacement, rightColumnPlacement, x, width, scrollOffset) {
-    if (leftColumnPlacement.length && x <= leftColumnPlacement.at(-1).right)
-        return [x, leftColumnPlacement];
 
-    if (rightColumnPlacement.length && x >= width - rightColumnPlacement.at(-1).right)
-        return [x - width + rightColumnPlacement.at(-1).right, rightColumnPlacement];
-
-    const leftOffset = leftColumnPlacement.length ? leftColumnPlacement.at(-1).right : 0;
-
-    return [x - leftOffset + scrollOffset, middleColumnPlacement];
-}
-
-function pickRows(topRowPlacement, middleRowPlacement, bottomRowPlacement, y, height, scrollOffset) {
-    if (topRowPlacement.length && y <= topRowPlacement.at(-1).bottom)
-        return [y, topRowPlacement];
-
-    if (bottomRowPlacement.length && y >= height - bottomRowPlacement.at(-1).bottom)
-        return [y - height + bottomRowPlacement.at(-1).bottom, bottomRowPlacement];
-
-    const topOffset = topRowPlacement.length ? topRowPlacement.at(-1).bottom : 0;
-
-    return [y - topOffset + scrollOffset, middleRowPlacement];
-}
-
-
-export default function GridInteractions({ /*don't remove yet, as the ones in StateContext are not rounded*/leftColumns, middleColumns, rightColumns, topRows, middleRows, bottomRows, borderWidth }) {
+export default function GridInteractions({ borderWidth }) {
     // console.count('render GridInteractions');
 
     const size = useSize();
@@ -129,18 +104,26 @@ export default function GridInteractions({ /*don't remove yet, as the ones in St
     const setFocusedCell = useSetFocusedCell();
     const addSelectedCells = useAddSelectedCells();
 
-    const leftColumnPlacement = useColumnPlacement(leftColumns, borderWidth);
-    const middleColumnPlacement = useColumnPlacement(middleColumns, borderWidth);
-    const rightColumnPlacement = useColumnPlacement(rightColumns, borderWidth);
-    const topRowPlacement = useRowPlacement(topRows, borderWidth);
-    const middleRowPlacement = useRowPlacement(middleRows, borderWidth);
-    const bottomRowPlacement = useRowPlacement(bottomRows, borderWidth);
+    const columns = useColumns();
+    const rows = useRows();
 
-    const allColumns = useMemo(() => [...leftColumns, ...middleColumns, ...rightColumns].map((column, index) => ({ ...column, index })), [leftColumns, middleColumns, rightColumns]);
-    const allRows = useMemo(() => [...topRows, ...middleRows, ...bottomRows].map((row, index) => ({ ...row, index })), [topRows, middleRows, bottomRows]);
+    const columnPlacement = useColumnPlacement(columns, borderWidth);
+    const rowPlacement = useRowPlacement(rows, borderWidth);
 
-    const columnLookup = useMemo(() => allColumns.reduce((map, column) => map.set(column.key, column), new Map()), [allColumns]);
-    const rowLookup = useMemo(() => allRows.reduce((map, row) => map.set(row.key, row), new Map()), [allRows]);
+    const pinnedTop = usePinnedTop();
+    const pinnedBottom = usePinnedBottom();
+    const pinnedLeft = usePinnedLeft();
+    const pinnedRight = usePinnedRight();
+
+    const topHeight = pinnedTop ? rowPlacement.at(pinnedTop - 1).bottom : 0;
+    const totalHeight = rowPlacement.at(-1).bottom;
+    const bottomHeight = pinnedBottom ? rowPlacement.at(-1).bottom - rowPlacement.at(-pinnedBottom).top : 0;
+    const leftWidth = pinnedLeft ? columnPlacement.at(pinnedLeft - 1).right : 0;
+    const totalWidth = columnPlacement.at(-1).right;
+    const rightWidth = pinnedRight ? columnPlacement.at(-1).right - columnPlacement.at(-pinnedRight).left : 0;
+
+    const columnLookup = useMemo(() => columns.reduce((map, column) => map.set(column.key, column), new Map()), [columns]);
+    const rowLookup = useMemo(() => rows.reduce((map, row) => map.set(row.key, row), new Map()), [rows]);
 
     useEffect(() => {
         if (!mousePosition) {
@@ -148,11 +131,19 @@ export default function GridInteractions({ /*don't remove yet, as the ones in St
             return;
         }
 
-        const [x, columns] = pickColumns(leftColumnPlacement, middleColumnPlacement, rightColumnPlacement, mousePosition.x, size.width, scrollOffset.left);
-        const [y, rows] = pickRows(topRowPlacement, middleRowPlacement, bottomRowPlacement, mousePosition.y, size.height, scrollOffset.top);
+        const x = mousePosition.x <= leftWidth
+            ? mousePosition.x
+            : mousePosition.x >= size.width - rightWidth
+                ? totalWidth - size.width + mousePosition.x
+                : mousePosition.x + scrollOffset.left;
+        const y = mousePosition.y <= topHeight
+            ? mousePosition.y
+            : mousePosition.y >= size.height - bottomHeight
+                ? totalHeight - size.height + mousePosition.y
+                : mousePosition.y + scrollOffset.top;
 
-        const hoverRowIndex = findRowIndex(rows, y);
-        const hoverColumnIndex = findColumnIndex(columns, x);
+        const hoverRowIndex = findRowIndex(rowPlacement, y);
+        const hoverColumnIndex = findColumnIndex(columnPlacement, x);
 
         if (hoverRowIndex === -1 || hoverColumnIndex === -1) {
             setHoveredCell(null);
@@ -163,7 +154,7 @@ export default function GridInteractions({ /*don't remove yet, as the ones in St
             rowId: rows[hoverRowIndex].id,
             columnId: columns[hoverColumnIndex].id
         });
-    }, [bottomRowPlacement, leftColumnPlacement, middleColumnPlacement, middleRowPlacement, mousePosition, rightColumnPlacement, scrollOffset, setHoveredCell, size, topRowPlacement]);
+    }, [bottomHeight, columnPlacement, columns, leftWidth, mousePosition, rightWidth, rowPlacement, rows, scrollOffset, setHoveredCell, size, topHeight, totalHeight, totalWidth]);
 
     useInteraction('mousedown', event => {
         if (!hoveredCell)
@@ -198,11 +189,11 @@ export default function GridInteractions({ /*don't remove yet, as the ones in St
                 return;
 
             const focusedColumnIndex = columnLookup.get(focusedColumnKey).index;
-            const newColumnIndex = Math.max(0, Math.min(allColumns.length - 1, focusedColumnIndex + offset));
+            const newColumnIndex = Math.max(0, Math.min(columns.length - 1, focusedColumnIndex + offset));
             if (newColumnIndex === focusedColumnIndex)
                 return;
 
-            const newFocusedCell = { rowId: focusedCell.rowId, columnId: allColumns[newColumnIndex].id };
+            const newFocusedCell = { rowId: focusedCell.rowId, columnId: columns[newColumnIndex].id };
 
             arrowTo(newFocusedCell, event);
         }
@@ -216,11 +207,11 @@ export default function GridInteractions({ /*don't remove yet, as the ones in St
                 return;
 
             const focusedRowIndex = rowLookup.get(focusedRowKey).index;
-            const newRowIndex = Math.max(0, Math.min(allRows.length - 1, focusedRowIndex + offset));
+            const newRowIndex = Math.max(0, Math.min(rows.length - 1, focusedRowIndex + offset));
             if (newRowIndex === focusedRowIndex)
                 return;
 
-            const newFocusedCell = { rowId: allRows[newRowIndex].id, columnId: focusedCell.columnId };
+            const newFocusedCell = { rowId: rows[newRowIndex].id, columnId: focusedCell.columnId };
 
             arrowTo(newFocusedCell, event);
         }
@@ -234,16 +225,16 @@ export default function GridInteractions({ /*don't remove yet, as the ones in St
                 }
             case 'ArrowUp':
                 // TODO: When ctrl and shift are pressed together, select all cells between the focused cell and the new cell
-                arrowVertically(event.ctrlKey ? -allRows.length : -1, event);
+                arrowVertically(event.ctrlKey ? -rows.length : -1, event);
                 break;
             case 'ArrowDown':
-                arrowVertically(event.ctrlKey ? allRows.length : 1, event);
+                arrowVertically(event.ctrlKey ? rows.length : 1, event);
                 break;
             case 'ArrowLeft':
-                arrowHorizontally(event.ctrlKey ? -allColumns.length : -1, event);
+                arrowHorizontally(event.ctrlKey ? -columns.length : -1, event);
                 break;
             case 'ArrowRight':
-                arrowHorizontally(event.ctrlKey ? allColumns.length : 1, event);
+                arrowHorizontally(event.ctrlKey ? columns.length : 1, event);
                 break;
             default:
                 return;

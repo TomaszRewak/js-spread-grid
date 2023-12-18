@@ -5,6 +5,7 @@ import Selection from "../utils/Selection";
 import useChangeCallback from "../hooks/useChangeCallback";
 import stringifyId from "../utils/stringifyId";
 import addDataFormattingRules from "../utils/addDataFormattingRules";
+import useDevicePixelRatio, { roundToPixels } from "../hooks/useDevicePixelRatio";
 
 function compareCells(oldCell, newCell) {
     return stringifyId(oldCell) === stringifyId(newCell);
@@ -18,6 +19,30 @@ function compareSelectedCells(oldCells, newCells) {
     return newCells.every(cell => selection.isIdSelected(cell.rowId, cell.columnId));
 }
 
+function useResolvedColumns(columns, devicePixelRatio)
+{
+    return useMemo(() => {
+        return columns.map((column, index) => ({
+            ...column,
+            width: roundToPixels(column.width, devicePixelRatio),
+            index: index,
+            key: stringifyId(column.id)
+        }));
+    }, [columns, devicePixelRatio]);
+}
+
+function useResolvedRows(rows, devicePixelRatio)
+{
+    return useMemo(() => {
+        return rows.map((row, index) => ({
+            ...row,
+            height: roundToPixels(row.height, devicePixelRatio),
+            index: index,
+            key: stringifyId(row.id)
+        }));
+    }, [rows, devicePixelRatio]);
+}
+
 const DataContext = createContext();
 const ColumnsAndRowsContext = createContext();
 const MeasuringContext = createContext();
@@ -25,13 +50,15 @@ const InteractionsContext = createContext();
 const RenderingContext = createContext();
 
 export function StateProvider(props) {
+    const devicePixelRatio = useDevicePixelRatio();
+    
     const data = props.data;
-    const columnsLeft = useInvoked(props.columnsLeft, [data]);
-    const columns = useInvoked(props.columns, [data]);
-    const columnsRight = useInvoked(props.columnsRight, [data]);
-    const rowsTop = useInvoked(props.rowsTop, [data]);
-    const rows = useInvoked(props.rows, [data]);
-    const rowsBottom = useInvoked(props.rowsBottom, [data]);
+    const columns = useResolvedColumns(useInvoked(props.columns, [data]), devicePixelRatio);
+    const rows = useResolvedRows(useInvoked(props.rows, [data]), devicePixelRatio);
+    const pinnedTop = props.pinnedTop;
+    const pinnedBottom = props.pinnedBottom;
+    const pinnedLeft = props.pinnedLeft;
+    const pinnedRight = props.pinnedRight;
     const selection = useMemo(() => new Selection(props.selectedCells), [props.selectedCells]);
     const hoveredCell = props.hoveredCell;
     const focusedCell = props.focusedCell;
@@ -54,8 +81,8 @@ export function StateProvider(props) {
             data
         }), [data])],
         [ColumnsAndRowsContext, useMemo(() => ({
-            columnsLeft, columns, columnsRight, rowsTop, rows, rowsBottom
-        }), [columnsLeft, columns, columnsRight, rowsTop, rows, rowsBottom])],
+            columns, rows, pinnedTop, pinnedBottom, pinnedLeft, pinnedRight
+        }), [columns, rows, pinnedTop, pinnedBottom, pinnedLeft, pinnedRight])],
         [MeasuringContext, useMemo(() => ({
             formatting
         }), [formatting])],
@@ -75,12 +102,12 @@ export function StateProvider(props) {
 }
 
 export const useData = () => React.useContext(DataContext).data;
-export const useColumnsLeft = () => React.useContext(ColumnsAndRowsContext).columnsLeft;
 export const useColumns = () => React.useContext(ColumnsAndRowsContext).columns;
-export const useColumnsRight = () => React.useContext(ColumnsAndRowsContext).columnsRight;
-export const useRowsTop = () => React.useContext(ColumnsAndRowsContext).rowsTop;
 export const useRows = () => React.useContext(ColumnsAndRowsContext).rows;
-export const useRowsBottom = () => React.useContext(ColumnsAndRowsContext).rowsBottom;
+export const usePinnedTop = () => React.useContext(ColumnsAndRowsContext).pinnedTop;
+export const usePinnedBottom = () => React.useContext(ColumnsAndRowsContext).pinnedBottom;
+export const usePinnedLeft = () => React.useContext(ColumnsAndRowsContext).pinnedLeft;
+export const usePinnedRight = () => React.useContext(ColumnsAndRowsContext).pinnedRight;
 export const useFormatting = () => React.useContext(MeasuringContext).formatting;
 export const useSelection = () => React.useContext(InteractionsContext).selection;
 export const useHoveredCell = () => React.useContext(InteractionsContext).hoveredCell;

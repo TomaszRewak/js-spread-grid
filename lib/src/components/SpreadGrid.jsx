@@ -3,14 +3,14 @@ import { StateProvider } from "../contexts/StateContext";
 import Grid from "../fragments/Grid";
 
 const defaultData = [];
-const defaultColumnsLeft = [];
-const defaultColumns = [];
-const defaultColumnsRight = [];
-const defaultRowsTop = [];
-const defaultRows = [];
-const defaultRowsBottom = [];
+const defaultColumns = data => data.length > 0 ? Object.keys(data[0]).map(key => ({ id: key, width: 100 })) : [];
+const defaultRows = data => [{ id: 'top-header', type: 'HEADER', height: 20 }, ...data.map((_, index) => ({ id: index, height: 20 }))];
 const defaultFormatting = [];
 const defaultDataSelector = ({data, row, column}) => data[row.id][column.id];
+const defaultPinnedTop = 1;
+const defaultPinnedBottom = 0;
+const defaultPinnedLeft = 0;
+const defaultPinnedRight = 0;
 
 export default function SpreadGrid(props) {
     const [localSelectedCells, setLocalSelectedCells] = useState([]);
@@ -18,14 +18,14 @@ export default function SpreadGrid(props) {
     const [localFocusedCell, setLocalFocusedCell] = useState(null);
 
     const data = 'data' in props ? props.data : defaultData;
-    const columnsLeft = 'columnsLeft' in props ? props.columnsLeft : defaultColumnsLeft;
     const columns = 'columns' in props ? props.columns : defaultColumns;
-    const columnsRight = 'columnsRight' in props ? props.columnsRight : defaultColumnsRight;
-    const rowsTop = 'rowsTop' in props ? props.rowsTop : defaultRowsTop;
     const rows = 'rows' in props ? props.rows : defaultRows;
-    const rowsBottom = 'rowsBottom' in props ? props.rowsBottom : defaultRowsBottom;
     const formatting = 'formatting' in props ? props.formatting : defaultFormatting;
     const dataSelector = 'dataSelector' in props ? props.dataSelector : defaultDataSelector;
+    const pinnedTop = 'pinnedTop' in props ? props.pinnedTop : defaultPinnedTop; // TODO: Throw error if pinnedTop + pinnedBottom > rows.length (and same for columns)
+    const pinnedBottom = 'pinnedBottom' in props ? props.pinnedBottom : defaultPinnedBottom;
+    const pinnedLeft = 'pinnedLeft' in props ? props.pinnedLeft : defaultPinnedLeft;
+    const pinnedRight = 'pinnedRight' in props ? props.pinnedRight : defaultPinnedRight;
     const selectedCells = 'selectedCells' in props ? props.selectedCells : localSelectedCells;
     const hoveredCell = 'hoveredCell' in props ? props.hoveredCell : localHoveredCell;
     const focusedCell = 'focusedCell' in props ? props.focusedCell : localFocusedCell;
@@ -49,12 +49,12 @@ export default function SpreadGrid(props) {
     return (
         <StateProvider
             data={data}
-            columnsLeft={columnsLeft}
             columns={columns}
-            columnsRight={columnsRight}
-            rowsTop={rowsTop}
             rows={rows}
-            rowsBottom={rowsBottom}
+            pinnedTop={pinnedTop}
+            pinnedBottom={pinnedBottom}
+            pinnedLeft={pinnedLeft}
+            pinnedRight={pinnedRight}
             formatting={formatting}
             dataSelector={dataSelector}
             selectedCells={selectedCells}

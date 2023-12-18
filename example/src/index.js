@@ -25,10 +25,10 @@ function App() {
         <div style={{ maxHeight: 'calc(100vh - 20px)', display: 'flex' }}>
             <SpreadGrid
                 data={data}
-                columnsLeft={columns.slice(0, 2)}
-                columns={columns.slice(2, -1)}
-                columnsRight={columns.slice(-1)}
-                rowsTop={[
+                columns={columns}
+                pinnedLeft={2}
+                pinnedRight={1}
+                rows={[
                     { id: 'top', type: 'HEADER', height: 20 },
                     ...rows.slice(0, 2),
                     { id: 100, height: 7 },
@@ -36,14 +36,14 @@ function App() {
                     { id: 102, height: 50 },
                     { id: 103, height: 50 },
                     ...rows.slice(8, 10),
-                    { type: 'HEADER', height: 20 }
-                ]}
-                rows={rows.slice(2, -2)}
-                rowsBottom={[
+                    { type: 'HEADER', height: 20 },
+                    ...rows.slice(2, -2),
                     { type: 'HEADER', height: 20 },
                     ...rows.slice(-2),
                     { type: 'HEADER', height: 20 }
                 ]}
+                pinnedTop={10}
+                pinnedBottom={4}
                 formatting={[
                     {
                         condition: ({row}) => row.index % 2 === 0,

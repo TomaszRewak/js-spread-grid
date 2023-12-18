@@ -7,7 +7,7 @@ import GridInteractions from './GridInteractions';
 import useDevicePixelRatio, { roundToPixels } from '../hooks/useDevicePixelRatio';
 import Conditional from './Conditional';
 import { InteractionsProvider } from '../contexts/InteractionsContext';
-import { useColumns, useColumnsLeft, useColumnsRight, useRows, useRowsBottom, useRowsTop } from '../contexts/StateContext';
+import { useColumns, useRows, usePinnedTop, usePinnedBottom, usePinnedLeft, usePinnedRight } from '../contexts/StateContext';
 
 function useIndexedDefinitions(definitions) {
     return useMemo(() => {
@@ -37,6 +37,10 @@ function useDefinitionWithRoundedHeight(rowDefinitions, devicePixelRatio) {
     }, [rowDefinitions, devicePixelRatio]);
 }
 
+function useSlice(array, start, end) {
+    return useMemo(() => array.slice(start, end), [array, start, end]);
+}
+
 // TODO: Write description
 export default function Grid() {
     // TODO: Use intersection observer to only render the grid if it is in view
@@ -59,20 +63,28 @@ export default function Grid() {
     const devicePixelRatio = useDevicePixelRatio();
     const borderWidth = 1 / devicePixelRatio;
 
-    const columnsLeft = useDefinitionWithRoundedWidth(useIndexedDefinitions(useColumnsLeft()), devicePixelRatio);
-    const columns = useDefinitionWithRoundedWidth(useIndexedDefinitions(useColumns()), devicePixelRatio);
-    const columnsRight = useDefinitionWithRoundedWidth(useIndexedDefinitions(useColumnsRight()), devicePixelRatio);
-    const rowsTop = useDefinitionWithRoundedHeight(useIndexedDefinitions(useRowsTop()), devicePixelRatio);
-    const rows = useDefinitionWithRoundedHeight(useIndexedDefinitions(useRows()), devicePixelRatio);
-    const rowsBottom = useDefinitionWithRoundedHeight(useIndexedDefinitions(useRowsBottom()), devicePixelRatio);
+    const columns = useColumns();
+    const rows = useRows();
+
+    const pinnedTop = usePinnedTop();
+    const pinnedBottom = usePinnedBottom();
+    const pinnedLeft = usePinnedLeft();
+    const pinnedRight = usePinnedRight();
+
+    const columnsLeft = useSlice(columns, 0, pinnedLeft);
+    const columnsMiddle = useSlice(columns, pinnedLeft, columns.length - pinnedRight);
+    const columnsRight = useSlice(columns, columns.length - pinnedRight, columns.length);
+    const rowsTop = useSlice(rows, 0, pinnedTop);
+    const rowsMiddle = useSlice(rows, pinnedTop, rows.length - pinnedBottom);
+    const rowsBottom = useSlice(rows, rows.length - pinnedBottom, rows.length);
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
     const hasLeftColumns = columnsLeft.length > 0;
-    const hasMiddleColumns = columns.length > 0;
+    const hasMiddleColumns = columnsMiddle.length > 0;
     const hasRightColumns = columnsRight.length > 0;
     const hasTopRows = rowsTop.length > 0;
-    const hasMiddleRows = rows.length > 0;
+    const hasMiddleRows = rowsMiddle.length > 0;
     const hasBottomRows = rowsBottom.length > 0;
 
     // TODO: Display left/right/top/bottom borders for all fixed rows and display them for middle cells if no fixed rows/columns are present
@@ -108,7 +120,7 @@ export default function Grid() {
             <Conditional condition={hasMiddleColumns && hasTopRows}>
                 <GridCanvas
                     style={{ position: 'sticky', top: 0, zIndex: 1, gridRow: '1', gridColumn: '2' }}
-                    columns={columns}
+                    columns={columnsMiddle}
                     rows={rowsTop}
                     showLeftBorder={!hasLeftColumns}
                     showTopBorder={true}
@@ -139,7 +151,7 @@ export default function Grid() {
                 <GridCanvas
                     style={{ position: 'sticky', left: 0, zIndex: 1, gridRow: '2', gridColumn: '1' }}
                     columns={columnsLeft}
-                    rows={rows}
+                    rows={rowsMiddle}
                     showLeftBorder={true}
                     showTopBorder={!hasTopRows}
                     showRightBorder={true}
@@ -154,8 +166,8 @@ export default function Grid() {
             <Conditional condition={hasMiddleColumns && hasMiddleRows}>
                 <GridCanvas
                     style={{ gridRow: '2', gridColumn: '2' }}
-                    columns={columns}
-                    rows={rows}
+                    columns={columnsMiddle}
+                    rows={rowsMiddle}
                     showLeftBorder={!hasLeftColumns}
                     showTopBorder={!hasTopRows}
                     showRightBorder={!hasRightColumns}
@@ -173,7 +185,7 @@ export default function Grid() {
                 <GridCanvas
                     style={{ position: 'sticky', right: 0, zIndex: 1, gridRow: '2', gridColumn: '3' }}
                     columns={columnsRight}
-                    rows={rows}
+                    rows={rowsMiddle}
                     showLeftBorder={hasMiddleColumns || !hasLeftColumns}
                     showTopBorder={!hasTopRows}
                     showRightBorder={true}
@@ -202,7 +214,7 @@ export default function Grid() {
             <Conditional condition={hasMiddleColumns && hasBottomRows}>
                 <GridCanvas
                     style={{ position: 'sticky', bottom: 0, zIndex: 1, gridRow: '3', gridColumn: '2' }}
-                    columns={columns}
+                    columns={columnsMiddle}
                     rows={rowsBottom}
                     showLeftBorder={!hasLeftColumns}
                     showTopBorder={hasMiddleRows || !hasTopRows}
@@ -231,12 +243,6 @@ export default function Grid() {
 
             <InteractionsProvider element={container}>
                 <GridInteractions
-                    leftColumns={columnsLeft}
-                    middleColumns={columns}
-                    rightColumns={columnsRight}
-                    topRows={rowsTop}
-                    middleRows={rows}
-                    bottomRows={rowsBottom}
                     borderWidth={borderWidth}
                 />
             </InteractionsProvider>
