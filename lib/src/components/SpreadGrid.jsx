@@ -22,7 +22,7 @@ export default function SpreadGrid(props) {
     const rows = 'rows' in props ? props.rows : defaultRows;
     const formatting = 'formatting' in props ? props.formatting : defaultFormatting;
     const dataSelector = 'dataSelector' in props ? props.dataSelector : defaultDataSelector;
-    const pinnedTop = 'pinnedTop' in props ? props.pinnedTop : defaultPinnedTop;
+    const pinnedTop = 'pinnedTop' in props ? props.pinnedTop : defaultPinnedTop; // TODO: Throw error if pinnedTop + pinnedBottom > rows.length (and same for columns)
     const pinnedBottom = 'pinnedBottom' in props ? props.pinnedBottom : defaultPinnedBottom;
     const pinnedLeft = 'pinnedLeft' in props ? props.pinnedLeft : defaultPinnedLeft;
     const pinnedRight = 'pinnedRight' in props ? props.pinnedRight : defaultPinnedRight;

@@ -4,24 +4,16 @@ import SpreadGrid from './SpreadGrid';
 const generateSpreadGrid = (top, middle, bottom, left, center, right) => {
     return (
         <SpreadGrid
-            columnsLeft={[
-                ...new Array(left).fill(0).map((_, i) => ({ id: i, width: 70 })),
-            ]}
             columns={[
-                ...new Array(center).fill(0).map((_, i) => ({ id: i + left, width: 70 })),
-            ]}
-            columnsRight={[
-                ...new Array(right).fill(0).map((_, i) => ({ id: i + left + center, width: 70 })),
-            ]}
-            rowsTop={[
-                ...new Array(top).fill(0).map((_, i) => ({ id: i, height: 20 })),
+                ...new Array(left + center + right).fill(0).map((_, i) => ({ id: i, width: 70 })),
             ]}
             rows={[
-                ...new Array(middle).fill(0).map((_, i) => ({ id: i + top, height: 20 })),
+                ...new Array(top + middle + bottom).fill(0).map((_, i) => ({ id: i, height: 20 })),
             ]}
-            rowsBottom={[
-                ...new Array(bottom).fill(0).map((_, i) => ({ id: i + top + middle, height: 20 })),
-            ]}
+            pinnedTop={top}
+            pinnedBottom={bottom}
+            pinnedLeft={left}
+            pinnedRight={right}
             data={[
                 ...new Array(top).fill([
                     ...new Array(left).fill('red'),
