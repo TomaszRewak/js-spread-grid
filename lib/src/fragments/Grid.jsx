@@ -71,12 +71,12 @@ export default function Grid() {
     const pinnedLeft = usePinnedLeft();
     const pinnedRight = usePinnedRight();
 
-    const columnsLeft = useDefinitionWithRoundedWidth(useIndexedDefinitions(useSlice(columns, 0, pinnedLeft)), devicePixelRatio);
-    const columnsMiddle = useDefinitionWithRoundedWidth(useIndexedDefinitions(useSlice(columns, pinnedLeft, columns.length - pinnedRight)), devicePixelRatio);
-    const columnsRight = useDefinitionWithRoundedWidth(useIndexedDefinitions(useSlice(columns, columns.length - pinnedRight, columns.length)), devicePixelRatio);
-    const rowsTop = useDefinitionWithRoundedHeight(useIndexedDefinitions(useSlice(rows, 0, pinnedTop)), devicePixelRatio);
-    const rowsMiddle = useDefinitionWithRoundedHeight(useIndexedDefinitions(useSlice(rows, pinnedTop, rows.length - pinnedBottom)), devicePixelRatio);
-    const rowsBottom = useDefinitionWithRoundedHeight(useIndexedDefinitions(useSlice(rows, rows.length - pinnedBottom, rows.length)), devicePixelRatio);
+    const columnsLeft = useSlice(columns, 0, pinnedLeft);
+    const columnsMiddle = useSlice(columns, pinnedLeft, columns.length - pinnedRight);
+    const columnsRight = useSlice(columns, columns.length - pinnedRight, columns.length);
+    const rowsTop = useSlice(rows, 0, pinnedTop);
+    const rowsMiddle = useSlice(rows, pinnedTop, rows.length - pinnedBottom);
+    const rowsBottom = useSlice(rows, rows.length - pinnedBottom, rows.length);
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
@@ -243,12 +243,6 @@ export default function Grid() {
 
             <InteractionsProvider element={container}>
                 <GridInteractions
-                    leftColumns={columnsLeft}
-                    middleColumns={columnsMiddle}
-                    rightColumns={columnsRight}
-                    topRows={rowsTop}
-                    middleRows={rowsMiddle}
-                    bottomRows={rowsBottom}
                     borderWidth={borderWidth}
                 />
             </InteractionsProvider>

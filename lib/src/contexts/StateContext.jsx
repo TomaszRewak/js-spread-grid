@@ -5,6 +5,7 @@ import Selection from "../utils/Selection";
 import useChangeCallback from "../hooks/useChangeCallback";
 import stringifyId from "../utils/stringifyId";
 import addDataFormattingRules from "../utils/addDataFormattingRules";
+import useDevicePixelRatio, { roundToPixels } from "../hooks/useDevicePixelRatio";
 
 function compareCells(oldCell, newCell) {
     return stringifyId(oldCell) === stringifyId(newCell);
@@ -18,6 +19,30 @@ function compareSelectedCells(oldCells, newCells) {
     return newCells.every(cell => selection.isIdSelected(cell.rowId, cell.columnId));
 }
 
+function useResolvedColumns(columns, devicePixelRatio)
+{
+    return useMemo(() => {
+        return columns.map((column, index) => ({
+            ...column,
+            width: roundToPixels(column.width, devicePixelRatio),
+            index: index,
+            key: stringifyId(column.id)
+        }));
+    }, [columns, devicePixelRatio]);
+}
+
+function useResolvedRows(rows, devicePixelRatio)
+{
+    return useMemo(() => {
+        return rows.map((row, index) => ({
+            ...row,
+            height: roundToPixels(row.height, devicePixelRatio),
+            index: index,
+            key: stringifyId(row.id)
+        }));
+    }, [rows, devicePixelRatio]);
+}
+
 const DataContext = createContext();
 const ColumnsAndRowsContext = createContext();
 const MeasuringContext = createContext();
@@ -25,9 +50,11 @@ const InteractionsContext = createContext();
 const RenderingContext = createContext();
 
 export function StateProvider(props) {
+    const devicePixelRatio = useDevicePixelRatio();
+    
     const data = props.data;
-    const columns = useInvoked(props.columns, [data]);
-    const rows = useInvoked(props.rows, [data]);
+    const columns = useResolvedColumns(useInvoked(props.columns, [data]), devicePixelRatio);
+    const rows = useResolvedRows(useInvoked(props.rows, [data]), devicePixelRatio);
     const pinnedTop = props.pinnedTop;
     const pinnedBottom = props.pinnedBottom;
     const pinnedLeft = props.pinnedLeft;

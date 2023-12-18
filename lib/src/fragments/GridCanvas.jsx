@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react"
 import TextResolver from "../utils/TextResolver";
 import { roundToPixels } from "../hooks/useDevicePixelRatio";
-import { useData, useRenderFormatting } from "../contexts/StateContext";
+import { useColumns, useData, useRenderFormatting, useRows } from "../contexts/StateContext";
 import FormatResolver from "../utils/FormatResolver";
 
 // TODO: Upgrade to react 18 for better performance
@@ -37,6 +37,8 @@ export default function GridCanvas({
     const formatting = useRenderFormatting();
     // TODO: Make sure those formatters are split based on the rule areas
     const formatResolver = useMemo(() => new FormatResolver(formatting), [formatting]);
+    const allColumns = useColumns();
+    const allRows = useRows();
 
     // TODO: Read and apply: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas?retiredLocale=pl
     // TODO: Redraw only the cells that have actually changed
@@ -97,7 +99,7 @@ export default function GridCanvas({
                 const row = rows[rowIndex + minVisibleRowIndex];
                 return Array.from({ length: maxVisibleColumnIndex - minVisibleColumnIndex + 1 }, (_, columnIndex) => {
                     const column = columns[columnIndex + minVisibleColumnIndex];
-                    return formatResolver.resolve(data, rows, columns, row, column);
+                    return formatResolver.resolve(data, allRows, allColumns, row, column);
                 });
             });
             const getCell = (rowIndex, columnIndex) => cells[rowIndex - minVisibleRowIndex][columnIndex - minVisibleColumnIndex];
@@ -300,7 +302,7 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, showRightBorder, showBottomBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth, formatResolver, data, textResolver]);
+    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, showRightBorder, showBottomBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth, formatResolver, data, textResolver, allRows, allColumns]);
 
     // TODO: style={{imageRendering: 'pixelated'}} - is this even needed, though?
     // TODO: memoize style
