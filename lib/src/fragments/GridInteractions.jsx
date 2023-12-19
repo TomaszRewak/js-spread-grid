@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
-import { useInteraction,  useScrollOffset, useSize } from '../contexts/InteractionsContext';
+import { useInteraction, useMousePosition, useScrollOffset, useSize } from '../contexts/InteractionsContext';
 import { useAddSelectedCells, useColumns, useFocusedCell, useHoveredCell, usePinnedBottom, usePinnedLeft, usePinnedRight, usePinnedTop, useRows, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells } from '../contexts/StateContext';
 
 function useColumnPlacement(columns, borderWidth) {
@@ -94,6 +94,7 @@ export default function GridInteractions({ borderWidth }) {
     // console.count('render GridInteractions');
 
     const size = useSize();
+    const mousePosition = useMousePosition();
     const scrollOffset = useScrollOffset();
     const hoveredCell = useHoveredCell();
     const focusedCell = useFocusedCell();
@@ -124,7 +125,7 @@ export default function GridInteractions({ borderWidth }) {
     const columnLookup = useMemo(() => columns.reduce((map, column) => map.set(column.key, column), new Map()), [columns]);
     const rowLookup = useMemo(() => rows.reduce((map, row) => map.set(row.key, row), new Map()), [rows]);
 
-    useInteraction('mousemove', mousePosition => {
+    useEffect(() => {
         if (!mousePosition) {
             setHoveredCell(null);
             return;
@@ -153,7 +154,7 @@ export default function GridInteractions({ borderWidth }) {
             rowId: rows[hoverRowIndex].id,
             columnId: columns[hoverColumnIndex].id
         });
-    });
+    }, [bottomHeight, columnPlacement, columns, leftWidth, mousePosition, rightWidth, rowPlacement, rows, scrollOffset, setHoveredCell, size, topHeight, totalHeight, totalWidth]);
 
     useInteraction('mousedown', event => {
         if (!hoveredCell)
