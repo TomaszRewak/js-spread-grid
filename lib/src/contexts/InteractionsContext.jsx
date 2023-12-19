@@ -9,10 +9,6 @@ function compareScrollOffsets(oldScrollOffset, newScrollOffset) {
     return oldScrollOffset.left === newScrollOffset.left && oldScrollOffset.top === newScrollOffset.top;
 }
 
-function compareMousePositions(oldMousePosition, newMousePosition) {
-    return oldMousePosition?.x === newMousePosition?.x && oldMousePosition?.y === newMousePosition?.y;
-}
-
 function compareSizes(oldSize, newSize) {
     return oldSize.width === newSize.width && oldSize.height === newSize.height;
 }
@@ -20,7 +16,6 @@ function compareSizes(oldSize, newSize) {
 export function InteractionsProvider({ element, children }) {
     const interactions = useRef({});
     const [scrollOffset, setScrollOffset] = useDeepState({ left: 0, top: 0 }, compareScrollOffsets);
-    const [mousePosition, setMousePosition] = useDeepState(null, compareMousePositions);
     const [size, setSize] = useDeepState({ width: 0, height: 0 }, compareSizes);
 
     useEventListener(element, 'scroll', () => {
@@ -31,22 +26,25 @@ export function InteractionsProvider({ element, children }) {
     }, [setScrollOffset]);
 
     useEventListener(element, 'mouseenter', (event) => {
-        setMousePosition({
-            x: event.clientX - element.offsetLeft,
-            y: event.clientY - element.offsetTop
-        });
-    }, [setMousePosition]);
+        if (interactions.current.mousemove)
+            interactions.current.mousemove({
+                x: event.clientX - element.offsetLeft,
+                y: event.clientY - element.offsetTop
+            });
+    }, []);
 
     useEventListener(element, 'mousemove', (event) => {
-        setMousePosition({
-            x: event.clientX - element.offsetLeft,
-            y: event.clientY - element.offsetTop
-        });
-    }, [setMousePosition]);
+        if (interactions.current.mousemove)
+            interactions.current.mousemove({
+                x: event.clientX - element.offsetLeft,
+                y: event.clientY - element.offsetTop
+            });
+    }, []);
 
     useEventListener(element, 'mouseleave', () => {
-        setMousePosition(null);
-    }, [setMousePosition]);
+        if (interactions.current.mousemove)
+            interactions.current.mousemove(null);
+    }, []);
 
     useDomObserver(element, ResizeObserver, () => {
         setSize({
@@ -57,7 +55,7 @@ export function InteractionsProvider({ element, children }) {
 
     useEventListener(element, 'mousedown', (event) => {
         element.focus();
-        
+
         if (interactions.current.mousedown)
             interactions.current.mousedown(event);
 
@@ -83,10 +81,9 @@ export function InteractionsProvider({ element, children }) {
 
     const value = useMemo(() => ({
         scrollOffset,
-        mousePosition,
         size,
         interactions
-    }), [mousePosition, scrollOffset, size]);
+    }), [scrollOffset, size]);
 
     return (
         <InteractionsContext.Provider value={value}>
