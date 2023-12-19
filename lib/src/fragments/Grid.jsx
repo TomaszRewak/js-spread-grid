@@ -2,40 +2,11 @@
 import React, { useMemo, useState } from 'react';
 import GridCanvas from './GridCanvas';
 import useScrollRect from '../hooks/useScrollRect';
-import stringifyId from '../utils/stringifyId';
 import GridInteractions from './GridInteractions';
-import useDevicePixelRatio, { roundToPixels } from '../hooks/useDevicePixelRatio';
+import useDevicePixelRatio from '../hooks/useDevicePixelRatio';
 import Conditional from './Conditional';
 import { InteractionsProvider } from '../contexts/InteractionsContext';
 import { useColumns, useRows, usePinnedTop, usePinnedBottom, usePinnedLeft, usePinnedRight } from '../contexts/StateContext';
-
-function useIndexedDefinitions(definitions) {
-    return useMemo(() => {
-        return definitions.map((definition, index) => ({
-            ...definition,
-            index,
-            key: stringifyId(definition.id),
-        }));
-    }, [definitions]);
-}
-
-function useDefinitionWithRoundedWidth(columnDefinitions, devicePixelRatio) {
-    return useMemo(() => {
-        return columnDefinitions.map(definition => ({
-            ...definition,
-            width: roundToPixels(definition.width, devicePixelRatio)
-        }));
-    }, [columnDefinitions, devicePixelRatio]);
-}
-
-function useDefinitionWithRoundedHeight(rowDefinitions, devicePixelRatio) {
-    return useMemo(() => {
-        return rowDefinitions.map(definition => ({
-            ...definition,
-            height: roundToPixels(definition.height, devicePixelRatio)
-        }));
-    }, [rowDefinitions, devicePixelRatio]);
-}
 
 function useSlice(array, start, end) {
     return useMemo(() => array.slice(start, end), [array, start, end]);
