@@ -78,6 +78,9 @@ export function GridSectionProvider({ children, horizontal, vertical }) {
         rect: sectionRect
     }), [sectionColumns, sectionRows, sectionRect]);
 
+    if (sectionColumns.length === 0 || sectionRows.length === 0)
+        return null;
+
     return (
         <GridSectionContext.Provider value={value}>
             {children}

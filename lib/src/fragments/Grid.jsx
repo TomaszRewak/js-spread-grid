@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import GridCanvas from './GridCanvas';
 import GridInteractions from './GridInteractions';
 import useDevicePixelRatio from '../hooks/useDevicePixelRatio';
-import Conditional from './Conditional';
 import { MouseAndKeyboardProvider } from '../contexts/MouseAndKeyboardContext';
 import { useColumns, useRows, usePinned } from '../contexts/StateContext';
 import { SizeAndScrollProvider } from '../contexts/SizeAndScrollContext';
@@ -33,6 +32,7 @@ export default function Grid() {
 
     const pinned = usePinned();
 
+    // TODO: Move to the GridSectionContext
     const hasLeftColumns = pinned.left > 0;
     const hasMiddleColumns = columns.length - pinned.left - pinned.right > 0;
     const hasRightColumns = pinned.right > 0;
@@ -53,122 +53,104 @@ export default function Grid() {
         >
             <SizeAndScrollProvider element={container}>
                 <ScrollRectProvider>
-                    <Conditional condition={hasLeftColumns && hasTopRows}>
-                        <GridSectionProvider horizontal='left' vertical='top'>
-                            <GridCanvas
-                                style={{ position: 'sticky', left: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '1' }}
-                                showLeftBorder={true}
-                                showTopBorder={true}
-                                showRightBorder={true}
-                                showBottomBorder={true}
-                                devicePixelRatio={devicePixelRatio}
-                            />
-                        </GridSectionProvider>
-                    </Conditional>
+                    <GridSectionProvider horizontal='left' vertical='top'>
+                        <GridCanvas
+                            style={{ position: 'sticky', left: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '1' }}
+                            showLeftBorder={true}
+                            showTopBorder={true}
+                            showRightBorder={true}
+                            showBottomBorder={true}
+                            devicePixelRatio={devicePixelRatio}
+                        />
+                    </GridSectionProvider>
 
-                    <Conditional condition={hasMiddleColumns && hasTopRows}>
-                        <GridSectionProvider horizontal='middle' vertical='top'>
-                            <GridCanvas
-                                style={{ position: 'sticky', top: 0, zIndex: 1, gridRow: '1', gridColumn: '2' }}
-                                showLeftBorder={!hasLeftColumns}
-                                showTopBorder={true}
-                                showRightBorder={!hasRightColumns}
-                                showBottomBorder={true}
-                                devicePixelRatio={devicePixelRatio}
-                            />
-                        </GridSectionProvider>
-                    </Conditional>
+                    <GridSectionProvider horizontal='middle' vertical='top'>
+                        <GridCanvas
+                            style={{ position: 'sticky', top: 0, zIndex: 1, gridRow: '1', gridColumn: '2' }}
+                            showLeftBorder={!hasLeftColumns}
+                            showTopBorder={true}
+                            showRightBorder={!hasRightColumns}
+                            showBottomBorder={true}
+                            devicePixelRatio={devicePixelRatio}
+                        />
+                    </GridSectionProvider>
 
-                    <Conditional condition={hasRightColumns && hasTopRows}>
-                        <GridSectionProvider horizontal='right' vertical='top'>
-                            <GridCanvas
-                                style={{ position: 'sticky', right: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '3' }}
-                                showLeftBorder={hasMiddleColumns || !hasLeftColumns}
-                                showTopBorder={true}
-                                showRightBorder={true}
-                                showBottomBorder={true}
-                                devicePixelRatio={devicePixelRatio}
-                            />
-                        </GridSectionProvider>
-                    </Conditional>
+                    <GridSectionProvider horizontal='right' vertical='top'>
+                        <GridCanvas
+                            style={{ position: 'sticky', right: 0, top: 0, zIndex: 2, gridRow: '1', gridColumn: '3' }}
+                            showLeftBorder={hasMiddleColumns || !hasLeftColumns}
+                            showTopBorder={true}
+                            showRightBorder={true}
+                            showBottomBorder={true}
+                            devicePixelRatio={devicePixelRatio}
+                        />
+                    </GridSectionProvider>
 
-                    <Conditional condition={hasLeftColumns && hasMiddleRows}>
-                        <GridSectionProvider horizontal='left' vertical='middle'>
-                            <GridCanvas
-                                style={{ position: 'sticky', left: 0, zIndex: 1, gridRow: '2', gridColumn: '1' }}
-                                showLeftBorder={true}
-                                showTopBorder={!hasTopRows}
-                                showRightBorder={true}
-                                showBottomBorder={!hasBottomRows}
-                                devicePixelRatio={devicePixelRatio}
-                            />
-                        </GridSectionProvider>
-                    </Conditional>
+                    <GridSectionProvider horizontal='left' vertical='middle'>
+                        <GridCanvas
+                            style={{ position: 'sticky', left: 0, zIndex: 1, gridRow: '2', gridColumn: '1' }}
+                            showLeftBorder={true}
+                            showTopBorder={!hasTopRows}
+                            showRightBorder={true}
+                            showBottomBorder={!hasBottomRows}
+                            devicePixelRatio={devicePixelRatio}
+                        />
+                    </GridSectionProvider>
 
-                    <Conditional condition={hasMiddleColumns && hasMiddleRows}>
-                        <GridSectionProvider horizontal='middle' vertical='middle'>
-                            <GridCanvas
-                                style={{ gridRow: '2', gridColumn: '2' }}
-                                showLeftBorder={!hasLeftColumns}
-                                showTopBorder={!hasTopRows}
-                                showRightBorder={!hasRightColumns}
-                                showBottomBorder={!hasBottomRows}
-                                devicePixelRatio={devicePixelRatio}
-                            />
-                        </GridSectionProvider>
-                    </Conditional>
+                    <GridSectionProvider horizontal='middle' vertical='middle'>
+                        <GridCanvas
+                            style={{ gridRow: '2', gridColumn: '2' }}
+                            showLeftBorder={!hasLeftColumns}
+                            showTopBorder={!hasTopRows}
+                            showRightBorder={!hasRightColumns}
+                            showBottomBorder={!hasBottomRows}
+                            devicePixelRatio={devicePixelRatio}
+                        />
+                    </GridSectionProvider>
 
-                    <Conditional condition={hasRightColumns && hasMiddleRows}>
-                        <GridSectionProvider horizontal='right' vertical='middle'>
-                            <GridCanvas
-                                style={{ position: 'sticky', right: 0, zIndex: 1, gridRow: '2', gridColumn: '3' }}
-                                showLeftBorder={hasMiddleColumns || !hasLeftColumns}
-                                showTopBorder={!hasTopRows}
-                                showRightBorder={true}
-                                showBottomBorder={!hasBottomRows}
-                                devicePixelRatio={devicePixelRatio}
-                            />
-                        </GridSectionProvider>
-                    </Conditional>
+                    <GridSectionProvider horizontal='right' vertical='middle'>
+                        <GridCanvas
+                            style={{ position: 'sticky', right: 0, zIndex: 1, gridRow: '2', gridColumn: '3' }}
+                            showLeftBorder={hasMiddleColumns || !hasLeftColumns}
+                            showTopBorder={!hasTopRows}
+                            showRightBorder={true}
+                            showBottomBorder={!hasBottomRows}
+                            devicePixelRatio={devicePixelRatio}
+                        />
+                    </GridSectionProvider>
 
-                    <Conditional condition={hasLeftColumns && hasBottomRows}>
-                        <GridSectionProvider horizontal='left' vertical='bottom'>
-                            <GridCanvas
-                                style={{ position: 'sticky', left: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '1' }}
-                                showLeftBorder={true}
-                                showTopBorder={hasMiddleRows || !hasTopRows}
-                                showRightBorder={true}
-                                showBottomBorder={true}
-                                devicePixelRatio={devicePixelRatio}
-                            />
-                        </GridSectionProvider>
-                    </Conditional>
+                    <GridSectionProvider horizontal='left' vertical='bottom'>
+                        <GridCanvas
+                            style={{ position: 'sticky', left: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '1' }}
+                            showLeftBorder={true}
+                            showTopBorder={hasMiddleRows || !hasTopRows}
+                            showRightBorder={true}
+                            showBottomBorder={true}
+                            devicePixelRatio={devicePixelRatio}
+                        />
+                    </GridSectionProvider>
 
-                    <Conditional condition={hasMiddleColumns && hasBottomRows}>
-                        <GridSectionProvider horizontal='middle' vertical='bottom'>
-                            <GridCanvas
-                                style={{ position: 'sticky', bottom: 0, zIndex: 1, gridRow: '3', gridColumn: '2' }}
-                                showLeftBorder={!hasLeftColumns}
-                                showTopBorder={hasMiddleRows || !hasTopRows}
-                                showRightBorder={!hasRightColumns}
-                                showBottomBorder={true}
-                                devicePixelRatio={devicePixelRatio}
-                            />
-                        </GridSectionProvider>
-                    </Conditional>
+                    <GridSectionProvider horizontal='middle' vertical='bottom'>
+                        <GridCanvas
+                            style={{ position: 'sticky', bottom: 0, zIndex: 1, gridRow: '3', gridColumn: '2' }}
+                            showLeftBorder={!hasLeftColumns}
+                            showTopBorder={hasMiddleRows || !hasTopRows}
+                            showRightBorder={!hasRightColumns}
+                            showBottomBorder={true}
+                            devicePixelRatio={devicePixelRatio}
+                        />
+                    </GridSectionProvider>
 
-                    <Conditional condition={hasRightColumns && hasBottomRows}>
-                        <GridSectionProvider horizontal='right' vertical='bottom'>
-                            <GridCanvas
-                                style={{ position: 'sticky', right: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '3' }}
-                                showLeftBorder={hasMiddleColumns || !hasLeftColumns}
-                                showTopBorder={hasMiddleRows || !hasTopRows}
-                                showRightBorder={true}
-                                showBottomBorder={true}
-                                devicePixelRatio={devicePixelRatio}
-                            />
-                        </GridSectionProvider>
-                    </Conditional>
+                    <GridSectionProvider horizontal='right' vertical='bottom'>
+                        <GridCanvas
+                            style={{ position: 'sticky', right: 0, bottom: 0, zIndex: 2, gridRow: '3', gridColumn: '3' }}
+                            showLeftBorder={hasMiddleColumns || !hasLeftColumns}
+                            showTopBorder={hasMiddleRows || !hasTopRows}
+                            showRightBorder={true}
+                            showBottomBorder={true}
+                            devicePixelRatio={devicePixelRatio}
+                        />
+                    </GridSectionProvider>
                 </ScrollRectProvider>
 
                 <MouseAndKeyboardProvider element={container}>
