@@ -16,6 +16,7 @@ function compareSizes(oldSize, newSize) {
 export function SizeAndScrollProvider({ element, children }) {
     const [scrollOffset, setScrollOffset] = useDeepState({ left: 0, top: 0 }, compareScrollOffsets);
     const [size, setSize] = useDeepState({ width: 0, height: 0 }, compareSizes);
+    const [clientSize, setClientSize] = useDeepState({ width: 0, height: 0 }, compareSizes);
 
     useEventListener(element, 'scroll', () => {
         setScrollOffset({
@@ -29,12 +30,17 @@ export function SizeAndScrollProvider({ element, children }) {
             width: element.getBoundingClientRect().width,
             height: element.getBoundingClientRect().height
         });
+        setClientSize({
+            width: element.clientWidth,
+            height: element.clientHeight
+        });
     }, [setSize]);
 
     const value = useMemo(() => ({
         scrollOffset,
-        size
-    }), [scrollOffset, size]);
+        size,
+        clientSize
+    }), [scrollOffset, size, clientSize]);
 
     return (
         <SizeAndScrollContext.Provider value={value}>
@@ -45,3 +51,4 @@ export function SizeAndScrollProvider({ element, children }) {
 
 export const useScrollOffset = () => useContext(SizeAndScrollContext).scrollOffset;
 export const useSize = () => useContext(SizeAndScrollContext).size;
+export const useClientSize = () => useContext(SizeAndScrollContext).clientSize;

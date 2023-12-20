@@ -23,10 +23,6 @@ export default function GridCanvas({
     showRightBorder,
     showBottomBorder,
     style,
-    scrollLeft,
-    scrollTop,
-    scrollWidth,
-    scrollHeight,
     devicePixelRatio
 }) {
     const [canvas, setCanvas] = useState(null);
