@@ -125,8 +125,8 @@ export function StateProvider(props) {
             renderFormatting
         }), [renderFormatting])],
         [SizeContext, useMemo(() => ({
-            fixedSize, totalSize
-        }), [fixedSize, totalSize])]
+            fixedSize, totalSize, borderWidth
+        }), [fixedSize, totalSize, borderWidth])]
     ];
 
     return contexts.reduce((children, [Context, value]) => (
@@ -151,3 +151,4 @@ export const useSetFocusedCell = () => React.useContext(InteractionsContext).set
 export const useAddSelectedCells = () => React.useContext(InteractionsContext).addSelectedCells;
 export const useFixedSize = () => React.useContext(SizeContext).fixedSize;
 export const useTotalSize = () => React.useContext(SizeContext).totalSize;
+export const useBorderWidth = () => React.useContext(SizeContext).borderWidth;

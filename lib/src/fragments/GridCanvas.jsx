@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react"
 import TextResolver from "../utils/TextResolver";
 import { roundToPixels } from "../hooks/useDevicePixelRatio";
-import { useColumns, useData, useRenderFormatting, useRows } from "../contexts/StateContext";
+import { useBorderWidth, useColumns, useData, useRenderFormatting, useRows } from "../contexts/StateContext";
 import FormatResolver from "../utils/FormatResolver";
 
 // TODO: Upgrade to react 18 for better performance
@@ -28,7 +28,6 @@ export default function GridCanvas({
     scrollTop,
     scrollWidth,
     scrollHeight,
-    borderWidth,
     devicePixelRatio
 }) {
     const [canvas, setCanvas] = useState(null);
@@ -39,6 +38,7 @@ export default function GridCanvas({
     const formatResolver = useMemo(() => new FormatResolver(formatting), [formatting]);
     const allColumns = useColumns();
     const allRows = useRows();
+    const borderWidth = useBorderWidth();
 
     // TODO: Read and apply: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas?retiredLocale=pl
     // TODO: Redraw only the cells that have actually changed

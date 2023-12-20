@@ -82,7 +82,6 @@ export default function Grid() {
                         showTopBorder={true}
                         showRightBorder={true}
                         showBottomBorder={true}
-                        borderWidth={borderWidth}
                         devicePixelRatio={devicePixelRatio}
                     />
                 </Conditional>
@@ -98,7 +97,6 @@ export default function Grid() {
                         showBottomBorder={true}
                         scrollLeft={scrollRect.left}
                         scrollWidth={scrollRect.width}
-                        borderWidth={borderWidth}
                         devicePixelRatio={devicePixelRatio}
                     />
                 </Conditional>
@@ -112,7 +110,6 @@ export default function Grid() {
                         showTopBorder={true}
                         showRightBorder={true}
                         showBottomBorder={true}
-                        borderWidth={borderWidth}
                         devicePixelRatio={devicePixelRatio}
                     />
                 </Conditional>
@@ -128,7 +125,6 @@ export default function Grid() {
                         showBottomBorder={!hasBottomRows}
                         scrollTop={scrollRect.top}
                         scrollHeight={scrollRect.height}
-                        borderWidth={borderWidth}
                         devicePixelRatio={devicePixelRatio}
                     />
                 </Conditional>
@@ -146,7 +142,6 @@ export default function Grid() {
                         scrollTop={scrollRect.top}
                         scrollWidth={scrollRect.width}
                         scrollHeight={scrollRect.height}
-                        borderWidth={borderWidth}
                         devicePixelRatio={devicePixelRatio}
                     />
                 </Conditional>
@@ -162,7 +157,6 @@ export default function Grid() {
                         showBottomBorder={!hasBottomRows}
                         scrollTop={scrollRect.top}
                         scrollHeight={scrollRect.height}
-                        borderWidth={borderWidth}
                         devicePixelRatio={devicePixelRatio}
                     />
                 </Conditional>
@@ -176,7 +170,6 @@ export default function Grid() {
                         showTopBorder={hasMiddleRows || !hasTopRows}
                         showRightBorder={true}
                         showBottomBorder={true}
-                        borderWidth={borderWidth}
                         devicePixelRatio={devicePixelRatio}
                     />
                 </Conditional>
@@ -192,7 +185,6 @@ export default function Grid() {
                         showBottomBorder={true}
                         scrollLeft={scrollRect.left}
                         scrollWidth={scrollRect.width}
-                        borderWidth={borderWidth}
                         devicePixelRatio={devicePixelRatio}
                     />
                 </Conditional>
@@ -206,15 +198,12 @@ export default function Grid() {
                         showTopBorder={hasMiddleRows || !hasTopRows}
                         showRightBorder={true}
                         showBottomBorder={true}
-                        borderWidth={borderWidth}
                         devicePixelRatio={devicePixelRatio}
                     />
                 </Conditional>
 
                 <MouseAndKeyboardProvider element={container}>
-                    <GridInteractions
-                        borderWidth={borderWidth}
-                    />
+                    <GridInteractions />
                 </MouseAndKeyboardProvider>
             </SizeAndScrollProvider>
         </div>

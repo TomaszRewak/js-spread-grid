@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
 import { useInteraction, useMousePosition } from '../contexts/MouseAndKeyboardContext';
-import { useAddSelectedCells, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useRows, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
+import { useAddSelectedCells, useBorderWidth, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useRows, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
 import { useScrollOffset, useSize } from '../contexts/SizeAndScrollContext';
 
 function useColumnPlacement(columns, borderWidth) {
@@ -90,7 +90,7 @@ function findRowIndex(placement, y) {
     return -1;
 }
 
-export default function GridInteractions({ borderWidth }) {
+export default function GridInteractions() {
     // console.count('render GridInteractions');
 
     const size = useSize();
@@ -98,6 +98,7 @@ export default function GridInteractions({ borderWidth }) {
     const scrollOffset = useScrollOffset();
     const hoveredCell = useHoveredCell();
     const focusedCell = useFocusedCell();
+    const borderWidth = useBorderWidth();
 
     const setSelectedCells = useSetSelectedCells();
     const setHoveredCell = useSetHoveredCell();
