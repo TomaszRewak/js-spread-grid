@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
 import { useInteraction, useMousePosition, useScrollOffset, useSize } from '../contexts/InteractionsContext';
-import { useAddSelectedCells, useColumns, useFocusedCell, useHoveredCell, usePinnedBottom, usePinnedLeft, usePinnedRight, usePinnedTop, useRows, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells } from '../contexts/StateContext';
+import { useAddSelectedCells, useColumns, useFixedSize, useFocusedCell, useHoveredCell, usePinned, useRows, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
 
 function useColumnPlacement(columns, borderWidth) {
     return useMemo(() => {
@@ -89,7 +89,6 @@ function findRowIndex(placement, y) {
     return -1;
 }
 
-
 export default function GridInteractions({ borderWidth }) {
     // console.count('render GridInteractions');
 
@@ -110,36 +109,28 @@ export default function GridInteractions({ borderWidth }) {
     const columnPlacement = useColumnPlacement(columns, borderWidth);
     const rowPlacement = useRowPlacement(rows, borderWidth);
 
-    const pinnedTop = usePinnedTop();
-    const pinnedBottom = usePinnedBottom();
-    const pinnedLeft = usePinnedLeft();
-    const pinnedRight = usePinnedRight();
-
-    const topHeight = pinnedTop ? rowPlacement.at(pinnedTop - 1).bottom : 0;
-    const totalHeight = rowPlacement.at(-1).bottom;
-    const bottomHeight = pinnedBottom ? rowPlacement.at(-1).bottom - rowPlacement.at(-pinnedBottom).top : 0;
-    const leftWidth = pinnedLeft ? columnPlacement.at(pinnedLeft - 1).right : 0;
-    const totalWidth = columnPlacement.at(-1).right;
-    const rightWidth = pinnedRight ? columnPlacement.at(-1).right - columnPlacement.at(-pinnedRight).left : 0;
+    const fixedSize = useFixedSize();
+    const totalSize = useTotalSize();
 
     const columnLookup = useMemo(() => columns.reduce((map, column) => map.set(column.key, column), new Map()), [columns]);
     const rowLookup = useMemo(() => rows.reduce((map, row) => map.set(row.key, row), new Map()), [rows]);
 
+    // TODO: Invoke this function also directly on the mousemove event. Though leave it as a effect as well, so that it is invoked when the scrollOffset changes.
     useEffect(() => {
         if (!mousePosition) {
             setHoveredCell(null);
             return;
         }
 
-        const x = mousePosition.x <= leftWidth
+        const x = mousePosition.x <= fixedSize.left
             ? mousePosition.x
-            : mousePosition.x >= size.width - rightWidth
-                ? totalWidth - size.width + mousePosition.x
+            : mousePosition.x >= size.width - fixedSize.right
+                ? totalSize.width - size.width + mousePosition.x
                 : mousePosition.x + scrollOffset.left;
-        const y = mousePosition.y <= topHeight
+        const y = mousePosition.y <= fixedSize.top
             ? mousePosition.y
-            : mousePosition.y >= size.height - bottomHeight
-                ? totalHeight - size.height + mousePosition.y
+            : mousePosition.y >= size.height - fixedSize.bottom
+                ? totalSize.height - size.height + mousePosition.y
                 : mousePosition.y + scrollOffset.top;
 
         const hoverRowIndex = findRowIndex(rowPlacement, y);
@@ -154,7 +145,7 @@ export default function GridInteractions({ borderWidth }) {
             rowId: rows[hoverRowIndex].id,
             columnId: columns[hoverColumnIndex].id
         });
-    }, [bottomHeight, columnPlacement, columns, leftWidth, mousePosition, rightWidth, rowPlacement, rows, scrollOffset, setHoveredCell, size, topHeight, totalHeight, totalWidth]);
+    }, [columnPlacement, columns, mousePosition, rowPlacement, rows, scrollOffset, setHoveredCell, size, fixedSize, totalSize]);
 
     useInteraction('mousedown', event => {
         if (!hoveredCell)

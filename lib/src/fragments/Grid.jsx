@@ -6,7 +6,7 @@ import GridInteractions from './GridInteractions';
 import useDevicePixelRatio from '../hooks/useDevicePixelRatio';
 import Conditional from './Conditional';
 import { InteractionsProvider } from '../contexts/InteractionsContext';
-import { useColumns, useRows, usePinnedTop, usePinnedBottom, usePinnedLeft, usePinnedRight } from '../contexts/StateContext';
+import { useColumns, useRows, usePinned } from '../contexts/StateContext';
 
 function useSlice(array, start, end) {
     return useMemo(() => array.slice(start, end), [array, start, end]);
@@ -37,17 +37,14 @@ export default function Grid() {
     const columns = useColumns();
     const rows = useRows();
 
-    const pinnedTop = usePinnedTop();
-    const pinnedBottom = usePinnedBottom();
-    const pinnedLeft = usePinnedLeft();
-    const pinnedRight = usePinnedRight();
+    const pinned = usePinned();
 
-    const columnsLeft = useSlice(columns, 0, pinnedLeft);
-    const columnsMiddle = useSlice(columns, pinnedLeft, columns.length - pinnedRight);
-    const columnsRight = useSlice(columns, columns.length - pinnedRight, columns.length);
-    const rowsTop = useSlice(rows, 0, pinnedTop);
-    const rowsMiddle = useSlice(rows, pinnedTop, rows.length - pinnedBottom);
-    const rowsBottom = useSlice(rows, rows.length - pinnedBottom, rows.length);
+    const columnsLeft = useSlice(columns, 0, pinned.left);
+    const columnsMiddle = useSlice(columns, pinned.left, columns.length - pinned.right);
+    const columnsRight = useSlice(columns, columns.length - pinned.right, columns.length);
+    const rowsTop = useSlice(rows, 0, pinned.top);
+    const rowsMiddle = useSlice(rows, pinned.top, rows.length - pinned.bottom);
+    const rowsBottom = useSlice(rows, rows.length - pinned.bottom, rows.length);
 
     const scrollRect = useScrollRect(container, fixedLeft, fixedTop, fixedRight, fixedBottom);
 
