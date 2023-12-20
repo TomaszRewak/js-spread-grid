@@ -3,6 +3,7 @@ import TextResolver from "../utils/TextResolver";
 import { roundToPixels } from "../hooks/useDevicePixelRatio";
 import { useBorderWidth, useColumns, useData, useRenderFormatting, useRows } from "../contexts/StateContext";
 import FormatResolver from "../utils/FormatResolver";
+import { useSectionColumns, useSectionRect, useSectionRows } from "../contexts/GridSectionContext";
 
 // TODO: Upgrade to react 18 for better performance
 /** TODO: update the arguments to reflect the real props
@@ -17,8 +18,6 @@ import FormatResolver from "../utils/FormatResolver";
  * }} props
  */
 export default function GridCanvas({
-    columns,
-    rows,
     showLeftBorder,
     showTopBorder,
     showRightBorder,
@@ -36,9 +35,12 @@ export default function GridCanvas({
     const formatting = useRenderFormatting();
     // TODO: Make sure those formatters are split based on the rule areas
     const formatResolver = useMemo(() => new FormatResolver(formatting), [formatting]);
+    const columns = useSectionColumns();
+    const rows = useSectionRows();
     const allColumns = useColumns();
     const allRows = useRows();
     const borderWidth = useBorderWidth();
+    const sectionRect = useSectionRect();
 
     // TODO: Read and apply: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas?retiredLocale=pl
     // TODO: Redraw only the cells that have actually changed
@@ -63,10 +65,10 @@ export default function GridCanvas({
             const columnWidths = columns.map(column => column.width);
             const totalWidth = columnWidths.reduce((a, b) => a + b, 0) + verticalBorderCount * borderWidth;
             const totalHeight = rowHeights.reduce((a, b) => a + b, 0) + horizontalBorderCount * borderWidth;
-            const left = (scrollLeft === undefined) ? 0 : scrollLeft;
-            const top = (scrollTop === undefined) ? 0 : scrollTop;
-            const width = (scrollWidth === undefined) ? totalWidth : scrollWidth;
-            const height = (scrollHeight === undefined) ? totalHeight : scrollHeight;
+            const left = sectionRect.left;
+            const top = sectionRect.top;
+            const width = sectionRect.width;
+            const height = sectionRect.height;
 
             // TODO: Move somewhere else
             const horizontalOffsets = columnWidths.reduce((acc, width, index) => {
@@ -302,7 +304,7 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, showRightBorder, showBottomBorder, rows, columns, scrollLeft, scrollTop, scrollWidth, scrollHeight, borderWidth, formatResolver, data, textResolver, allRows, allColumns]);
+    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, showRightBorder, showBottomBorder, rows, columns, sectionRect, borderWidth, formatResolver, data, textResolver, allRows, allColumns]);
 
     // TODO: style={{imageRendering: 'pixelated'}} - is this even needed, though?
     // TODO: memoize style

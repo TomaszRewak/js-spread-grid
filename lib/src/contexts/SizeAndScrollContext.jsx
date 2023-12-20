@@ -26,8 +26,8 @@ export function SizeAndScrollProvider({ element, children }) {
 
     useDomObserver(element, ResizeObserver, () => {
         setSize({
-            width: element.clientWidth,
-            height: element.clientHeight
+            width: element.getBoundingClientRect().width,
+            height: element.getBoundingClientRect().height
         });
     }, [setSize]);
 
