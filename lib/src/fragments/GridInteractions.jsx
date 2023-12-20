@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
-import { useInteraction, useMousePosition, useScrollOffset, useSize } from '../contexts/InteractionsContext';
-import { useAddSelectedCells, useColumns, useFixedSize, useFocusedCell, useHoveredCell, usePinned, useRows, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
+import { useInteraction, useMousePosition } from '../contexts/MouseAndKeyboardContext';
+import { useAddSelectedCells, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useRows, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
+import { useScrollOffset, useSize } from '../contexts/SizeAndScrollContext';
 
 function useColumnPlacement(columns, borderWidth) {
     return useMemo(() => {
