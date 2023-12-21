@@ -29,14 +29,13 @@ function App() {
                 pinnedLeft={2}
                 pinnedRight={1}
                 rows={[
-                    { id: 'top', type: 'HEADER', height: 20 },
-                    ...rows.slice(0, 2),
-                    ...rows.slice(8, 10),
-                    { type: 'HEADER', height: 20 },
-                    ...rows.slice(2, -2),
-                    { type: 'HEADER', height: 20 },
+                    { id: 'a', type: 'HEADER', height: 20 },
+                    ...rows.slice(0, 4),
+                    { id: 'b', type: 'HEADER', height: 20 },
+                    ...rows.slice(4, -2),
+                    { id: 'c', type: 'HEADER', height: 20 },
                     ...rows.slice(-2),
-                    { type: 'HEADER', height: 20 }
+                    { id: 'd', type: 'HEADER', height: 20 }
                 ]}
                 pinnedTop={6}
                 pinnedBottom={4}

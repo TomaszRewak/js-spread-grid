@@ -15,6 +15,7 @@ const defaultBorderWidth = 1;
 
 export default function SpreadGrid(props) {
     const [localSelectedCells, setLocalSelectedCells] = useState([]);
+    const [localHighlightedCells, setLocalHighlightedCells] = useState([]);
     const [localHoveredCell, setLocalHoveredCell] = useState(null);
     const [localFocusedCell, setLocalFocusedCell] = useState(null);
 
@@ -28,6 +29,7 @@ export default function SpreadGrid(props) {
     const pinnedLeft = 'pinnedLeft' in props ? props.pinnedLeft : defaultPinnedLeft;
     const pinnedRight = 'pinnedRight' in props ? props.pinnedRight : defaultPinnedRight;
     const selectedCells = 'selectedCells' in props ? props.selectedCells : localSelectedCells;
+    const highlightedCells = 'highlightedCells' in props ? props.highlightedCells : localHighlightedCells;
     const hoveredCell = 'hoveredCell' in props ? props.hoveredCell : localHoveredCell;
     const focusedCell = 'focusedCell' in props ? props.focusedCell : localFocusedCell;
     const borderWidth = 'borderWidth' in props ? props.borderWidth : defaultBorderWidth;
@@ -37,6 +39,11 @@ export default function SpreadGrid(props) {
         if (props.onSelectedCellsChange)
             props.onSelectedCellsChange(selectedCells);
     };
+    const onHighlightedCellsChange = highlightedCells => {
+        setLocalHighlightedCells(highlightedCells);
+        if (props.onHighlightedCellsChange)
+            props.onHighlightedCellsChange(highlightedCells);
+    }
     const onHoveredCellChange = hoveredCell => {
         setLocalHoveredCell(hoveredCell);
         if (props.onHoveredCellChange)
@@ -60,10 +67,12 @@ export default function SpreadGrid(props) {
             formatting={formatting}
             dataSelector={dataSelector}
             selectedCells={selectedCells}
+            highlightedCells={highlightedCells}
             hoveredCell={hoveredCell}
             focusedCell={focusedCell}
             borderWidth={borderWidth}
             onSelectedCellsChange={onSelectedCellsChange}
+            onHighlightedCellsChange={onHighlightedCellsChange}
             onHoveredCellChange={onHoveredCellChange}
             onFocusedCellChange={onFocusedCellChange}
         >

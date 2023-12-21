@@ -79,15 +79,16 @@ export function StateProvider(props) {
     const devicePixelRatio = useDevicePixelRatio();
     const borderWidth = props.borderWidth / devicePixelRatio;
     const data = props.data;
-    const columns = useResolvedColumns(useInvoked(props.columns, [data]), devicePixelRatio, borderWidth);
+    const columns = useResolvedColumns(useInvoked(props.columns, [data]), devicePixelRatio, borderWidth); // TODO: Throw on duplicate ids
     const rows = useResolvedRows(useInvoked(props.rows, [data]), devicePixelRatio, borderWidth);
     const pinned = useMemo(() => ({ top: props.pinnedTop, bottom: props.pinnedBottom, left: props.pinnedLeft, right: props.pinnedRight }), [props.pinnedTop, props.pinnedBottom, props.pinnedLeft, props.pinnedRight]);
     const sections = useMemo(() => getSections(columns, rows, pinned), [columns, rows, pinned]);
     const selection = useMemo(() => new Selection(props.selectedCells), [props.selectedCells]);
+    const highlight = useMemo(() => new Selection(props.highlightedCells), [props.highlightedCells]);
     const hoveredCell = props.hoveredCell;
     const focusedCell = props.focusedCell;
     const formatting = useMemo(() => addDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
-    const renderFormatting = useMemo(() => addRenderFormattingRules(formatting, hoveredCell, focusedCell, selection), [formatting, hoveredCell, focusedCell, selection]);
+    const renderFormatting = useMemo(() => addRenderFormattingRules(formatting, hoveredCell, focusedCell, selection, highlight), [formatting, hoveredCell, focusedCell, selection, highlight]);
     const fixedSize = useMemo(() => ({
         top: sections.top.height,
         bottom: sections.bottom.height,
@@ -100,6 +101,7 @@ export function StateProvider(props) {
     }), [columns, rows]);
 
     const setSelectedCells = useChangeCallback(props.selectedCells, props.onSelectedCellsChange, compareSelectedCells);
+    const setHighlightedCells = useChangeCallback(props.highlightedCells, props.onHighlightedCellsChange, compareSelectedCells);
     const setHoveredCell = useChangeCallback(props.hoveredCell, props.onHoveredCellChange, compareCells);
     const setFocusedCell = useChangeCallback(props.focusedCell, props.onFocusedCellChange, compareCells);
     const addSelectedCells = useCallback(cells => setSelectedCells(oldSelectedCells => { // TODO: Should the selected cells include info about the section?
@@ -121,8 +123,8 @@ export function StateProvider(props) {
             formatting
         }), [formatting])],
         [InteractionsContext, useMemo(() => ({
-            selection, hoveredCell, focusedCell, setSelectedCells, setHoveredCell, setFocusedCell, addSelectedCells
-        }), [selection, hoveredCell, focusedCell, setSelectedCells, setHoveredCell, setFocusedCell, addSelectedCells])],
+            selection, hoveredCell, focusedCell, setSelectedCells, setHighlightedCells, setHoveredCell, setFocusedCell, addSelectedCells
+        }), [selection, hoveredCell, focusedCell, setSelectedCells, setHighlightedCells, setHoveredCell, setFocusedCell, addSelectedCells])],
         [RenderingContext, useMemo(() => ({
             renderFormatting
         }), [renderFormatting])],
@@ -149,6 +151,7 @@ export const useHoveredCell = () => React.useContext(InteractionsContext).hovere
 export const useFocusedCell = () => React.useContext(InteractionsContext).focusedCell;
 export const useRenderFormatting = () => React.useContext(RenderingContext).renderFormatting;
 export const useSetSelectedCells = () => React.useContext(InteractionsContext).setSelectedCells;
+export const useSetHighlightedCells = () => React.useContext(InteractionsContext).setHighlightedCells;
 export const useSetHoveredCell = () => React.useContext(InteractionsContext).setHoveredCell;
 export const useSetFocusedCell = () => React.useContext(InteractionsContext).setFocusedCell;
 export const useAddSelectedCells = () => React.useContext(InteractionsContext).addSelectedCells;

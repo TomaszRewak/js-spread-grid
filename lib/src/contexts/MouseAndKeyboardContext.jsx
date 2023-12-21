@@ -11,6 +11,7 @@ function compareMousePositions(oldMousePosition, newMousePosition) {
 export function MouseAndKeyboardProvider({ element, children }) {
     const interactions = useRef({});
     const [mousePosition, setMousePosition] = useDeepState(null, compareMousePositions);
+    const [isMouseDown, setIsMouseDown] = useDeepState(false);
 
     useEventListener(element, 'mouseenter', (event) => {
         setMousePosition({
@@ -32,7 +33,9 @@ export function MouseAndKeyboardProvider({ element, children }) {
 
     useEventListener(element, 'mousedown', (event) => {
         element.focus();
-        
+
+        setIsMouseDown(true);
+
         if (interactions.current.mousedown)
             interactions.current.mousedown(event);
 
@@ -41,6 +44,8 @@ export function MouseAndKeyboardProvider({ element, children }) {
     }, []);
 
     useEventListener(element, 'mouseup', (event) => {
+        setIsMouseDown(false);
+
         if (interactions.current.mouseup)
             interactions.current.mouseup(event);
 
@@ -58,8 +63,9 @@ export function MouseAndKeyboardProvider({ element, children }) {
 
     const value = useMemo(() => ({
         mousePosition,
+        isMouseDown,
         interactions
-    }), [mousePosition]);
+    }), [mousePosition, isMouseDown]);
 
     return (
         <MouseAndKeyboardContext.Provider value={value}>
@@ -73,3 +79,4 @@ export function useInteraction(name, handler) {
 }
 
 export const useMousePosition = () => useContext(MouseAndKeyboardContext).mousePosition;
+export const useIsMouseDown = () => useContext(MouseAndKeyboardContext).isMouseDown;
