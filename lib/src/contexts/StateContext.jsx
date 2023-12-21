@@ -6,6 +6,7 @@ import useChangeCallback from "../hooks/useChangeCallback";
 import stringifyId from "../utils/stringifyId";
 import addDataFormattingRules from "../utils/addDataFormattingRules";
 import useDevicePixelRatio, { roundToPixels } from "../hooks/useDevicePixelRatio";
+import getSections from "../utils/getSections";
 
 function compareCells(oldCell, newCell) {
     return stringifyId(oldCell) === stringifyId(newCell);
@@ -81,17 +82,18 @@ export function StateProvider(props) {
     const columns = useResolvedColumns(useInvoked(props.columns, [data]), devicePixelRatio, borderWidth);
     const rows = useResolvedRows(useInvoked(props.rows, [data]), devicePixelRatio, borderWidth);
     const pinned = useMemo(() => ({ top: props.pinnedTop, bottom: props.pinnedBottom, left: props.pinnedLeft, right: props.pinnedRight }), [props.pinnedTop, props.pinnedBottom, props.pinnedLeft, props.pinnedRight]);
+    const sections = useMemo(() => getSections(columns, rows, pinned), [columns, rows, pinned]);
     const selection = useMemo(() => new Selection(props.selectedCells), [props.selectedCells]);
     const hoveredCell = props.hoveredCell;
     const focusedCell = props.focusedCell;
     const formatting = useMemo(() => addDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
     const renderFormatting = useMemo(() => addRenderFormattingRules(formatting, hoveredCell, focusedCell, selection), [formatting, hoveredCell, focusedCell, selection]);
     const fixedSize = useMemo(() => ({
-        top: pinned.top ? rows.at(pinned.top - 1).bottomWithBorder : 0,
-        bottom: pinned.bottom ? rows.at(-1).bottomWithBorder - rows.at(-pinned.bottom).topWithBorder : 0,
-        left: pinned.left ? columns.at(pinned.left - 1).rightWithBorder : 0,
-        right: pinned.right ? columns.at(-1).rightWithBorder - columns.at(-pinned.right).leftWithBorder : 0
-    }), [pinned, columns, rows]);
+        top: sections.top.height,
+        bottom: sections.bottom.height,
+        left: sections.left.width,
+        right: sections.right.width
+    }), [sections.top.height, sections.bottom.height, sections.left.width, sections.right.width]);
     const totalSize = useMemo(() => ({
         width: columns.at(-1).rightWithBorder,
         height: rows.at(-1).bottomWithBorder
@@ -113,8 +115,8 @@ export function StateProvider(props) {
             data
         }), [data])],
         [ColumnsAndRowsContext, useMemo(() => ({
-            columns, rows, pinned
-        }), [columns, rows, pinned])],
+            columns, rows, pinned, sections
+        }), [columns, rows, pinned, sections])],
         [MeasuringContext, useMemo(() => ({
             formatting
         }), [formatting])],
@@ -140,6 +142,7 @@ export const useData = () => React.useContext(DataContext).data;
 export const useColumns = () => React.useContext(ColumnsAndRowsContext).columns;
 export const useRows = () => React.useContext(ColumnsAndRowsContext).rows;
 export const usePinned = () => React.useContext(ColumnsAndRowsContext).pinned;
+export const useSections = () => React.useContext(ColumnsAndRowsContext).sections;
 export const useFormatting = () => React.useContext(MeasuringContext).formatting;
 export const useSelection = () => React.useContext(InteractionsContext).selection;
 export const useHoveredCell = () => React.useContext(InteractionsContext).hoveredCell;

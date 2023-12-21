@@ -3,7 +3,7 @@ import TextResolver from "../utils/TextResolver";
 import { roundToPixels } from "../hooks/useDevicePixelRatio";
 import { useBorderWidth, useColumns, useData, useRenderFormatting, useRows } from "../contexts/StateContext";
 import FormatResolver from "../utils/FormatResolver";
-import { useSectionColumns, useSectionRect, useSectionRows } from "../contexts/GridSectionContext";
+import { useSectionBorders, useSectionColumns, useSectionRect, useSectionRows } from "../contexts/GridSectionContext";
 
 // TODO: Upgrade to react 18 for better performance
 /** TODO: update the arguments to reflect the real props
@@ -18,10 +18,6 @@ import { useSectionColumns, useSectionRect, useSectionRows } from "../contexts/G
  * }} props
  */
 export default function GridCanvas({
-    showLeftBorder,
-    showTopBorder,
-    showRightBorder,
-    showBottomBorder,
     style,
     devicePixelRatio
 }) {
@@ -37,6 +33,7 @@ export default function GridCanvas({
     const allRows = useRows();
     const borderWidth = useBorderWidth();
     const sectionRect = useSectionRect();
+    const sectionBorders = useSectionBorders();
 
     // TODO: Read and apply: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas?retiredLocale=pl
     // TODO: Redraw only the cells that have actually changed
@@ -55,8 +52,8 @@ export default function GridCanvas({
             const borderOffset = borderWidth / 2;
             const rowCount = rows.length;
             const columnCount = columns.length;
-            const horizontalBorderCount = rowCount - 1 + (showTopBorder ? 1 : 0) + (showBottomBorder ? 1 : 0);
-            const verticalBorderCount = columnCount - 1 + (showLeftBorder ? 1 : 0) + (showRightBorder ? 1 : 0);
+            const horizontalBorderCount = rowCount - 1 + (sectionBorders.top ? 1 : 0) + (sectionBorders.bottom ? 1 : 0);
+            const verticalBorderCount = columnCount - 1 + (sectionBorders.left ? 1 : 0) + (sectionBorders.right ? 1 : 0);
             const rowHeights = rows.map(row => row.height);
             const columnWidths = columns.map(column => column.width);
             const totalWidth = columnWidths.reduce((a, b) => a + b, 0) + verticalBorderCount * borderWidth;
@@ -72,13 +69,13 @@ export default function GridCanvas({
                 const offset = prevOffset + width + borderWidth;
                 acc.push(offset);
                 return acc;
-            }, [showLeftBorder ? borderWidth : 0]);
+            }, [sectionBorders.left ? borderWidth : 0]);
             const verticalOffsets = rowHeights.reduce((acc, height, index) => {
                 const prevOffset = acc[index];
                 const offset = prevOffset + height + borderWidth;
                 acc.push(offset);
                 return acc;
-            }, [showTopBorder ? borderWidth : 0]);
+            }, [sectionBorders.top ? borderWidth : 0]);
 
             const columnOffsets = horizontalOffsets.slice(0, -1);
             const rowOffsets = verticalOffsets.slice(0, -1);
@@ -88,10 +85,10 @@ export default function GridCanvas({
             const minVisibleRowIndex = Math.max(rowOffsets.findLastIndex(offset => offset <= top), 0);
             const maxVisibleRowIndex = rowOffsets.findLastIndex(offset => offset <= top + height);
 
-            const minVisibleVerticalBorderIndex = Math.max(minVisibleColumnIndex, showLeftBorder ? 0 : 1);
-            const maxVisibleVerticalBorderIndex = maxVisibleColumnIndex + (showRightBorder ? 1 : 0);
-            const minVisibleHorizontalBorderIndex = Math.max(minVisibleRowIndex, showTopBorder ? 0 : 1);
-            const maxVisibleHorizontalBorderIndex = maxVisibleRowIndex + (showBottomBorder ? 1 : 0);
+            const minVisibleVerticalBorderIndex = Math.max(minVisibleColumnIndex, sectionBorders.left ? 0 : 1);
+            const maxVisibleVerticalBorderIndex = maxVisibleColumnIndex + (sectionBorders.right ? 1 : 0);
+            const minVisibleHorizontalBorderIndex = Math.max(minVisibleRowIndex, sectionBorders.top ? 0 : 1);
+            const maxVisibleHorizontalBorderIndex = maxVisibleRowIndex + (sectionBorders.bottom ? 1 : 0);
 
             const cells = Array.from({ length: maxVisibleRowIndex - minVisibleRowIndex + 1 }, (_, rowIndex) => {
                 const row = rows[rowIndex + minVisibleRowIndex];
@@ -300,7 +297,7 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [canvas, devicePixelRatio, showTopBorder, showLeftBorder, showRightBorder, showBottomBorder, rows, columns, sectionRect, borderWidth, formatResolver, data, textResolver, allRows, allColumns]);
+    }, [canvas, devicePixelRatio, rows, columns, sectionRect, borderWidth, formatResolver, data, textResolver, allRows, allColumns, sectionBorders]);
 
     // TODO: style={{imageRendering: 'pixelated'}} - is this even needed, though?
     // TODO: memoize style
