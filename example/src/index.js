@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client';
 import SpreadGrid from './spread-grid/components/SpreadGrid';
 
 function App() {
-    const column_widths = [100, 80, 80, 111, 73, 173, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 30, 100]
-    const rows_count = 2300
+    const column_widths = [100, 80, 80, 111, 73, 173, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 30, 100]
+    const rows_count = 2000
 
     const columns = column_widths.map((width, i) => ({
         id: `column_${i}`,
@@ -31,10 +31,6 @@ function App() {
                 rows={[
                     { id: 'top', type: 'HEADER', height: 20 },
                     ...rows.slice(0, 2),
-                    { id: 100, height: 7 },
-                    { id: 101, height: 50 },
-                    { id: 102, height: 50 },
-                    { id: 103, height: 50 },
                     ...rows.slice(8, 10),
                     { type: 'HEADER', height: 20 },
                     ...rows.slice(2, -2),
@@ -42,7 +38,7 @@ function App() {
                     ...rows.slice(-2),
                     { type: 'HEADER', height: 20 }
                 ]}
-                pinnedTop={10}
+                pinnedTop={6}
                 pinnedBottom={4}
                 formatting={[
                     {

@@ -11,6 +11,7 @@ const defaultPinnedTop = 1;
 const defaultPinnedBottom = 0;
 const defaultPinnedLeft = 0;
 const defaultPinnedRight = 0;
+const defaultBorderWidth = 1;
 
 export default function SpreadGrid(props) {
     const [localSelectedCells, setLocalSelectedCells] = useState([]);
@@ -29,6 +30,7 @@ export default function SpreadGrid(props) {
     const selectedCells = 'selectedCells' in props ? props.selectedCells : localSelectedCells;
     const hoveredCell = 'hoveredCell' in props ? props.hoveredCell : localHoveredCell;
     const focusedCell = 'focusedCell' in props ? props.focusedCell : localFocusedCell;
+    const borderWidth = 'borderWidth' in props ? props.borderWidth : defaultBorderWidth;
 
     const onSelectedCellsChange = selectedCells => {
         setLocalSelectedCells(selectedCells);
@@ -60,6 +62,7 @@ export default function SpreadGrid(props) {
             selectedCells={selectedCells}
             hoveredCell={hoveredCell}
             focusedCell={focusedCell}
+            borderWidth={borderWidth}
             onSelectedCellsChange={onSelectedCellsChange}
             onHoveredCellChange={onHoveredCellChange}
             onFocusedCellChange={onFocusedCellChange}
