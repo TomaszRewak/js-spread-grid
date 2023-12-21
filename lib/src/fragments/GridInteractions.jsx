@@ -268,6 +268,7 @@ export default function GridInteractions() {
                 }
             case 'ArrowUp':
                 // TODO: When ctrl and shift are pressed together, select all cells between the focused cell and the new cell
+                // TODO: When shift is pressed, expand the current rect selection instead of moving the focused cell
                 arrowVertically(event.ctrlKey ? -rows.length : -1, event);
                 break;
             case 'ArrowDown':
