@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
-import { useInteraction, useMousePosition } from '../contexts/MouseAndKeyboardContext';
-import { useAddSelectedCells, useBorderWidth, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useRows, useSetFocusedCell, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
+import { useInteraction, useIsMouseDown, useMousePosition } from '../contexts/MouseAndKeyboardContext';
+import { useAddSelectedCells, useBorderWidth, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useRows, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
 import { useClientSize, useScrollOffset } from '../contexts/SizeAndScrollContext';
 
 function useColumnPlacement(columns, borderWidth) {
@@ -90,17 +90,54 @@ function findRowIndex(placement, y) {
     return -1;
 }
 
+function findHighlightedCells(focusedCell, hoveredCell, columns, rows, columnLookup, rowLookup) {
+    if (!hoveredCell)
+        return [];
+    if (!focusedCell)
+        return [];
+
+    const focusedColumnKey = stringifyId(focusedCell.columnId);
+    const focusedRowKey = stringifyId(focusedCell.rowId);
+    const hoveredColumnKey = stringifyId(hoveredCell.columnId);
+    const hoveredRowKey = stringifyId(hoveredCell.rowId);
+
+    if (!columnLookup.has(focusedColumnKey))
+        return [];
+    if (!rowLookup.has(focusedRowKey))
+        return [];
+    if (!columnLookup.has(hoveredColumnKey))
+        return [];
+    if (!rowLookup.has(hoveredRowKey))
+        return [];
+
+    const minColumnIndex = Math.min(columnLookup.get(focusedColumnKey).index, columnLookup.get(hoveredColumnKey).index);
+    const maxColumnIndex = Math.max(columnLookup.get(focusedColumnKey).index, columnLookup.get(hoveredColumnKey).index);
+    const minRowIndex = Math.min(rowLookup.get(focusedRowKey).index, rowLookup.get(hoveredRowKey).index);
+    const maxRowIndex = Math.max(rowLookup.get(focusedRowKey).index, rowLookup.get(hoveredRowKey).index);
+
+    return columns.slice(minColumnIndex, maxColumnIndex + 1).flatMap(column => {
+        return rows.slice(minRowIndex, maxRowIndex + 1).map(row => {
+            return {
+                rowId: row.id,
+                columnId: column.id
+            };
+        });
+    });
+}
+
 export default function GridInteractions() {
     // console.count('render GridInteractions');
 
     const size = useClientSize();
     const mousePosition = useMousePosition();
+    const isMouseDown = useIsMouseDown();
     const scrollOffset = useScrollOffset();
     const hoveredCell = useHoveredCell();
     const focusedCell = useFocusedCell();
     const borderWidth = useBorderWidth();
 
     const setSelectedCells = useSetSelectedCells();
+    const setHighlightedCells = useSetHighlightedCells();
     const setHoveredCell = useSetHoveredCell();
     const setFocusedCell = useSetFocusedCell();
     const addSelectedCells = useAddSelectedCells();
@@ -149,16 +186,29 @@ export default function GridInteractions() {
         });
     }, [columnPlacement, columns, mousePosition, rowPlacement, rows, scrollOffset, setHoveredCell, size, fixedSize, totalSize]);
 
+    useEffect(() => {
+        if (!isMouseDown)
+            return;
+
+        setHighlightedCells(findHighlightedCells(focusedCell, hoveredCell, columns, rows, columnLookup, rowLookup));
+    }, [isMouseDown, hoveredCell, focusedCell, columns, rows, columnLookup, rowLookup, setHighlightedCells]);
+
     useInteraction('mousedown', event => {
         if (!hoveredCell)
             return;
 
         setFocusedCell(hoveredCell);
 
-        if (event.ctrlKey)
-            addSelectedCells([hoveredCell]);
-        else
-            setSelectedCells([hoveredCell]);
+        if (!event.ctrlKey)
+            setSelectedCells([]);
+    });
+
+    useInteraction('mouseup', () => {
+        if (!focusedCell)
+            return;
+
+        addSelectedCells(findHighlightedCells(focusedCell, hoveredCell, columns, rows, columnLookup, rowLookup));
+        setHighlightedCells([]);
     });
 
     useInteraction('keydown', event => {
