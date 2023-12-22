@@ -1,12 +1,13 @@
 import React, { createContext, useCallback, useEffect, useMemo } from "react";
 import useInvoked from "../hooks/useInvoked";
-import addRenderFormattingRules from "../utils/addRenderFormattingRules";
+import getRenderFormattingRules from "../utils/getRenderFormattingRules";
 import Selection from "../utils/Selection";
 import useChangeCallback from "../hooks/useChangeCallback";
 import stringifyId from "../utils/stringifyId";
-import addDataFormattingRules from "../utils/addDataFormattingRules";
+import getDataFormattingRules from "../utils/getDataFormattingRules";
 import useDevicePixelRatio, { roundToPixels } from "../hooks/useDevicePixelRatio";
 import getSections from "../utils/getSections";
+import getInputFormattingRules from "../utils/getInputFormattingRules";
 
 function compareCells(oldCell, newCell) {
     return stringifyId(oldCell) === stringifyId(newCell);
@@ -87,8 +88,10 @@ export function StateProvider(props) {
     const highlight = useMemo(() => new Selection(props.highlightedCells), [props.highlightedCells]);
     const hoveredCell = props.hoveredCell;
     const focusedCell = props.focusedCell;
-    const formatting = useMemo(() => addDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
-    const renderFormatting = useMemo(() => addRenderFormattingRules(formatting, hoveredCell, focusedCell, selection, highlight), [formatting, hoveredCell, focusedCell, selection, highlight]);
+    // TODO: addDataFormattingRules and addRenderFormattingRules should remove unnecessary rules
+    const dataFormatting = useMemo(() => getDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
+    const renderFormatting = useMemo(() => getRenderFormattingRules(dataFormatting, hoveredCell, focusedCell, selection, highlight), [dataFormatting, hoveredCell, focusedCell, selection, highlight]);
+    const inputFormatting = useMemo(() => getInputFormattingRules(dataFormatting), [dataFormatting]);
     const fixedSize = useMemo(() => ({
         top: sections.top.height,
         bottom: sections.bottom.height,
@@ -120,11 +123,11 @@ export function StateProvider(props) {
             columns, rows, pinned, sections
         }), [columns, rows, pinned, sections])],
         [MeasuringContext, useMemo(() => ({
-            formatting
-        }), [formatting])],
+            dataFormatting
+        }), [dataFormatting])],
         [InteractionsContext, useMemo(() => ({
-            selection, hoveredCell, focusedCell, setSelectedCells, setHighlightedCells, setHoveredCell, setFocusedCell, addSelectedCells
-        }), [selection, hoveredCell, focusedCell, setSelectedCells, setHighlightedCells, setHoveredCell, setFocusedCell, addSelectedCells])],
+            selection, hoveredCell, focusedCell, inputFormatting, setSelectedCells, setHighlightedCells, setHoveredCell, setFocusedCell, addSelectedCells
+        }), [selection, hoveredCell, focusedCell, inputFormatting, setSelectedCells, setHighlightedCells, setHoveredCell, setFocusedCell, addSelectedCells])],
         [RenderingContext, useMemo(() => ({
             renderFormatting
         }), [renderFormatting])],
@@ -145,11 +148,12 @@ export const useColumns = () => React.useContext(ColumnsAndRowsContext).columns;
 export const useRows = () => React.useContext(ColumnsAndRowsContext).rows;
 export const usePinned = () => React.useContext(ColumnsAndRowsContext).pinned;
 export const useSections = () => React.useContext(ColumnsAndRowsContext).sections;
-export const useFormatting = () => React.useContext(MeasuringContext).formatting;
+export const useDataFormatting = () => React.useContext(MeasuringContext).dataFormatting;
 export const useSelection = () => React.useContext(InteractionsContext).selection;
 export const useHoveredCell = () => React.useContext(InteractionsContext).hoveredCell;
 export const useFocusedCell = () => React.useContext(InteractionsContext).focusedCell;
 export const useRenderFormatting = () => React.useContext(RenderingContext).renderFormatting;
+export const useInputFormatting = () => React.useContext(InteractionsContext).inputFormatting;
 export const useSetSelectedCells = () => React.useContext(InteractionsContext).setSelectedCells;
 export const useSetHighlightedCells = () => React.useContext(InteractionsContext).setHighlightedCells;
 export const useSetHoveredCell = () => React.useContext(InteractionsContext).setHoveredCell;
