@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
-import { useInteraction, useIsMouseDown, useMousePosition } from '../contexts/MouseAndKeyboardContext';
+import { useFocus, useInteraction, useIsMouseDown, useMousePosition } from '../contexts/MouseAndKeyboardContext';
 import { useAddEditedCells, useAddSelectedCells, useBorderWidth, useColumns, useData, useFixedSize, useFocusedCell, useHoveredCell, useInputFormatting, useRows, useSelectedCells, useSetEditedCells, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
 import { useClientSize, useScrollOffset } from '../contexts/SizeAndScrollContext';
 import { useState } from 'react';
@@ -136,6 +136,7 @@ export default function GridInteractions() {
     const size = useClientSize();
     const mousePosition = useMousePosition();
     const isMouseDown = useIsMouseDown();
+    const focus = useFocus();
     const scrollOffset = useScrollOffset();
     const hoveredCell = useHoveredCell();
     const focusedCell = useFocusedCell();
@@ -279,17 +280,14 @@ export default function GridInteractions() {
         };
 
         const cancel = () => {
-            if (text !== '')
-            {
+            if (text !== '') {
                 setText('');
             }
-            else if (focusedCell)
-            {
+            else if (focusedCell) {
                 setFocusedCell(null);
                 setSelectedCells([]);
             }
-            else
-            {
+            else {
                 setEditedCells([]);
             }
         };
@@ -377,6 +375,13 @@ export default function GridInteractions() {
             boxSizing: 'border-box',
         };
     }, [focusedCell, columnLookup, rowLookup]);
+
+    const inputHasFocus = input && document.activeElement === input;
+
+    useEffect(() => {
+        if (inputHasFocus && !inputPlacement)
+            focus();
+    }, [inputPlacement, inputHasFocus, focus]);
 
     return (
         <>

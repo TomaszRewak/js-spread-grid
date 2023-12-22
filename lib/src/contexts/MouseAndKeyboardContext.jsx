@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useRef } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useRef } from "react";
 import useDeepState from "../hooks/useDeepState";
 import useEventListener from "../hooks/useEventListener";
 
@@ -65,11 +65,16 @@ export function MouseAndKeyboardProvider({ element, children }) {
             interactions.current.focus(event);
     }, []);
 
+    const focus = useCallback(() => {
+        element?.focus();
+    }, [element]);
+
     const value = useMemo(() => ({
         mousePosition,
         isMouseDown,
+        focus,
         interactions
-    }), [mousePosition, isMouseDown]);
+    }), [mousePosition, isMouseDown, focus]);
 
     return (
         <MouseAndKeyboardContext.Provider value={value}>
@@ -84,3 +89,4 @@ export function useInteraction(name, handler) {
 
 export const useMousePosition = () => useContext(MouseAndKeyboardContext).mousePosition;
 export const useIsMouseDown = () => useContext(MouseAndKeyboardContext).isMouseDown;
+export const useFocus = () => useContext(MouseAndKeyboardContext).focus;
