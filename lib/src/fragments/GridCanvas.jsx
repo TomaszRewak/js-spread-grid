@@ -151,6 +151,15 @@ export default function GridCanvas({
                         ctx.fillRect(0, 0, cellWidth, cellHeight);
                     }
 
+                    if (style.corner) {
+                        ctx.fillStyle = style.corner;
+                        ctx.beginPath();
+                        ctx.moveTo(cellWidth - 15 / devicePixelRatio, cellHeight);
+                        ctx.lineTo(cellWidth, cellHeight);
+                        ctx.lineTo(cellWidth, cellHeight - 15 / devicePixelRatio);
+                        ctx.fill();
+                    }
+
                     ctx.fillStyle = "#000";
                     ctx.font = style.font || '12px Calibri';
                     ctx.textAlign = textAlign;
@@ -160,17 +169,17 @@ export default function GridCanvas({
                     // TODO: Make sure that values are rounded using devicePixelRatio
                     const textX = roundToPixels(
                         textAlign === 'left' ? paddingLeft :
-                        textAlign === 'center' ? cellWidth / 2 :
-                        textAlign === 'right' ? cellWidth - paddingRight :
-                        0,
+                            textAlign === 'center' ? cellWidth / 2 :
+                                textAlign === 'right' ? cellWidth - paddingRight :
+                                    0,
                         devicePixelRatio
                     );
 
                     const textY = roundToPixels(
                         textBaseline === 'top' ? fontMetrics.middle + fontMetrics.topOffset + paddingTop :
-                        textBaseline === 'middle' ? cellHeight / 2 + fontMetrics.middle :
-                        textBaseline === 'bottom' ? cellHeight + fontMetrics.middle - fontMetrics.bottomOffset - paddingBottom :
-                        0,
+                            textBaseline === 'middle' ? cellHeight / 2 + fontMetrics.middle :
+                                textBaseline === 'bottom' ? cellHeight + fontMetrics.middle - fontMetrics.bottomOffset - paddingBottom :
+                                    0,
                         devicePixelRatio
                     );
 
@@ -193,7 +202,7 @@ export default function GridCanvas({
 
                         ctx.save();
                         setClip(0, 2 * borderWidth, cellWidth, cellHeight - 4 * borderWidth);
-                        
+
                         ctx.fillText(text, textX, textY);
 
                         ctx.restore();

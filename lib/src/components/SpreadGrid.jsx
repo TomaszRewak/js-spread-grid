@@ -16,6 +16,7 @@ const defaultBorderWidth = 1;
 export default function SpreadGrid(props) {
     const [localSelectedCells, setLocalSelectedCells] = useState([]);
     const [localHighlightedCells, setLocalHighlightedCells] = useState([]);
+    const [localEditedCells, setLocalEditedCells] = useState([]);
     const [localHoveredCell, setLocalHoveredCell] = useState(null);
     const [localFocusedCell, setLocalFocusedCell] = useState(null);
 
@@ -30,29 +31,30 @@ export default function SpreadGrid(props) {
     const pinnedRight = 'pinnedRight' in props ? props.pinnedRight : defaultPinnedRight;
     const selectedCells = 'selectedCells' in props ? props.selectedCells : localSelectedCells;
     const highlightedCells = 'highlightedCells' in props ? props.highlightedCells : localHighlightedCells;
+    const editedCells = 'editedCells' in props ? props.editedCells : localEditedCells;
     const hoveredCell = 'hoveredCell' in props ? props.hoveredCell : localHoveredCell;
     const focusedCell = 'focusedCell' in props ? props.focusedCell : localFocusedCell;
     const borderWidth = 'borderWidth' in props ? props.borderWidth : defaultBorderWidth;
 
     const onSelectedCellsChange = selectedCells => {
         setLocalSelectedCells(selectedCells);
-        if (props.onSelectedCellsChange)
-            props.onSelectedCellsChange(selectedCells);
+        props.onSelectedCellsChange?.(selectedCells);
     };
     const onHighlightedCellsChange = highlightedCells => {
         setLocalHighlightedCells(highlightedCells);
-        if (props.onHighlightedCellsChange)
-            props.onHighlightedCellsChange(highlightedCells);
+        props.onHighlightedCellsChange?.(highlightedCells);
+    }
+    const onEditedCellsChange = editedCells => {
+        setLocalEditedCells(editedCells);
+        props.onEditedCellsChange?.(editedCells);
     }
     const onHoveredCellChange = hoveredCell => {
         setLocalHoveredCell(hoveredCell);
-        if (props.onHoveredCellChange)
-            props.onHoveredCellChange(hoveredCell);
+        props.onHoveredCellChange?.(hoveredCell);
     }
     const onFocusedCellChange = focusedCell => {
         setLocalFocusedCell(focusedCell);
-        if (props.onFocusedCellChange)
-            props.onFocusedCellChange(focusedCell);
+        props.onFocusedCellChange?.(focusedCell);
     }
 
     return (
@@ -68,11 +70,13 @@ export default function SpreadGrid(props) {
             dataSelector={dataSelector}
             selectedCells={selectedCells}
             highlightedCells={highlightedCells}
+            editedCells={editedCells}
             hoveredCell={hoveredCell}
             focusedCell={focusedCell}
             borderWidth={borderWidth}
             onSelectedCellsChange={onSelectedCellsChange}
             onHighlightedCellsChange={onHighlightedCellsChange}
+            onEditedCellsChange={onEditedCellsChange}
             onHoveredCellChange={onHoveredCellChange}
             onFocusedCellChange={onFocusedCellChange}
         >

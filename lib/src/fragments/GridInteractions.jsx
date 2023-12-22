@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
 import { useInteraction, useIsMouseDown, useMousePosition } from '../contexts/MouseAndKeyboardContext';
-import { useAddSelectedCells, useBorderWidth, useColumns, useData, useFixedSize, useFocusedCell, useHoveredCell, useInputFormatting, useRows, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
+import { useAddEditedCells, useAddSelectedCells, useBorderWidth, useColumns, useData, useFixedSize, useFocusedCell, useHoveredCell, useInputFormatting, useRows, useSelectedCells, useSetEditedCells, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
 import { useClientSize, useScrollOffset } from '../contexts/SizeAndScrollContext';
 import { useState } from 'react';
 import FormatResolver from '../utils/FormatResolver';
@@ -141,11 +141,14 @@ export default function GridInteractions() {
     const focusedCell = useFocusedCell();
     const borderWidth = useBorderWidth();
 
+    const selectedCells = useSelectedCells();
     const setSelectedCells = useSetSelectedCells();
     const setHighlightedCells = useSetHighlightedCells();
+    const setEditedCells = useSetEditedCells();
     const setHoveredCell = useSetHoveredCell();
     const setFocusedCell = useSetFocusedCell();
     const addSelectedCells = useAddSelectedCells();
+    const addEditedCells = useAddEditedCells();
 
     const data = useData();
     const columns = useColumns();
@@ -280,16 +283,28 @@ export default function GridInteractions() {
             {
                 setText('');
             }
-            else
+            else if (focusedCell)
             {
                 setFocusedCell(null);
                 setSelectedCells([]);
             }
+            else
+            {
+                setEditedCells([]);
+            }
+        };
+
+        const accept = () => {
+            addEditedCells(selectedCells.map(cell => ({ ...cell, value: text })));
+            setText('');
         };
 
         switch (event.key) {
             case 'Escape':
                 cancel();
+                break;
+            case 'Enter':
+                accept();
                 break;
             case 'ArrowUp':
                 // TODO: When ctrl and shift are pressed together, select all cells between the focused cell and the new cell
