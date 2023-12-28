@@ -317,6 +317,8 @@ export default function GridInteractions() {
         const accept = () => {
             const editableCells = getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup);
 
+            if (text === '')
+                return;
             if (!editableCells.every(cell => cell.edit.validate({ string: text })))
                 return;
 
