@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
 import { useFocus, useInteraction, useIsMouseDown, useMousePosition } from '../contexts/MouseAndKeyboardContext';
-import { useAddEditedCells, useAddSelectedCells, useBorderWidth, useColumns, useData, useFixedSize, useFocusedCell, useHoveredCell, useInputFormatting, useRows, useSelectedCells, useSetEditedCells, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
+import { useAddEditedCells, useAddSelectedCells, useBorderWidth, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useInputFormatResolver, useRows, useSelectedCells, useSetEditedCells, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
 import { useClientSize, useScrollOffset } from '../contexts/SizeAndScrollContext';
 import { useState } from 'react';
-import FormatResolver from '../utils/FormatResolver';
 import GridInput from './GridInput';
 
 function useColumnPlacement(columns, borderWidth) {
@@ -128,6 +127,26 @@ function findHighlightedCells(focusedCell, hoveredCell, columns, rows, columnLoo
     });
 }
 
+function getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup) {
+    return selectedCells.map(cell => {
+        const columnKey = stringifyId(cell.columnId);
+        const rowKey = stringifyId(cell.rowId);
+
+        if (!columnLookup.has(columnKey))
+            return null;
+        if (!rowLookup.has(rowKey))
+            return null;
+
+        const column = columnLookup.get(columnKey);
+        const row = rowLookup.get(rowKey);
+
+        return {
+            edit: formatResolver.resolve(row, column).edit,
+            cell: cell
+        }
+    }).filter(cell => cell?.edit);
+}
+
 export default function GridInteractions() {
     // console.count('render GridInteractions');
     const [text, setText] = useState('');
@@ -151,7 +170,6 @@ export default function GridInteractions() {
     const addSelectedCells = useAddSelectedCells();
     const addEditedCells = useAddEditedCells();
 
-    const data = useData();
     const columns = useColumns();
     const rows = useRows();
 
@@ -161,11 +179,15 @@ export default function GridInteractions() {
     const fixedSize = useFixedSize();
     const totalSize = useTotalSize();
 
-    const inputFormatting = useInputFormatting();
-    const formatResolver = useMemo(() => new FormatResolver(inputFormatting), [inputFormatting]);
+    const formatResolver = useInputFormatResolver();
 
     const columnLookup = useMemo(() => columns.reduce((map, column) => map.set(column.key, column), new Map()), [columns]);
     const rowLookup = useMemo(() => rows.reduce((map, row) => map.set(row.key, row), new Map()), [rows]);
+
+    const isTextValid = useMemo(() => {
+        const editableCells = getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup);
+        return editableCells.every(cell => cell.edit.validate({ string: text }));
+    }, [selectedCells, formatResolver, columnLookup, rowLookup, text]);
 
     // TODO: Invoke this function also directly on the mousemove event. Though leave it as a effect as well, so that it is invoked when the scrollOffset changes.
     useEffect(() => {
@@ -293,7 +315,12 @@ export default function GridInteractions() {
         };
 
         const accept = () => {
-            addEditedCells(selectedCells.map(cell => ({ ...cell, value: text })));
+            const editableCells = getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup);
+
+            if (!editableCells.every(cell => cell.edit.validate({ string: text })))
+                return;
+
+            addEditedCells(editableCells.map(cell => ({ ...cell.cell, value: text })));
             setText('');
         };
 
@@ -341,7 +368,7 @@ export default function GridInteractions() {
 
         const column = columnLookup.get(focusedColumnKey);
         const row = rowLookup.get(focusedRowKey);
-        const cell = formatResolver.resolve(data, rows, columns, row, column);
+        const cell = formatResolver.resolve(row, column);
         const text = `${cell.value}` // TODO: Use the text, not value (???)
 
         setText(text);
@@ -385,7 +412,7 @@ export default function GridInteractions() {
 
     return (
         <>
-            <GridInput ref={setInput} text={text} onTextChange={setText} placement={inputPlacement} />
+            <GridInput ref={setInput} text={text} onTextChange={setText} placement={inputPlacement} isValid={isTextValid} />
         </>
     );
 }

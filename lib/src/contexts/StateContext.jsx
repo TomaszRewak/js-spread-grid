@@ -9,6 +9,8 @@ import useDevicePixelRatio, { roundToPixels } from "../hooks/useDevicePixelRatio
 import getSections from "../utils/getSections";
 import getInputFormattingRules from "../utils/getInputFormattingRules";
 import Edition from "../utils/Edition";
+import FormatResolver from "../utils/FormatResolver";
+import FormatResolverContext from "../utils/FormatResolverContext";
 
 function compareCells(oldCell, newCell) {
     return stringifyId(oldCell) === stringifyId(newCell);
@@ -101,8 +103,14 @@ export function StateProvider(props) {
     const focusedCell = props.focusedCell;
     // TODO: addDataFormattingRules and addRenderFormattingRules should remove unnecessary rules
     const dataFormatting = useMemo(() => getDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
+    const dataFormatResolver = useMemo(() => new FormatResolver(dataFormatting), [dataFormatting]);
+    const dataFormatResolverContext = useMemo(() => new FormatResolverContext(dataFormatResolver, data, rows, columns), [dataFormatResolver, data, columns, rows]);
     const renderFormatting = useMemo(() => getRenderFormattingRules(dataFormatting, hoveredCell, focusedCell, selection, highlight, edition), [dataFormatting, hoveredCell, focusedCell, selection, highlight, edition]);
+    const renderFormatResolver = useMemo(() => new FormatResolver(renderFormatting), [renderFormatting]);
+    const renderFormatResolverContext = useMemo(() => new FormatResolverContext(renderFormatResolver, data, rows, columns), [renderFormatResolver, data, columns, rows]);
     const inputFormatting = useMemo(() => getInputFormattingRules(dataFormatting), [dataFormatting]);
+    const inputFormatResolver = useMemo(() => new FormatResolver(inputFormatting), [inputFormatting]);
+    const inputFormatResolverContext = useMemo(() => new FormatResolverContext(inputFormatResolver, data, rows, columns), [inputFormatResolver, data, columns, rows]);
     const fixedSize = useMemo(() => ({
         top: sections.top.height,
         bottom: sections.bottom.height,
@@ -138,14 +146,14 @@ export function StateProvider(props) {
             columns, rows, pinned, sections
         }), [columns, rows, pinned, sections])],
         [MeasuringContext, useMemo(() => ({
-            dataFormatting
-        }), [dataFormatting])],
+            dataFormatResolverContext
+        }), [dataFormatResolverContext])],
         [InteractionsContext, useMemo(() => ({
-            selectedCells, selection, hoveredCell, focusedCell, inputFormatting, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells
-        }), [selectedCells, selection, hoveredCell, focusedCell, inputFormatting, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells])],
+            selectedCells, selection, hoveredCell, focusedCell, inputFormatResolverContext, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells
+        }), [selectedCells, selection, hoveredCell, focusedCell, inputFormatResolverContext, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells])],
         [RenderingContext, useMemo(() => ({
-            renderFormatting
-        }), [renderFormatting])],
+            renderFormatResolverContext
+        }), [renderFormatResolverContext])],
         [SizeContext, useMemo(() => ({
             fixedSize, totalSize, borderWidth
         }), [fixedSize, totalSize, borderWidth])]
@@ -158,19 +166,20 @@ export function StateProvider(props) {
     ), props.children);
 }
 
+// TODO: see if calling the useContext hook multiple times is a performance issue
 export const useData = () => React.useContext(DataContext).data;
 export const useColumns = () => React.useContext(ColumnsAndRowsContext).columns;
 export const useRows = () => React.useContext(ColumnsAndRowsContext).rows;
 export const usePinned = () => React.useContext(ColumnsAndRowsContext).pinned;
 export const useSections = () => React.useContext(ColumnsAndRowsContext).sections;
-export const useDataFormatting = () => React.useContext(MeasuringContext).dataFormatting;
+export const useDataFormatResolver = () => React.useContext(MeasuringContext).dataFormatResolverContext;
 export const useSelectedCells = () => React.useContext(InteractionsContext).selectedCells;
 export const useSelection = () => React.useContext(InteractionsContext).selection;
 export const useEdition = () => React.useContext(InteractionsContext).edition;
 export const useHoveredCell = () => React.useContext(InteractionsContext).hoveredCell;
 export const useFocusedCell = () => React.useContext(InteractionsContext).focusedCell;
-export const useRenderFormatting = () => React.useContext(RenderingContext).renderFormatting;
-export const useInputFormatting = () => React.useContext(InteractionsContext).inputFormatting;
+export const useRenderFormatResolver = () => React.useContext(RenderingContext).renderFormatResolverContext;
+export const useInputFormatResolver = () => React.useContext(InteractionsContext).inputFormatResolverContext;
 export const useSetSelectedCells = () => React.useContext(InteractionsContext).setSelectedCells;
 export const useSetHighlightedCells = () => React.useContext(InteractionsContext).setHighlightedCells;
 export const useSetEditedCells = () => React.useContext(InteractionsContext).setEditedCells;

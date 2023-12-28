@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import useEventListener from "../hooks/useEventListener";
 
-const GridInput = forwardRef(({ text, onTextChange, placement }, ref) => {
+const GridInput = forwardRef(({ text, onTextChange, placement, isValid }, ref) => {
     const [element, setElement] = useState(null);
     const internalText = useRef('');
 
@@ -63,6 +63,7 @@ const GridInput = forwardRef(({ text, onTextChange, placement }, ref) => {
             padding: '0 5px',
             fontSize: '12px',
             fontFamily: 'Calibri',
+            backgroundColor: isValid ? 'white' : '#eb3434'
         }}
         placeholder='placeholder'
         value={text}

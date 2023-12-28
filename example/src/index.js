@@ -41,6 +41,13 @@ function App() {
                 pinnedBottom={4}
                 formatting={[
                     {
+                        condition: ({column, row}) => row.index < 25 && column.index > 3,
+                        edit: {
+                            validate: ({string}) => !isNaN(Number(string)),
+                            parse: ({string}) => Number(string),
+                        }
+                    },
+                    {
                         condition: ({row}) => row.index % 2 === 0,
                         style: { background: '#fbfbfb' }
                     },
