@@ -395,6 +395,10 @@ export default function GridInteractions() {
 
         const column = columnLookup.get(focusedColumnKey);
         const row = rowLookup.get(focusedRowKey);
+        const editableCells = getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup);
+
+        if (editableCells.length === 0)
+            return null;
 
         return {
             left: column.left,
@@ -403,7 +407,7 @@ export default function GridInteractions() {
             height: row.height,
             boxSizing: 'border-box',
         };
-    }, [focusedCell, columnLookup, rowLookup]);
+    }, [focusedCell, columnLookup, rowLookup, selectedCells, formatResolver]);
 
     const inputHasFocus = input && document.activeElement === input;
 
