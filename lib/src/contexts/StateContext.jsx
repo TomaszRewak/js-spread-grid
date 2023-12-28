@@ -9,8 +9,8 @@ import useDevicePixelRatio, { roundToPixels } from "../hooks/useDevicePixelRatio
 import getSections from "../utils/getSections";
 import getInputFormattingRules from "../utils/getInputFormattingRules";
 import Edition from "../utils/Edition";
+import FormatResolverRules from "../utils/FormatResolverRules";
 import FormatResolver from "../utils/FormatResolver";
-import FormatResolverContext from "../utils/FormatResolverContext";
 
 function compareCells(oldCell, newCell) {
     return stringifyId(oldCell) === stringifyId(newCell);
@@ -103,14 +103,14 @@ export function StateProvider(props) {
     const focusedCell = props.focusedCell;
     // TODO: addDataFormattingRules and addRenderFormattingRules should remove unnecessary rules
     const dataFormatting = useMemo(() => getDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
-    const dataFormatResolver = useMemo(() => new FormatResolver(dataFormatting), [dataFormatting]);
-    const dataFormatResolverContext = useMemo(() => new FormatResolverContext(dataFormatResolver, data, rows, columns), [dataFormatResolver, data, columns, rows]);
+    const dataFormatResolverRules = useMemo(() => new FormatResolverRules(dataFormatting), [dataFormatting]);
+    const dataFormatResolver = useMemo(() => new FormatResolver(dataFormatResolverRules, data, rows, columns), [dataFormatResolverRules, data, columns, rows]);
     const renderFormatting = useMemo(() => getRenderFormattingRules(dataFormatting, hoveredCell, focusedCell, selection, highlight, edition), [dataFormatting, hoveredCell, focusedCell, selection, highlight, edition]);
-    const renderFormatResolver = useMemo(() => new FormatResolver(renderFormatting), [renderFormatting]);
-    const renderFormatResolverContext = useMemo(() => new FormatResolverContext(renderFormatResolver, data, rows, columns), [renderFormatResolver, data, columns, rows]);
+    const renderFormatResolverRules = useMemo(() => new FormatResolverRules(renderFormatting), [renderFormatting]);
+    const renderFormatResolver = useMemo(() => new FormatResolver(renderFormatResolverRules, data, rows, columns), [renderFormatResolverRules, data, columns, rows]);
     const inputFormatting = useMemo(() => getInputFormattingRules(dataFormatting), [dataFormatting]);
-    const inputFormatResolver = useMemo(() => new FormatResolver(inputFormatting), [inputFormatting]);
-    const inputFormatResolverContext = useMemo(() => new FormatResolverContext(inputFormatResolver, data, rows, columns), [inputFormatResolver, data, columns, rows]);
+    const inputFormatResolverRules = useMemo(() => new FormatResolverRules(inputFormatting), [inputFormatting]);
+    const inputFormatResolver = useMemo(() => new FormatResolver(inputFormatResolverRules, data, rows, columns), [inputFormatResolverRules, data, columns, rows]);
     const fixedSize = useMemo(() => ({
         top: sections.top.height,
         bottom: sections.bottom.height,
@@ -146,14 +146,14 @@ export function StateProvider(props) {
             columns, rows, pinned, sections
         }), [columns, rows, pinned, sections])],
         [MeasuringContext, useMemo(() => ({
-            dataFormatResolverContext
-        }), [dataFormatResolverContext])],
+            dataFormatResolverContext: dataFormatResolver
+        }), [dataFormatResolver])],
         [InteractionsContext, useMemo(() => ({
-            selectedCells, selection, hoveredCell, focusedCell, inputFormatResolverContext, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells
-        }), [selectedCells, selection, hoveredCell, focusedCell, inputFormatResolverContext, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells])],
+            selectedCells, selection, hoveredCell, focusedCell, inputFormatResolverContext: inputFormatResolver, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells
+        }), [selectedCells, selection, hoveredCell, focusedCell, inputFormatResolver, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells])],
         [RenderingContext, useMemo(() => ({
-            renderFormatResolverContext
-        }), [renderFormatResolverContext])],
+            renderFormatResolverContext: renderFormatResolver
+        }), [renderFormatResolver])],
         [SizeContext, useMemo(() => ({
             fixedSize, totalSize, borderWidth
         }), [fixedSize, totalSize, borderWidth])]
