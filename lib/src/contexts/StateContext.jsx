@@ -104,13 +104,13 @@ export function StateProvider(props) {
     // TODO: addDataFormattingRules and addRenderFormattingRules should remove unnecessary rules
     const dataFormatting = useMemo(() => getDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
     const dataFormatResolverRules = useMemo(() => new FormatResolverRules(dataFormatting), [dataFormatting]);
-    const dataFormatResolver = useMemo(() => new FormatResolver(dataFormatResolverRules, data, rows, columns), [dataFormatResolverRules, data, columns, rows]);
+    const dataFormatResolver = useMemo(() => new FormatResolver(dataFormatResolverRules, data, rows, columns, edition), [dataFormatResolverRules, data, columns, rows, edition]);
     const renderFormatting = useMemo(() => getRenderFormattingRules(dataFormatting, hoveredCell, focusedCell, selection, highlight, edition), [dataFormatting, hoveredCell, focusedCell, selection, highlight, edition]);
     const renderFormatResolverRules = useMemo(() => new FormatResolverRules(renderFormatting), [renderFormatting]);
-    const renderFormatResolver = useMemo(() => new FormatResolver(renderFormatResolverRules, data, rows, columns), [renderFormatResolverRules, data, columns, rows]);
+    const renderFormatResolver = useMemo(() => new FormatResolver(renderFormatResolverRules, data, rows, columns, edition), [renderFormatResolverRules, data, columns, rows, edition]);
     const inputFormatting = useMemo(() => getInputFormattingRules(dataFormatting), [dataFormatting]);
     const inputFormatResolverRules = useMemo(() => new FormatResolverRules(inputFormatting), [inputFormatting]);
-    const inputFormatResolver = useMemo(() => new FormatResolver(inputFormatResolverRules, data, rows, columns), [inputFormatResolverRules, data, columns, rows]);
+    const inputFormatResolver = useMemo(() => new FormatResolver(inputFormatResolverRules, data, rows, columns, edition), [inputFormatResolverRules, data, columns, rows, edition]);
     const fixedSize = useMemo(() => ({
         top: sections.top.height,
         bottom: sections.bottom.height,

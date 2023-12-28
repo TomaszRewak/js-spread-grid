@@ -45,7 +45,8 @@ function App() {
                         edit: {
                             validate: ({string}) => !isNaN(Number(string)),
                             parse: ({string}) => Number(string),
-                        }
+                        },
+                        value: context => 'newValue' in context ? context.newValue : context.value,
                     },
                     {
                         condition: ({row}) => row.index % 2 === 0,
