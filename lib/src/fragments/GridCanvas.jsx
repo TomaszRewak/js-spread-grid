@@ -158,7 +158,7 @@ export default function GridCanvas({
                         ctx.fill();
                     }
 
-                    ctx.fillStyle = "#000";
+                    ctx.fillStyle = style.foreground || 'black';
                     ctx.font = style.font || '12px Calibri';
                     ctx.textAlign = textAlign;
 

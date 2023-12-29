@@ -32,12 +32,13 @@ function App() {
                     { id: 'a', type: 'HEADER', height: 20 },
                     ...rows.slice(0, 4),
                     { id: 'b', type: 'HEADER', height: 20 },
+                    { id: 'search', type: 'SEARCH', height: 20 },
                     ...rows.slice(4, -2),
                     { id: 'c', type: 'HEADER', height: 20 },
                     ...rows.slice(-2),
                     { id: 'd', type: 'HEADER', height: 20 }
                 ]}
-                pinnedTop={6}
+                pinnedTop={7}
                 pinnedBottom={4}
                 formatting={[
                     {

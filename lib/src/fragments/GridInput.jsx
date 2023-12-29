@@ -49,6 +49,7 @@ const GridInput = forwardRef(({ text, onTextChange, placement, isValid }, ref) =
     if (!placement)
         return <></>;
 
+    // TODO: It's currently not possible to clear the text as the input hides before the text is cleared.
     return <input
         ref={setElementAndRef}
         autoFocus
