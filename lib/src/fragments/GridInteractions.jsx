@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
-import { useInteraction, useIsMouseDown, useMousePosition } from '../contexts/MouseAndKeyboardContext';
-import { useAddSelectedCells, useBorderWidth, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useRows, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
+import { useFocus, useInteraction, useIsMouseDown, useMousePosition } from '../contexts/MouseAndKeyboardContext';
+import { useAddEditedCells, useAddSelectedCells, useBorderWidth, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useInputFormatResolver, useRows, useSelectedCells, useSetEditedCells, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
 import { useClientSize, useScrollOffset } from '../contexts/SizeAndScrollContext';
+import { useState } from 'react';
+import GridInput from './GridInput';
 
 function useColumnPlacement(columns, borderWidth) {
     return useMemo(() => {
@@ -125,22 +127,48 @@ function findHighlightedCells(focusedCell, hoveredCell, columns, rows, columnLoo
     });
 }
 
+function getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup) {
+    return selectedCells.map(cell => {
+        const columnKey = stringifyId(cell.columnId);
+        const rowKey = stringifyId(cell.rowId);
+
+        if (!columnLookup.has(columnKey))
+            return null;
+        if (!rowLookup.has(rowKey))
+            return null;
+
+        const column = columnLookup.get(columnKey);
+        const row = rowLookup.get(rowKey);
+
+        return {
+            edit: formatResolver.resolve(row, column).edit,
+            cell: cell
+        }
+    }).filter(cell => cell?.edit);
+}
+
 export default function GridInteractions() {
     // console.count('render GridInteractions');
+    const [text, setText] = useState('');
+    const [input, setInput] = useState(null);
 
     const size = useClientSize();
     const mousePosition = useMousePosition();
     const isMouseDown = useIsMouseDown();
+    const focus = useFocus();
     const scrollOffset = useScrollOffset();
     const hoveredCell = useHoveredCell();
     const focusedCell = useFocusedCell();
     const borderWidth = useBorderWidth();
 
+    const selectedCells = useSelectedCells();
     const setSelectedCells = useSetSelectedCells();
     const setHighlightedCells = useSetHighlightedCells();
+    const setEditedCells = useSetEditedCells();
     const setHoveredCell = useSetHoveredCell();
     const setFocusedCell = useSetFocusedCell();
     const addSelectedCells = useAddSelectedCells();
+    const addEditedCells = useAddEditedCells();
 
     const columns = useColumns();
     const rows = useRows();
@@ -151,8 +179,15 @@ export default function GridInteractions() {
     const fixedSize = useFixedSize();
     const totalSize = useTotalSize();
 
+    const formatResolver = useInputFormatResolver();
+
     const columnLookup = useMemo(() => columns.reduce((map, column) => map.set(column.key, column), new Map()), [columns]);
     const rowLookup = useMemo(() => rows.reduce((map, row) => map.set(row.key, row), new Map()), [rows]);
+
+    const isTextValid = useMemo(() => {
+        const editableCells = getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup);
+        return editableCells.every(cell => cell.edit.validate({ string: text }));
+    }, [selectedCells, formatResolver, columnLookup, rowLookup, text]);
 
     // TODO: Invoke this function also directly on the mousemove event. Though leave it as a effect as well, so that it is invoked when the scrollOffset changes.
     useEffect(() => {
@@ -187,6 +222,7 @@ export default function GridInteractions() {
     }, [columnPlacement, columns, mousePosition, rowPlacement, rows, scrollOffset, setHoveredCell, size, fixedSize, totalSize]);
 
     useEffect(() => {
+        // TODO: Make sure it behaves correctly when the mouse is moved outside the grid while the mouse button is down
         if (!isMouseDown)
             return;
 
@@ -197,6 +233,7 @@ export default function GridInteractions() {
         if (!hoveredCell)
             return;
 
+        setText('');
         setFocusedCell(hoveredCell);
 
         if (!event.ctrlKey)
@@ -259,25 +296,59 @@ export default function GridInteractions() {
             arrowTo(newFocusedCell, event);
         }
 
+        const preventDefault = () => {
+            event.preventDefault();
+            event.stopPropagation();
+        };
+
+        const cancel = () => {
+            if (text !== '') {
+                setText('');
+            }
+            else if (focusedCell) {
+                setFocusedCell(null);
+                setSelectedCells([]);
+            }
+            else {
+                setEditedCells([]);
+            }
+        };
+
+        const accept = () => {
+            const editableCells = getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup);
+
+            if (text === '')
+                return;
+            if (!editableCells.every(cell => cell.edit.validate({ string: text })))
+                return;
+
+            addEditedCells(editableCells.map(cell => ({ ...cell.cell, value: text })));
+            setText('');
+        };
+
         switch (event.key) {
             case 'Escape':
-                {
-                    setFocusedCell(null);
-                    setSelectedCells([]);
-                    break;
-                }
+                cancel();
+                break;
+            case 'Enter':
+                accept();
+                break;
             case 'ArrowUp':
                 // TODO: When ctrl and shift are pressed together, select all cells between the focused cell and the new cell
                 // TODO: When shift is pressed, expand the current rect selection instead of moving the focused cell
+                preventDefault();
                 arrowVertically(event.ctrlKey ? -rows.length : -1, event);
                 break;
             case 'ArrowDown':
+                preventDefault();
                 arrowVertically(event.ctrlKey ? rows.length : 1, event);
                 break;
             case 'ArrowLeft':
+                preventDefault();
                 arrowHorizontally(event.ctrlKey ? -columns.length : -1, event);
                 break;
             case 'ArrowRight':
+                preventDefault();
                 arrowHorizontally(event.ctrlKey ? columns.length : 1, event);
                 break;
             default:
@@ -285,7 +356,70 @@ export default function GridInteractions() {
         }
     });
 
+    useInteraction('dblclick', () => {
+        if (!focusedCell)
+            return;
+
+        const focusedColumnKey = stringifyId(focusedCell.columnId);
+        const focusedRowKey = stringifyId(focusedCell.rowId);
+
+        if (!columnLookup.has(focusedColumnKey))
+            return;
+        if (!rowLookup.has(focusedRowKey))
+            return;
+
+        const column = columnLookup.get(focusedColumnKey);
+        const row = rowLookup.get(focusedRowKey);
+        const cell = formatResolver.resolve(row, column);
+        const text = `${cell.value}` // TODO: Use the text, not value (???)
+
+        setText(text);
+    });
+
+    useInteraction('focus', () => {
+        console.log('refocusing on input');
+        input?.focus();
+    });
+
+    // TODO: Fix placement for fixed rows/columns
+    const inputPlacement = useMemo(() => {
+        if (!focusedCell)
+            return null;
+
+        const focusedColumnKey = stringifyId(focusedCell.columnId);
+        const focusedRowKey = stringifyId(focusedCell.rowId);
+
+        if (!columnLookup.has(focusedColumnKey))
+            return null;
+        if (!rowLookup.has(focusedRowKey))
+            return null;
+
+        const column = columnLookup.get(focusedColumnKey);
+        const row = rowLookup.get(focusedRowKey);
+        const editableCells = getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup);
+
+        if (editableCells.length === 0)
+            return null;
+
+        return {
+            left: column.left,
+            top: row.top,
+            width: column.width,
+            height: row.height,
+            boxSizing: 'border-box',
+        };
+    }, [focusedCell, columnLookup, rowLookup, selectedCells, formatResolver]);
+
+    const inputHasFocus = input && document.activeElement === input;
+
+    useEffect(() => {
+        if (inputHasFocus && !inputPlacement)
+            focus();
+    }, [inputPlacement, inputHasFocus, focus]);
+
     return (
-        <></>
+        <>
+            <GridInput ref={setInput} text={text} onTextChange={setText} placement={inputPlacement} isValid={isTextValid} />
+        </>
     );
 }

@@ -45,6 +45,14 @@ function App() {
                         style: { background: '#fbfbfb' }
                     },
                     {
+                        condition: ({column, row}) => row.index < 25 && column.index > 3,
+                        edit: {
+                            validate: ({string}) => !isNaN(Number(string)),
+                            parse: ({string}) => Number(string),
+                        },
+                        value: context => 'newValue' in context ? context.newValue : context.value,
+                    },
+                    {
                         column: { id: 'column_11' },
                         style: ({value}) => ({ background: `rgb(${value % 255}, 100, 100)` })
                     },

@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react"
 import TextResolver from "../utils/TextResolver";
 import { roundToPixels } from "../hooks/useDevicePixelRatio";
-import { useBorderWidth, useColumns, useData, useRenderFormatting, useRows } from "../contexts/StateContext";
-import FormatResolver from "../utils/FormatResolver";
+import { useBorderWidth, useRenderFormatResolver } from "../contexts/StateContext";
 import { useSectionBorders, useSectionColumns, useSectionRect, useSectionRows } from "../contexts/GridSectionContext";
 
 // TODO: Upgrade to react 18 for better performance
@@ -23,14 +22,10 @@ export default function GridCanvas({
 }) {
     const [canvas, setCanvas] = useState(null);
     const textResolver = useMemo(() => new TextResolver(), []);
-    const data = useData();
-    const formatting = useRenderFormatting();
     // TODO: Make sure those formatters are split based on the rule areas
-    const formatResolver = useMemo(() => new FormatResolver(formatting), [formatting]);
+    const formatResolver = useRenderFormatResolver();
     const columns = useSectionColumns();
     const rows = useSectionRows();
-    const allColumns = useColumns();
-    const allRows = useRows();
     const borderWidth = useBorderWidth();
     const sectionRect = useSectionRect();
     const sectionBorders = useSectionBorders();
@@ -94,7 +89,7 @@ export default function GridCanvas({
                 const row = rows[rowIndex + minVisibleRowIndex];
                 return Array.from({ length: maxVisibleColumnIndex - minVisibleColumnIndex + 1 }, (_, columnIndex) => {
                     const column = columns[columnIndex + minVisibleColumnIndex];
-                    return formatResolver.resolve(data, allRows, allColumns, row, column);
+                    return formatResolver.resolve(row, column);
                 });
             });
             const getCell = (rowIndex, columnIndex) => cells[rowIndex - minVisibleRowIndex][columnIndex - minVisibleColumnIndex];
@@ -151,6 +146,15 @@ export default function GridCanvas({
                         ctx.fillRect(0, 0, cellWidth, cellHeight);
                     }
 
+                    if (style.corner) {
+                        ctx.fillStyle = style.corner;
+                        ctx.beginPath();
+                        ctx.moveTo(cellWidth - 7, cellHeight);
+                        ctx.lineTo(cellWidth, cellHeight);
+                        ctx.lineTo(cellWidth, cellHeight - 7);
+                        ctx.fill();
+                    }
+
                     ctx.fillStyle = "#000";
                     ctx.font = style.font || '12px Calibri';
                     ctx.textAlign = textAlign;
@@ -160,17 +164,17 @@ export default function GridCanvas({
                     // TODO: Make sure that values are rounded using devicePixelRatio
                     const textX = roundToPixels(
                         textAlign === 'left' ? paddingLeft :
-                        textAlign === 'center' ? cellWidth / 2 :
-                        textAlign === 'right' ? cellWidth - paddingRight :
-                        0,
+                            textAlign === 'center' ? cellWidth / 2 :
+                                textAlign === 'right' ? cellWidth - paddingRight :
+                                    0,
                         devicePixelRatio
                     );
 
                     const textY = roundToPixels(
                         textBaseline === 'top' ? fontMetrics.middle + fontMetrics.topOffset + paddingTop :
-                        textBaseline === 'middle' ? cellHeight / 2 + fontMetrics.middle :
-                        textBaseline === 'bottom' ? cellHeight + fontMetrics.middle - fontMetrics.bottomOffset - paddingBottom :
-                        0,
+                            textBaseline === 'middle' ? cellHeight / 2 + fontMetrics.middle :
+                                textBaseline === 'bottom' ? cellHeight + fontMetrics.middle - fontMetrics.bottomOffset - paddingBottom :
+                                    0,
                         devicePixelRatio
                     );
 
@@ -193,7 +197,7 @@ export default function GridCanvas({
 
                         ctx.save();
                         setClip(0, 2 * borderWidth, cellWidth, cellHeight - 4 * borderWidth);
-                        
+
                         ctx.fillText(text, textX, textY);
 
                         ctx.restore();
@@ -297,7 +301,7 @@ export default function GridCanvas({
 
         // Can this ever be starved out?
         return () => cancelAnimationFrame(nextFrame);
-    }, [canvas, devicePixelRatio, rows, columns, sectionRect, borderWidth, formatResolver, data, textResolver, allRows, allColumns, sectionBorders]);
+    }, [canvas, devicePixelRatio, rows, columns, sectionRect, borderWidth, formatResolver, textResolver, sectionBorders]);
 
     // TODO: style={{imageRendering: 'pixelated'}} - is this even needed, though?
     // TODO: memoize style

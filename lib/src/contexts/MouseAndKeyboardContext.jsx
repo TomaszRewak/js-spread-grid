@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useRef } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useRef } from "react";
 import useDeepState from "../hooks/useDeepState";
 import useEventListener from "../hooks/useEventListener";
 
@@ -32,15 +32,10 @@ export function MouseAndKeyboardProvider({ element, children }) {
     }, [setMousePosition]);
 
     useEventListener(element, 'mousedown', (event) => {
-        element.focus();
-
         setIsMouseDown(true);
 
         if (interactions.current.mousedown)
             interactions.current.mousedown(event);
-
-        event.preventDefault();
-        event.stopPropagation();
     }, []);
 
     useEventListener(element, 'mouseup', (event) => {
@@ -48,24 +43,38 @@ export function MouseAndKeyboardProvider({ element, children }) {
 
         if (interactions.current.mouseup)
             interactions.current.mouseup(event);
-
-        event.preventDefault();
-        event.stopPropagation();
     }, []);
 
     useEventListener(element, 'keydown', (event) => {
         if (interactions.current.keydown)
             interactions.current.keydown(event);
-
-        event.preventDefault();
-        event.stopPropagation();
     }, []);
+
+    useEventListener(element, 'click', (event) => {
+        if (interactions.current.click)
+            interactions.current.click(event);
+    }, []);
+
+    useEventListener(element, 'dblclick', (event) => {
+        if (interactions.current.dblclick)
+            interactions.current.dblclick(event);
+    }, []);
+
+    useEventListener(element, 'focus', (event) => {
+        if (interactions.current.focus)
+            interactions.current.focus(event);
+    }, []);
+
+    const focus = useCallback(() => {
+        element?.focus();
+    }, [element]);
 
     const value = useMemo(() => ({
         mousePosition,
         isMouseDown,
+        focus,
         interactions
-    }), [mousePosition, isMouseDown]);
+    }), [mousePosition, isMouseDown, focus]);
 
     return (
         <MouseAndKeyboardContext.Provider value={value}>
@@ -80,3 +89,4 @@ export function useInteraction(name, handler) {
 
 export const useMousePosition = () => useContext(MouseAndKeyboardContext).mousePosition;
 export const useIsMouseDown = () => useContext(MouseAndKeyboardContext).isMouseDown;
+export const useFocus = () => useContext(MouseAndKeyboardContext).focus;
