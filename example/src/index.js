@@ -41,16 +41,16 @@ function App() {
                 pinnedBottom={4}
                 formatting={[
                     {
+                        condition: ({row}) => row.index % 2 === 0,
+                        style: { background: '#fbfbfb' }
+                    },
+                    {
                         condition: ({column, row}) => row.index < 25 && column.index > 3,
                         edit: {
                             validate: ({string}) => !isNaN(Number(string)),
                             parse: ({string}) => Number(string),
                         },
                         value: context => 'newValue' in context ? context.newValue : context.value,
-                    },
-                    {
-                        condition: ({row}) => row.index % 2 === 0,
-                        style: { background: '#fbfbfb' }
                     },
                     {
                         column: { id: 'column_11' },

@@ -381,6 +381,7 @@ export default function GridInteractions() {
         input?.focus();
     });
 
+    // TODO: Fix placement for fixed rows/columns
     const inputPlacement = useMemo(() => {
         if (!focusedCell)
             return null;
