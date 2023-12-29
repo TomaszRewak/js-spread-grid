@@ -141,6 +141,9 @@ export default function GridCanvas({
                     ctx.fillStyle = style.background || 'white';
                     ctx.fillRect(0, 0, cellWidth, cellHeight);
 
+                    if (cell.draw)
+                        cell.draw(ctx);
+
                     if (style.highlight) {
                         ctx.fillStyle = style.highlight;
                         ctx.fillRect(0, 0, cellWidth, cellHeight);

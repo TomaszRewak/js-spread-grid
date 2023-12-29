@@ -70,6 +70,13 @@ function App() {
                         style: { background: 'lightcoral' }
                     },
                     {
+                        column: { id: 'column_13' },
+                        draw: ({ctx, value, column, row}) => {
+                            ctx.fillStyle = 'red';
+                            ctx.fillRect(5, 5, Math.min(value / 20, column.width - 10), row.height - 10);
+                        }
+                    },
+                    {
                         row: { id: 5 },
                         column: { id: 'column_5' },
                         style: { borderLeft: { width: 3 }, borderTop: { width: 3 }, borderRight: { width: 3 } }
