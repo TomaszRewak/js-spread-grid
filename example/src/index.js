@@ -72,8 +72,8 @@ function App() {
                     {
                         column: { id: 'column_13' },
                         draw: ({ctx, value, column, row}) => {
-                            ctx.fillStyle = 'red';
-                            ctx.fillRect(5, 5, Math.min(value / 20, column.width - 10), row.height - 10);
+                            ctx.fillStyle = 'pink';
+                            ctx.fillRect(4, 4, Math.min(value / 20, column.width - 8), row.height - 8);
                         }
                     },
                     {
@@ -109,16 +109,12 @@ function App() {
                         style: { borderLeft: { width: 5, dash: [15, 15] }, borderRight: { width: 5, dash: [15, 15] }, background: 'lightgrey' }
                     },
                     {
-                        condition: ({value}) => value < 70,
-                        value: () => 'small [jjj]'
-                    },
-                    {
                         condition: ({value}) => value < 100,
-                        value: () => 'SMALL'
+                        text: ({value}) => `small [${value}]`
                     },
                     {
                         row: { id: 20 },
-                        value: () => 'ABCDEFGHIJKLMNOPQRSTUVXYZ'
+                        text: 'ABCDEFGHIJKLMNOPQRSTUVXYZ'
                     },
                     {
                         column: { id: 'column_5' },

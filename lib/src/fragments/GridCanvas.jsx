@@ -128,7 +128,7 @@ export default function GridCanvas({
                     const cellLeft = horizontalOffsets[columnIndex];
                     const cellWidth = columnWidths[columnIndex];
                     const cellHeight = rowHeights[rowIndex];
-                    const text = `${cell.value}`;
+                    const text = 'text' in cell ? cell.text : cell.value;
                     const textAlign = style.textAlign || 'left';
                     const textBaseline = style.textBaseline || 'middle';
                     const paddingLeft = 'paddingLeft' in style ? style.paddingLeft : 5;
@@ -141,7 +141,7 @@ export default function GridCanvas({
                     ctx.fillStyle = style.background || 'white';
                     ctx.fillRect(0, 0, cellWidth, cellHeight);
 
-                    if (cell.draw)
+                    if ('draw' in cell) 
                         cell.draw(ctx);
 
                     if (style.highlight) {
