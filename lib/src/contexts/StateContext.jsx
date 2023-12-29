@@ -40,6 +40,7 @@ function useResolvedColumns(columns, devicePixelRatio, borderWidth) {
             const width = roundToPixels(column.width, devicePixelRatio);
             const newColumn = {
                 ...column,
+                type: column.type || "DATA",
                 width: width,
                 leftWithBorder: left - borderWidth,
                 left: left,
@@ -64,6 +65,7 @@ function useResolvedRows(rows, devicePixelRatio, borderWidth) {
             const height = roundToPixels(row.height, devicePixelRatio);
             const newRow = {
                 ...row,
+                type: row.type || "DATA",
                 height: height,
                 topWithBorder: top - borderWidth,
                 top: top,
