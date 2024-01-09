@@ -1,25 +1,33 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import SpreadGrid from './spread-grid/components/SpreadGrid';
 
 function App() {
+    const [offset, setOffset] = React.useState(0);
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         setOffset(Math.random() * 1000);
+    //     }, 100);
+    //     return () => clearInterval(interval);
+    // }, []);
+
     const column_widths = [100, 80, 80, 111, 73, 173, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 30, 100]
-    const rows_count = 2000
+    const rows_count = 200
 
     const columns = column_widths.map((width, i) => ({
         id: `column_${i}`,
         header: `Column ${i}`,
         width
-    }))
+    }));
 
     const rows = Array.from({ length: rows_count }, (_, i) => ({
         id: i,
         height: 20
-    }))
+    }));
 
     const data = rows.map((_, i) => ({
-        ...columns.reduce((acc, _, j) => ({ ...acc, [`column_${j}`]: i * columns.length + j }), {})
-    }))
+        ...columns.reduce((acc, _, j) => ({ ...acc, [`column_${j}`]: i * columns.length + j + offset }), {}),
+    }));
 
     return (
         <div style={{ maxHeight: 'calc(100vh - 20px)', display: 'flex' }}>
@@ -32,15 +40,34 @@ function App() {
                     { id: 'a', type: 'HEADER', height: 20 },
                     ...rows.slice(0, 4),
                     { id: 'b', type: 'HEADER', height: 20 },
-                    { id: 'search', type: 'SEARCH', height: 20 },
+                    { id: 'search_row', type: 'SEARCH', height: 20 },
                     ...rows.slice(4, -2),
                     { id: 'c', type: 'HEADER', height: 20 },
                     ...rows.slice(-2),
                     { id: 'd', type: 'HEADER', height: 20 }
                 ]}
+                filters={[
+                    { rowId: 'search_row', columnId: 'column_8', expression: '300' }
+                ]}
                 pinnedTop={7}
                 pinnedBottom={4}
                 formatting={[
+                    {
+                        row: { id: 'search_row' },
+                        column: { id: 'column_8' },
+                        edit: {
+                            validate: ({string}) => !isNaN(Number(string)),
+                            parse: ({string}) => Number(string),
+                        }
+                    },
+                    {
+                        column: { id: 'column_0' },
+                        filter: {
+                            by: 'ROW',
+                            id: 'search_row',
+                            with: ({value, expression}) => value > expression
+                        }
+                    },
                     {
                         condition: ({row}) => row.index % 2 === 0,
                         style: { background: '#fbfbfb' }

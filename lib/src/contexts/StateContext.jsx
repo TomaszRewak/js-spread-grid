@@ -32,7 +32,20 @@ function compareEditedCells(oldCells, newCells) {
     return newCells.every(cell => edition.getIdValue(cell.rowId, cell.columnId) === cell.value);
 }
 
-function useResolvedColumns(columns, devicePixelRatio, borderWidth) {
+function useResolvedColumnsOrRows(elements) {
+    return useMemo(() => {
+        return elements.map((element, index) => {
+            return {
+                ...element,
+                type: element.type || "DATA",
+                index: index,
+                key: stringifyId(element.id)
+            }
+        });
+    }, [elements]);
+}
+
+function usePlacedColumns(columns, devicePixelRatio, borderWidth) {
     return useMemo(() => {
         let left = borderWidth;
 
@@ -40,14 +53,11 @@ function useResolvedColumns(columns, devicePixelRatio, borderWidth) {
             const width = roundToPixels(column.width, devicePixelRatio);
             const newColumn = {
                 ...column,
-                type: column.type || "DATA",
                 width: width,
                 leftWithBorder: left - borderWidth,
                 left: left,
                 right: left + width,
-                rightWithBorder: left + width + borderWidth,
-                index: index,
-                key: stringifyId(column.id)
+                rightWithBorder: left + width + borderWidth
             }
 
             left += newColumn.width + borderWidth;
@@ -57,7 +67,7 @@ function useResolvedColumns(columns, devicePixelRatio, borderWidth) {
     }, [borderWidth, columns, devicePixelRatio]);
 }
 
-function useResolvedRows(rows, devicePixelRatio, borderWidth) {
+function usePlacedRows(rows, devicePixelRatio, borderWidth) {
     return useMemo(() => {
         let top = borderWidth;
 
@@ -65,14 +75,11 @@ function useResolvedRows(rows, devicePixelRatio, borderWidth) {
             const height = roundToPixels(row.height, devicePixelRatio);
             const newRow = {
                 ...row,
-                type: row.type || "DATA",
                 height: height,
                 topWithBorder: top - borderWidth,
                 top: top,
                 bottom: top + height,
-                bottomWithBorder: top + height + borderWidth,
-                index: index,
-                key: stringifyId(row.id)
+                bottomWithBorder: top + height + borderWidth
             }
 
             top += newRow.height + borderWidth;
@@ -82,9 +89,15 @@ function useResolvedRows(rows, devicePixelRatio, borderWidth) {
     }, [borderWidth, rows, devicePixelRatio]);
 }
 
+function useFormatResolver(dataFormatting, data, rows, columns, edition) {
+    const formatResolverRules = useMemo(() => new FormatResolverRules(dataFormatting), [dataFormatting]);
+    const formatResolver = useMemo(() => new FormatResolver(formatResolverRules, data, rows, columns, edition), [formatResolverRules, data, columns, rows, edition]);
+
+    return formatResolver;
+}
+
 const DataContext = createContext();
 const ColumnsAndRowsContext = createContext();
-const MeasuringContext = createContext();
 const InteractionsContext = createContext();
 const RenderingContext = createContext();
 const SizeContext = createContext();
@@ -93,26 +106,25 @@ export function StateProvider(props) {
     const devicePixelRatio = useDevicePixelRatio();
     const borderWidth = props.borderWidth / devicePixelRatio;
     const data = props.data;
-    const columns = useResolvedColumns(useInvoked(props.columns, [data]), devicePixelRatio, borderWidth); // TODO: Throw on duplicate ids
-    const rows = useResolvedRows(useInvoked(props.rows, [data]), devicePixelRatio, borderWidth);
+    const dataFormatting = useMemo(() => getDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
+    const edition = useMemo(() => new Edition(props.editedCells), [props.editedCells]);
+    const unfilteredColumns = useResolvedColumnsOrRows(useInvoked(props.columns, [data])); // TODO: Throw on duplicate ids
+    const unfilteredRows = useResolvedColumnsOrRows(useInvoked(props.rows, [data]));
+    const shapeFormatResolver = useFormatResolver(dataFormatting, data, unfilteredRows, unfilteredColumns, edition);
+    const columns = usePlacedColumns(unfilteredColumns, devicePixelRatio, borderWidth);
+    const rows = usePlacedRows(unfilteredRows, devicePixelRatio, borderWidth);
     const pinned = useMemo(() => ({ top: props.pinnedTop, bottom: props.pinnedBottom, left: props.pinnedLeft, right: props.pinnedRight }), [props.pinnedTop, props.pinnedBottom, props.pinnedLeft, props.pinnedRight]);
     const sections = useMemo(() => getSections(columns, rows, pinned), [columns, rows, pinned]);
     const selectedCells = props.selectedCells;
     const selection = useMemo(() => new Selection(props.selectedCells), [props.selectedCells]);
     const highlight = useMemo(() => new Selection(props.highlightedCells), [props.highlightedCells]);
-    const edition = useMemo(() => new Edition(props.editedCells), [props.editedCells]);
     const hoveredCell = props.hoveredCell;
     const focusedCell = props.focusedCell;
     // TODO: addDataFormattingRules and addRenderFormattingRules should remove unnecessary rules
-    const dataFormatting = useMemo(() => getDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
-    const dataFormatResolverRules = useMemo(() => new FormatResolverRules(dataFormatting), [dataFormatting]);
-    const dataFormatResolver = useMemo(() => new FormatResolver(dataFormatResolverRules, data, rows, columns, edition), [dataFormatResolverRules, data, columns, rows, edition]);
     const renderFormatting = useMemo(() => getRenderFormattingRules(dataFormatting, hoveredCell, focusedCell, selection, highlight, edition), [dataFormatting, hoveredCell, focusedCell, selection, highlight, edition]);
-    const renderFormatResolverRules = useMemo(() => new FormatResolverRules(renderFormatting), [renderFormatting]);
-    const renderFormatResolver = useMemo(() => new FormatResolver(renderFormatResolverRules, data, rows, columns, edition), [renderFormatResolverRules, data, columns, rows, edition]);
+    const renderFormatResolver = useFormatResolver(renderFormatting, data, rows, columns, edition);
     const inputFormatting = useMemo(() => getInputFormattingRules(dataFormatting), [dataFormatting]);
-    const inputFormatResolverRules = useMemo(() => new FormatResolverRules(inputFormatting), [inputFormatting]);
-    const inputFormatResolver = useMemo(() => new FormatResolver(inputFormatResolverRules, data, rows, columns, edition), [inputFormatResolverRules, data, columns, rows, edition]);
+    const inputFormatResolver = useFormatResolver(inputFormatting, data, rows, columns, edition);
     const fixedSize = useMemo(() => ({
         top: sections.top.height,
         bottom: sections.bottom.height,
@@ -147,9 +159,6 @@ export function StateProvider(props) {
         [ColumnsAndRowsContext, useMemo(() => ({
             columns, rows, pinned, sections
         }), [columns, rows, pinned, sections])],
-        [MeasuringContext, useMemo(() => ({
-            dataFormatResolverContext: dataFormatResolver
-        }), [dataFormatResolver])],
         [InteractionsContext, useMemo(() => ({
             selectedCells, selection, hoveredCell, focusedCell, inputFormatResolverContext: inputFormatResolver, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells
         }), [selectedCells, selection, hoveredCell, focusedCell, inputFormatResolver, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells])],
@@ -174,7 +183,6 @@ export const useColumns = () => React.useContext(ColumnsAndRowsContext).columns;
 export const useRows = () => React.useContext(ColumnsAndRowsContext).rows;
 export const usePinned = () => React.useContext(ColumnsAndRowsContext).pinned;
 export const useSections = () => React.useContext(ColumnsAndRowsContext).sections;
-export const useDataFormatResolver = () => React.useContext(MeasuringContext).dataFormatResolverContext;
 export const useSelectedCells = () => React.useContext(InteractionsContext).selectedCells;
 export const useSelection = () => React.useContext(InteractionsContext).selection;
 export const useEdition = () => React.useContext(InteractionsContext).edition;
