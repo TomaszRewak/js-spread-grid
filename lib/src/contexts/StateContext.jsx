@@ -9,8 +9,10 @@ import useDevicePixelRatio, { roundToPixels } from "../hooks/useDevicePixelRatio
 import getSections from "../utils/getSections";
 import getInputFormattingRules from "../utils/getInputFormattingRules";
 import Edition from "../utils/Edition";
-import FormatResolverRules from "../utils/FormatResolverRules";
+import FormattingRules from "../utils/FormattingRules";
 import FormatResolver from "../utils/FormatResolver";
+import getShapeFormattingRules from "../utils/getShapeFormattingRules";
+import Filtering from "../utils/Filtering";
 
 function compareCells(oldCell, newCell) {
     return stringifyId(oldCell) === stringifyId(newCell);
@@ -99,8 +101,8 @@ function usePlacedRows(rows, devicePixelRatio, borderWidth) {
 }
 
 function useFormatResolver(dataFormatting, data, rows, columns, edition) {
-    const formatResolverRules = useMemo(() => new FormatResolverRules(dataFormatting), [dataFormatting]);
-    const formatResolver = useMemo(() => new FormatResolver(formatResolverRules, data, rows, columns, edition), [formatResolverRules, data, columns, rows, edition]);
+    const formattingRules = useMemo(() => new FormattingRules(dataFormatting), [dataFormatting]);
+    const formatResolver = useMemo(() => new FormatResolver(formattingRules, data, rows, columns, edition), [formattingRules, data, columns, rows, edition]);
 
     return formatResolver;
 }
@@ -117,9 +119,11 @@ export function StateProvider(props) {
     const data = props.data;
     const dataFormatting = useMemo(() => getDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
     const edition = useMemo(() => new Edition(props.editedCells), [props.editedCells]);
+    const filters = useMemo(() => new Filtering(props.filters), [props.filters]);
     const unfilteredColumns = useResolvedColumnsOrRows(useInvoked(props.columns, [data]), props.pinnedLeft, props.pinnedRight); // TODO: Throw on duplicate ids
     const unfilteredRows = useResolvedColumnsOrRows(useInvoked(props.rows, [data]), props.pinnedTop, props.pinnedBottom);
-    const shapeFormatResolver = useFormatResolver(dataFormatting, data, unfilteredRows, unfilteredColumns, edition);
+    const shapeFormatting = useMemo(() => getShapeFormattingRules(dataFormatting), [dataFormatting]);
+    const shapeFormatResolver = useFormatResolver(shapeFormatting, data, unfilteredRows, unfilteredColumns, edition);
     const columns = usePlacedColumns(unfilteredColumns, devicePixelRatio, borderWidth);
     const rows = usePlacedRows(unfilteredRows, devicePixelRatio, borderWidth);
     const sections = useMemo(() => getSections(columns, rows), [columns, rows]);

@@ -40,7 +40,7 @@ function App() {
                     { id: 'a', type: 'HEADER', height: 20 },
                     ...rows.slice(0, 4),
                     { id: 'b', type: 'HEADER', height: 20 },
-                    { id: 'search_row', type: 'SEARCH', height: 20 },
+                    { id: 'search_row', type: 'FILTER', height: 20 },
                     ...rows.slice(4, -2),
                     { id: 'c', type: 'HEADER', height: 20 },
                     ...rows.slice(-2),
@@ -56,33 +56,39 @@ function App() {
                         row: { id: 'search_row' },
                         column: { id: 'column_8' },
                         edit: {
-                            validate: ({string}) => !isNaN(Number(string)),
-                            parse: ({string}) => Number(string),
+                            validate: ({ string }) => !isNaN(Number(string)),
+                            parse: ({ string }) => Number(string),
                         }
                     },
                     {
-                        column: { id: 'column_0' },
+                        column: { id: 'column_8' },
+                        filter: { type: 'ROW', id: 'search_row' },
+                        condition: ({ value, filter }) => value < filter,
+                        visible: false
+                    },
+                    {
+                        column: { id: 'column_8' },
                         filter: {
                             type: 'ROW',
                             id: 'search_row',
-                            with: ({value, expression}) => value > expression
+                            with: ({ value, expression }) => value > expression
                         }
                     },
                     {
-                        condition: ({row}) => row.index % 2 === 0,
+                        condition: ({ row }) => row.index % 2 === 0,
                         style: { background: '#fbfbfb' }
                     },
                     {
-                        condition: ({column, row}) => row.index < 25 && column.index > 3,
+                        condition: ({ column, row }) => row.index < 25 && column.index > 3,
                         edit: {
-                            validate: ({string}) => !isNaN(Number(string)),
-                            parse: ({string}) => Number(string),
+                            validate: ({ string }) => !isNaN(Number(string)),
+                            parse: ({ string }) => Number(string),
                         },
                         value: context => 'newValue' in context ? context.newValue : context.value,
                     },
                     {
                         column: { id: 'column_11' },
-                        style: ({value}) => ({ background: `rgb(${value % 255}, 100, 100)` })
+                        style: ({ value }) => ({ background: `rgb(${value % 255}, 100, 100)` })
                     },
                     {
                         column: { id: 'column_5' },
@@ -99,7 +105,7 @@ function App() {
                     },
                     {
                         column: { id: 'column_13' },
-                        draw: ({ctx, value, column, row}) => {
+                        draw: ({ ctx, value, column, row }) => {
                             ctx.fillStyle = 'pink';
                             ctx.fillRect(4, 4, Math.min(value / 20, column.width - 8), row.height - 8);
                         }
@@ -137,8 +143,8 @@ function App() {
                         style: { borderLeft: { width: 5, dash: [15, 15] }, borderRight: { width: 5, dash: [15, 15] }, background: 'lightgrey' }
                     },
                     {
-                        condition: ({value}) => value < 100,
-                        text: ({value}) => `small [${value}]`
+                        condition: ({ value }) => value < 100,
+                        text: ({ value }) => `small [${value}]`
                     },
                     {
                         row: { id: 20 },
