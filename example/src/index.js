@@ -47,7 +47,7 @@ function App() {
                     { id: 'd', type: 'HEADER', height: 20 }
                 ]}
                 filters={[
-                    { rowId: 'search_row', columnId: 'column_8', expression: '300' }
+                    { rowId: 'search_row', columnId: 'column_8', expression: 300 }
                 ]}
                 pinnedTop={7}
                 pinnedBottom={4}
@@ -63,7 +63,7 @@ function App() {
                     {
                         column: { id: 'column_0' },
                         filter: {
-                            by: 'ROW',
+                            type: 'ROW',
                             id: 'search_row',
                             with: ({value, expression}) => value > expression
                         }

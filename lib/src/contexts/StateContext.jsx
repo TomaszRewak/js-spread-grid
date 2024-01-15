@@ -32,17 +32,26 @@ function compareEditedCells(oldCells, newCells) {
     return newCells.every(cell => edition.getIdValue(cell.rowId, cell.columnId) === cell.value);
 }
 
-function useResolvedColumnsOrRows(elements) {
+function getPinned(index, length, pinnedBegin, pinnedEnd) {
+    if (index < pinnedBegin)
+        return "BEGIN";
+    if (index >= length - pinnedEnd)
+        return "END";
+    return undefined;
+}
+
+function useResolvedColumnsOrRows(elements, pinnedBegin, pinnedEnd) {
     return useMemo(() => {
         return elements.map((element, index) => {
             return {
                 ...element,
                 type: element.type || "DATA",
                 index: index,
-                key: stringifyId(element.id)
+                key: stringifyId(element.id),
+                pinned: getPinned(index, elements.length, pinnedBegin, pinnedEnd)
             }
         });
-    }, [elements]);
+    }, [elements, pinnedBegin, pinnedEnd]);
 }
 
 function usePlacedColumns(columns, devicePixelRatio, borderWidth) {
@@ -108,13 +117,12 @@ export function StateProvider(props) {
     const data = props.data;
     const dataFormatting = useMemo(() => getDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
     const edition = useMemo(() => new Edition(props.editedCells), [props.editedCells]);
-    const unfilteredColumns = useResolvedColumnsOrRows(useInvoked(props.columns, [data])); // TODO: Throw on duplicate ids
-    const unfilteredRows = useResolvedColumnsOrRows(useInvoked(props.rows, [data]));
+    const unfilteredColumns = useResolvedColumnsOrRows(useInvoked(props.columns, [data]), props.pinnedLeft, props.pinnedRight); // TODO: Throw on duplicate ids
+    const unfilteredRows = useResolvedColumnsOrRows(useInvoked(props.rows, [data]), props.pinnedTop, props.pinnedBottom);
     const shapeFormatResolver = useFormatResolver(dataFormatting, data, unfilteredRows, unfilteredColumns, edition);
     const columns = usePlacedColumns(unfilteredColumns, devicePixelRatio, borderWidth);
     const rows = usePlacedRows(unfilteredRows, devicePixelRatio, borderWidth);
-    const pinned = useMemo(() => ({ top: props.pinnedTop, bottom: props.pinnedBottom, left: props.pinnedLeft, right: props.pinnedRight }), [props.pinnedTop, props.pinnedBottom, props.pinnedLeft, props.pinnedRight]);
-    const sections = useMemo(() => getSections(columns, rows, pinned), [columns, rows, pinned]);
+    const sections = useMemo(() => getSections(columns, rows), [columns, rows]);
     const selectedCells = props.selectedCells;
     const selection = useMemo(() => new Selection(props.selectedCells), [props.selectedCells]);
     const highlight = useMemo(() => new Selection(props.highlightedCells), [props.highlightedCells]);
@@ -157,8 +165,8 @@ export function StateProvider(props) {
             data
         }), [data])],
         [ColumnsAndRowsContext, useMemo(() => ({
-            columns, rows, pinned, sections
-        }), [columns, rows, pinned, sections])],
+            columns, rows, sections
+        }), [columns, rows, sections])],
         [InteractionsContext, useMemo(() => ({
             selectedCells, selection, hoveredCell, focusedCell, inputFormatResolverContext: inputFormatResolver, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells
         }), [selectedCells, selection, hoveredCell, focusedCell, inputFormatResolver, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells])],
@@ -181,7 +189,6 @@ export function StateProvider(props) {
 export const useData = () => React.useContext(DataContext).data;
 export const useColumns = () => React.useContext(ColumnsAndRowsContext).columns;
 export const useRows = () => React.useContext(ColumnsAndRowsContext).rows;
-export const usePinned = () => React.useContext(ColumnsAndRowsContext).pinned;
 export const useSections = () => React.useContext(ColumnsAndRowsContext).sections;
 export const useSelectedCells = () => React.useContext(InteractionsContext).selectedCells;
 export const useSelection = () => React.useContext(InteractionsContext).selection;
