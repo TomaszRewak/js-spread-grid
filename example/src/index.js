@@ -62,17 +62,9 @@ function App() {
                     },
                     {
                         column: { id: 'column_8' },
-                        filter: { type: 'ROW', id: 'search_row' },
+                        filterBy: { type: 'ROW', id: 'search_row' },
                         condition: ({ value, filter }) => value < filter,
                         visible: false
-                    },
-                    {
-                        column: { id: 'column_8' },
-                        filter: {
-                            type: 'ROW',
-                            id: 'search_row',
-                            with: ({ value, expression }) => value > expression
-                        }
                     },
                     {
                         condition: ({ row }) => row.index % 2 === 0,
