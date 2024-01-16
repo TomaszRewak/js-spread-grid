@@ -11,8 +11,9 @@ import getInputFormattingRules from "../utils/getInputFormattingRules";
 import Edition from "../utils/Edition";
 import FormattingRules from "../utils/FormattingRules";
 import FormatResolver from "../utils/FormatResolver";
-import getShapeFormattingRules from "../utils/getShapeFormattingRules";
+import getVisibilityFormattingRules from "../utils/getVisibilityFormattingRules";
 import Filtering from "../utils/Filtering";
+import VisibilityResolver from "../utils/VisibilityResolver";
 
 function compareCells(oldCell, newCell) {
     return stringifyId(oldCell) === stringifyId(newCell);
@@ -31,7 +32,7 @@ function compareEditedCells(oldCells, newCells) {
         return false;
 
     const edition = new Edition(oldCells);
-    return newCells.every(cell => edition.getIdValue(cell.rowId, cell.columnId) === cell.value);
+    return newCells.every(cell => edition.getValueById(cell.rowId, cell.columnId) === cell.value);
 }
 
 function getPinned(index, length, pinnedBegin, pinnedEnd) {
@@ -107,6 +108,13 @@ function useFormatResolver(dataFormatting, data, rows, columns, edition) {
     return formatResolver;
 }
 
+function useVisibilityResolver(dataFormatting, data, rows, columns, filters) {
+    const formattingRules = useMemo(() => new FormattingRules(dataFormatting), [dataFormatting]);
+    const formatResolver = useMemo(() => new VisibilityResolver(formattingRules, data, rows, columns, filters), [formattingRules, data, columns, rows, filters]);
+
+    return formatResolver;
+}
+
 const DataContext = createContext();
 const ColumnsAndRowsContext = createContext();
 const InteractionsContext = createContext();
@@ -122,10 +130,12 @@ export function StateProvider(props) {
     const filters = useMemo(() => new Filtering(props.filters), [props.filters]);
     const unfilteredColumns = useResolvedColumnsOrRows(useInvoked(props.columns, [data]), props.pinnedLeft, props.pinnedRight); // TODO: Throw on duplicate ids
     const unfilteredRows = useResolvedColumnsOrRows(useInvoked(props.rows, [data]), props.pinnedTop, props.pinnedBottom);
-    const shapeFormatting = useMemo(() => getShapeFormattingRules(dataFormatting), [dataFormatting]);
-    const shapeFormatResolver = useFormatResolver(shapeFormatting, data, unfilteredRows, unfilteredColumns, edition);
-    const columns = usePlacedColumns(unfilteredColumns, devicePixelRatio, borderWidth);
-    const rows = usePlacedRows(unfilteredRows, devicePixelRatio, borderWidth);
+    const visibilityFormatting = useMemo(() => getVisibilityFormattingRules(dataFormatting), [dataFormatting]);
+    const visibilityResolver = useVisibilityResolver(visibilityFormatting, data, unfilteredRows, unfilteredColumns, filters);
+    const filteredColumns = useMemo(() => visibilityResolver.findVisibleColumns(), [visibilityResolver]);
+    const filteredRows = useMemo(() => visibilityResolver.findVisibleRows(), [visibilityResolver]);
+    const columns = usePlacedColumns(filteredColumns, devicePixelRatio, borderWidth);
+    const rows = usePlacedRows(filteredRows, devicePixelRatio, borderWidth);
     const sections = useMemo(() => getSections(columns, rows), [columns, rows]);
     const selectedCells = props.selectedCells;
     const selection = useMemo(() => new Selection(props.selectedCells), [props.selectedCells]);
@@ -159,7 +169,7 @@ export function StateProvider(props) {
     }), [setSelectedCells]);
     const addEditedCells = useCallback(cells => setEditedCells(oldEditedCells => {
         const edition = new Edition(cells);
-        return [...cells, ...oldEditedCells.filter(cell => !edition.hasIdValue(cell.rowId, cell.columnId))];
+        return [...cells, ...oldEditedCells.filter(cell => !edition.hasValueById(cell.rowId, cell.columnId))];
     }), [setEditedCells]);
 
     useEffect(() => { console.log(props.selectedCells) }, [props.selectedCells]);

@@ -62,9 +62,10 @@ function App() {
                     },
                     {
                         column: { id: 'column_8' },
-                        filterBy: { type: 'ROW', id: 'search_row' },
-                        condition: ({ value, filter }) => value < filter,
-                        visible: false
+                        filter: {
+                            by: { type: 'ROW', id: 'search_row' },
+                            condition: ({ value, expression }) => value > expression
+                        }
                     },
                     {
                         condition: ({ row }) => row.index % 2 === 0,
