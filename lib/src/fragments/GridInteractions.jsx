@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
 import { useFocus, useInteraction, useIsMouseDown, useMousePosition } from '../contexts/MouseAndKeyboardContext';
-import { useAddEditedCells, useAddFilters, useAddSelectedCells, useBorderWidth, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useInputFormatResolver, useRows, useSelectedCells, useSetEditedCells, useSetFilters, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
+import { useAddEditedCells, useAddFilters, useAddSelectedCells, useBorderWidth, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useInputFormatResolver, useRemoveEditedCells, useRemoveFilters, useRows, useSelectedCells, useSetEditedCells, useSetFilters, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
 import { useClientSize, useScrollOffset } from '../contexts/SizeAndScrollContext';
 import { useState } from 'react';
 import GridInput from './GridInput';
@@ -176,10 +176,11 @@ export default function GridInteractions() {
     const setEditedCells = useSetEditedCells();
     const setHoveredCell = useSetHoveredCell();
     const setFocusedCell = useSetFocusedCell();
-    const setFilters = useSetFilters();
     const addSelectedCells = useAddSelectedCells();
     const addEditedCells = useAddEditedCells();
     const addFilters = useAddFilters();
+    const removeEditedCells = useRemoveEditedCells();
+    const removeFilters = useRemoveFilters();
 
     const columns = useColumns();
     const rows = useRows();
@@ -342,6 +343,11 @@ export default function GridInteractions() {
             setText('');
         };
 
+        const clear = () => {
+            removeEditedCells(selectedCells);
+            removeFilters(selectedCells);
+        }
+
         switch (event.key) {
             case 'Escape':
                 cancel();
@@ -366,6 +372,11 @@ export default function GridInteractions() {
             case 'ArrowRight':
                 preventDefault();
                 arrowHorizontally(event.ctrlKey ? columns.length : 1, event);
+                break;
+            case 'Delete':
+            case 'Backspace':
+                console.log('delete');
+                clear();
                 break;
             default:
                 return;

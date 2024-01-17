@@ -14,6 +14,11 @@ const GridInput = forwardRef(({ text, onTextChange, placement, isValid }, ref) =
             case 'Enter':
             case 'Escape':
                 break;
+            case 'Delete':
+            case 'Backspace':
+                if (internalText.current !== '')
+                    event.stopPropagation();
+                break;
             default:
                 event.stopPropagation();
                 break;

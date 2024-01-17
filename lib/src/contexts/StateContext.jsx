@@ -188,6 +188,14 @@ export function StateProvider(props) {
         const filtering = new Filtering(filters);
         return [...filters, ...oldFilters.filter(filter => !filtering.hasValueById(filter.rowId, filter.columnId))];
     }), [setFilters]);
+    const removeEditedCells = useCallback(cells => setEditedCells(oldEditedCells => {
+        const selection = new Selection(cells);
+        return oldEditedCells.filter(cell => !selection.isIdSelected(cell.rowId, cell.columnId));
+    }), [setEditedCells]);
+    const removeFilters = useCallback(cells => setFilters(oldFilters => {
+        const selection = new Selection(cells);
+        return oldFilters.filter(filter => !selection.isIdSelected(filter.rowId, filter.columnId));
+    }), [setFilters]);
 
     useEffect(() => { console.log(props.selectedCells) }, [props.selectedCells]);
 
@@ -199,8 +207,8 @@ export function StateProvider(props) {
             columns, rows, sections
         }), [columns, rows, sections])],
         [InteractionsContext, useMemo(() => ({
-            selectedCells, selection, hoveredCell, focusedCell, inputFormatResolver, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, setFilters, addSelectedCells, addEditedCells, addFilters
-        }), [selectedCells, selection, hoveredCell, focusedCell, inputFormatResolver, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, setFilters, addSelectedCells, addEditedCells, addFilters])],
+            selectedCells, selection, hoveredCell, focusedCell, inputFormatResolver, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells, addFilters, removeEditedCells, removeFilters
+        }), [selectedCells, selection, hoveredCell, focusedCell, inputFormatResolver, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells, addFilters, removeEditedCells, removeFilters])],
         [RenderingContext, useMemo(() => ({
             renderFormatResolver
         }), [renderFormatResolver])],
@@ -232,10 +240,11 @@ export const useSetHighlightedCells = () => React.useContext(InteractionsContext
 export const useSetEditedCells = () => React.useContext(InteractionsContext).setEditedCells;
 export const useSetHoveredCell = () => React.useContext(InteractionsContext).setHoveredCell;
 export const useSetFocusedCell = () => React.useContext(InteractionsContext).setFocusedCell;
-export const useSetFilters = () => React.useContext(InteractionsContext).setFilters;
 export const useAddSelectedCells = () => React.useContext(InteractionsContext).addSelectedCells;
 export const useAddEditedCells = () => React.useContext(InteractionsContext).addEditedCells;
 export const useAddFilters = () => React.useContext(InteractionsContext).addFilters;
+export const useRemoveEditedCells = () => React.useContext(InteractionsContext).removeEditedCells;
+export const useRemoveFilters = () => React.useContext(InteractionsContext).removeFilters;
 export const useFixedSize = () => React.useContext(SizeContext).fixedSize;
 export const useTotalSize = () => React.useContext(SizeContext).totalSize;
 export const useBorderWidth = () => React.useContext(SizeContext).borderWidth;
