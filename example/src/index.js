@@ -46,9 +46,6 @@ function App() {
                     ...rows.slice(-2),
                     { id: 'd', type: 'HEADER', height: 20 }
                 ]}
-                filters={[
-                    { rowId: 'search_row', columnId: 'column_8', expression: 300 }
-                ]}
                 pinnedTop={7}
                 pinnedBottom={4}
                 formatting={[
@@ -62,9 +59,18 @@ function App() {
                     },
                     {
                         column: { id: 'column_8' },
+                        condition: ({ row }) => !row.pinned,
                         filter: {
                             by: { type: 'ROW', id: 'search_row' },
                             condition: ({ value, expression }) => value > expression
+                        }
+                    },
+                    {
+                        column: { id: 'column_9' },
+                        condition: ({ row }) => !row.pinned,
+                        filter: {
+                            by: { type: 'ROW', id: 'search_row' },
+                            condition: ({ value, expression }) => `${value}`.includes(expression)
                         }
                     },
                     {
