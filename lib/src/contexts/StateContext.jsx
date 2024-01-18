@@ -9,8 +9,11 @@ import useDevicePixelRatio, { roundToPixels } from "../hooks/useDevicePixelRatio
 import getSections from "../utils/getSections";
 import getInputFormattingRules from "../utils/getInputFormattingRules";
 import Edition from "../utils/Edition";
-import FormatResolverRules from "../utils/FormatResolverRules";
+import FormattingRules from "../utils/FormattingRules";
 import FormatResolver from "../utils/FormatResolver";
+import getVisibilityFormattingRules from "../utils/getVisibilityFormattingRules";
+import Filtering from "../utils/Filtering";
+import VisibilityResolver from "../utils/VisibilityResolver";
 
 function compareCells(oldCell, newCell) {
     return stringifyId(oldCell) === stringifyId(newCell);
@@ -29,10 +32,41 @@ function compareEditedCells(oldCells, newCells) {
         return false;
 
     const edition = new Edition(oldCells);
-    return newCells.every(cell => edition.getIdValue(cell.rowId, cell.columnId) === cell.value);
+    return newCells.every(cell => edition.getValueById(cell.rowId, cell.columnId) === cell.value);
 }
 
-function useResolvedColumns(columns, devicePixelRatio, borderWidth) {
+function compareFilters(oldFilters, newFilters) {
+    if (oldFilters.length !== newFilters.length)
+        return false;
+
+    const filtering = new Filtering(oldFilters);
+    return newFilters.every(filter => filtering.getValueById(filter.rowId, filter.columnId) === filter.value);
+
+}
+
+function getPinned(index, length, pinnedBegin, pinnedEnd) {
+    if (index < pinnedBegin)
+        return "BEGIN";
+    if (index >= length - pinnedEnd)
+        return "END";
+    return undefined;
+}
+
+function useResolvedColumnsOrRows(elements, pinnedBegin, pinnedEnd) {
+    return useMemo(() => {
+        return elements.map((element, index) => {
+            return {
+                ...element,
+                type: element.type || "DATA",
+                index: index,
+                key: stringifyId(element.id),
+                pinned: getPinned(index, elements.length, pinnedBegin, pinnedEnd)
+            }
+        });
+    }, [elements, pinnedBegin, pinnedEnd]);
+}
+
+function usePlacedColumns(columns, devicePixelRatio, borderWidth) {
     return useMemo(() => {
         let left = borderWidth;
 
@@ -40,13 +74,12 @@ function useResolvedColumns(columns, devicePixelRatio, borderWidth) {
             const width = roundToPixels(column.width, devicePixelRatio);
             const newColumn = {
                 ...column,
+                index: index,
                 width: width,
                 leftWithBorder: left - borderWidth,
                 left: left,
                 right: left + width,
-                rightWithBorder: left + width + borderWidth,
-                index: index,
-                key: stringifyId(column.id)
+                rightWithBorder: left + width + borderWidth
             }
 
             left += newColumn.width + borderWidth;
@@ -56,7 +89,7 @@ function useResolvedColumns(columns, devicePixelRatio, borderWidth) {
     }, [borderWidth, columns, devicePixelRatio]);
 }
 
-function useResolvedRows(rows, devicePixelRatio, borderWidth) {
+function usePlacedRows(rows, devicePixelRatio, borderWidth) {
     return useMemo(() => {
         let top = borderWidth;
 
@@ -64,13 +97,12 @@ function useResolvedRows(rows, devicePixelRatio, borderWidth) {
             const height = roundToPixels(row.height, devicePixelRatio);
             const newRow = {
                 ...row,
+                index: index,
                 height: height,
                 topWithBorder: top - borderWidth,
                 top: top,
                 bottom: top + height,
-                bottomWithBorder: top + height + borderWidth,
-                index: index,
-                key: stringifyId(row.id)
+                bottomWithBorder: top + height + borderWidth
             }
 
             top += newRow.height + borderWidth;
@@ -80,9 +112,22 @@ function useResolvedRows(rows, devicePixelRatio, borderWidth) {
     }, [borderWidth, rows, devicePixelRatio]);
 }
 
+function useFormatResolver(dataFormatting, data, rows, columns, edition) {
+    const formattingRules = useMemo(() => new FormattingRules(dataFormatting), [dataFormatting]);
+    const formatResolver = useMemo(() => new FormatResolver(formattingRules, data, rows, columns, edition), [formattingRules, data, columns, rows, edition]);
+
+    return formatResolver;
+}
+
+function useVisibilityResolver(dataFormatting, data, rows, columns, filters) {
+    const formattingRules = useMemo(() => new FormattingRules(dataFormatting), [dataFormatting]);
+    const formatResolver = useMemo(() => new VisibilityResolver(formattingRules, data, rows, columns, filters), [formattingRules, data, columns, rows, filters]);
+
+    return formatResolver;
+}
+
 const DataContext = createContext();
 const ColumnsAndRowsContext = createContext();
-const MeasuringContext = createContext();
 const InteractionsContext = createContext();
 const RenderingContext = createContext();
 const SizeContext = createContext();
@@ -91,26 +136,29 @@ export function StateProvider(props) {
     const devicePixelRatio = useDevicePixelRatio();
     const borderWidth = props.borderWidth / devicePixelRatio;
     const data = props.data;
-    const columns = useResolvedColumns(useInvoked(props.columns, [data]), devicePixelRatio, borderWidth); // TODO: Throw on duplicate ids
-    const rows = useResolvedRows(useInvoked(props.rows, [data]), devicePixelRatio, borderWidth);
-    const pinned = useMemo(() => ({ top: props.pinnedTop, bottom: props.pinnedBottom, left: props.pinnedLeft, right: props.pinnedRight }), [props.pinnedTop, props.pinnedBottom, props.pinnedLeft, props.pinnedRight]);
-    const sections = useMemo(() => getSections(columns, rows, pinned), [columns, rows, pinned]);
+    const dataFormatting = useMemo(() => getDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
+    const editedCellsAndFilters = useMemo(() => [...props.editedCells, ...props.filters.map(filter => ({ columnId: filter.columnId, rowId: filter.rowId, value: filter.expression }))], [props.editedCells, props.filters]);
+    const edition = useMemo(() => new Edition(editedCellsAndFilters), [editedCellsAndFilters]);
+    const filters = useMemo(() => new Filtering(props.filters), [props.filters]);
+    const unfilteredColumns = useResolvedColumnsOrRows(useInvoked(props.columns, [data]), props.pinnedLeft, props.pinnedRight); // TODO: Throw on duplicate ids
+    const unfilteredRows = useResolvedColumnsOrRows(useInvoked(props.rows, [data]), props.pinnedTop, props.pinnedBottom);
+    const visibilityFormatting = useMemo(() => getVisibilityFormattingRules(dataFormatting), [dataFormatting]);
+    const visibilityResolver = useVisibilityResolver(visibilityFormatting, data, unfilteredRows, unfilteredColumns, filters);
+    const filteredColumns = useMemo(() => visibilityResolver.findVisibleColumns(), [visibilityResolver]);
+    const filteredRows = useMemo(() => visibilityResolver.findVisibleRows(), [visibilityResolver]);
+    const columns = usePlacedColumns(filteredColumns, devicePixelRatio, borderWidth);
+    const rows = usePlacedRows(filteredRows, devicePixelRatio, borderWidth);
+    const sections = useMemo(() => getSections(columns, rows), [columns, rows]);
     const selectedCells = props.selectedCells;
     const selection = useMemo(() => new Selection(props.selectedCells), [props.selectedCells]);
     const highlight = useMemo(() => new Selection(props.highlightedCells), [props.highlightedCells]);
-    const edition = useMemo(() => new Edition(props.editedCells), [props.editedCells]);
     const hoveredCell = props.hoveredCell;
     const focusedCell = props.focusedCell;
     // TODO: addDataFormattingRules and addRenderFormattingRules should remove unnecessary rules
-    const dataFormatting = useMemo(() => getDataFormattingRules(props.formatting, props.dataSelector), [props.formatting, props.dataSelector]);
-    const dataFormatResolverRules = useMemo(() => new FormatResolverRules(dataFormatting), [dataFormatting]);
-    const dataFormatResolver = useMemo(() => new FormatResolver(dataFormatResolverRules, data, rows, columns, edition), [dataFormatResolverRules, data, columns, rows, edition]);
     const renderFormatting = useMemo(() => getRenderFormattingRules(dataFormatting, hoveredCell, focusedCell, selection, highlight, edition), [dataFormatting, hoveredCell, focusedCell, selection, highlight, edition]);
-    const renderFormatResolverRules = useMemo(() => new FormatResolverRules(renderFormatting), [renderFormatting]);
-    const renderFormatResolver = useMemo(() => new FormatResolver(renderFormatResolverRules, data, rows, columns, edition), [renderFormatResolverRules, data, columns, rows, edition]);
+    const renderFormatResolver = useFormatResolver(renderFormatting, data, rows, columns, edition);
     const inputFormatting = useMemo(() => getInputFormattingRules(dataFormatting), [dataFormatting]);
-    const inputFormatResolverRules = useMemo(() => new FormatResolverRules(inputFormatting), [inputFormatting]);
-    const inputFormatResolver = useMemo(() => new FormatResolver(inputFormatResolverRules, data, rows, columns, edition), [inputFormatResolverRules, data, columns, rows, edition]);
+    const inputFormatResolver = useFormatResolver(inputFormatting, data, rows, columns, edition);
     const fixedSize = useMemo(() => ({
         top: sections.top.height,
         bottom: sections.bottom.height,
@@ -127,14 +175,27 @@ export function StateProvider(props) {
     const setEditedCells = useChangeCallback(props.editedCells, props.onEditedCellsChange, compareEditedCells);
     const setHoveredCell = useChangeCallback(props.hoveredCell, props.onHoveredCellChange, compareCells);
     const setFocusedCell = useChangeCallback(props.focusedCell, props.onFocusedCellChange, compareCells);
+    const setFilters = useChangeCallback(props.filters, props.onFiltersChange, compareFilters);
     const addSelectedCells = useCallback(cells => setSelectedCells(oldSelectedCells => { // TODO: Should the selected cells include info about the section?
         const selection = new Selection(cells);
         return [...cells, ...oldSelectedCells.filter(cell => !selection.isIdSelected(cell.rowId, cell.columnId))];
     }), [setSelectedCells]);
     const addEditedCells = useCallback(cells => setEditedCells(oldEditedCells => {
         const edition = new Edition(cells);
-        return [...cells, ...oldEditedCells.filter(cell => !edition.hasIdValue(cell.rowId, cell.columnId))];
+        return [...cells, ...oldEditedCells.filter(cell => !edition.hasValueById(cell.rowId, cell.columnId))];
     }), [setEditedCells]);
+    const addFilters = useCallback(filters => setFilters(oldFilters => {
+        const filtering = new Filtering(filters);
+        return [...filters, ...oldFilters.filter(filter => !filtering.hasValueById(filter.rowId, filter.columnId))];
+    }), [setFilters]);
+    const removeEditedCells = useCallback(cells => setEditedCells(oldEditedCells => {
+        const selection = new Selection(cells);
+        return oldEditedCells.filter(cell => !selection.isIdSelected(cell.rowId, cell.columnId));
+    }), [setEditedCells]);
+    const removeFilters = useCallback(cells => setFilters(oldFilters => {
+        const selection = new Selection(cells);
+        return oldFilters.filter(filter => !selection.isIdSelected(filter.rowId, filter.columnId));
+    }), [setFilters]);
 
     useEffect(() => { console.log(props.selectedCells) }, [props.selectedCells]);
 
@@ -143,16 +204,13 @@ export function StateProvider(props) {
             data
         }), [data])],
         [ColumnsAndRowsContext, useMemo(() => ({
-            columns, rows, pinned, sections
-        }), [columns, rows, pinned, sections])],
-        [MeasuringContext, useMemo(() => ({
-            dataFormatResolverContext: dataFormatResolver
-        }), [dataFormatResolver])],
+            columns, rows, sections
+        }), [columns, rows, sections])],
         [InteractionsContext, useMemo(() => ({
-            selectedCells, selection, hoveredCell, focusedCell, inputFormatResolverContext: inputFormatResolver, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells
-        }), [selectedCells, selection, hoveredCell, focusedCell, inputFormatResolver, edition, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells])],
+            selectedCells, selection, hoveredCell, focusedCell, inputFormatResolver, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells, addFilters, removeEditedCells, removeFilters
+        }), [selectedCells, selection, hoveredCell, focusedCell, inputFormatResolver, setSelectedCells, setHighlightedCells, setHoveredCell, setEditedCells, setFocusedCell, addSelectedCells, addEditedCells, addFilters, removeEditedCells, removeFilters])],
         [RenderingContext, useMemo(() => ({
-            renderFormatResolverContext: renderFormatResolver
+            renderFormatResolver
         }), [renderFormatResolver])],
         [SizeContext, useMemo(() => ({
             fixedSize, totalSize, borderWidth
@@ -170,16 +228,13 @@ export function StateProvider(props) {
 export const useData = () => React.useContext(DataContext).data;
 export const useColumns = () => React.useContext(ColumnsAndRowsContext).columns;
 export const useRows = () => React.useContext(ColumnsAndRowsContext).rows;
-export const usePinned = () => React.useContext(ColumnsAndRowsContext).pinned;
 export const useSections = () => React.useContext(ColumnsAndRowsContext).sections;
-export const useDataFormatResolver = () => React.useContext(MeasuringContext).dataFormatResolverContext;
 export const useSelectedCells = () => React.useContext(InteractionsContext).selectedCells;
 export const useSelection = () => React.useContext(InteractionsContext).selection;
-export const useEdition = () => React.useContext(InteractionsContext).edition;
 export const useHoveredCell = () => React.useContext(InteractionsContext).hoveredCell;
 export const useFocusedCell = () => React.useContext(InteractionsContext).focusedCell;
-export const useRenderFormatResolver = () => React.useContext(RenderingContext).renderFormatResolverContext;
-export const useInputFormatResolver = () => React.useContext(InteractionsContext).inputFormatResolverContext;
+export const useRenderFormatResolver = () => React.useContext(RenderingContext).renderFormatResolver;
+export const useInputFormatResolver = () => React.useContext(InteractionsContext).inputFormatResolver;
 export const useSetSelectedCells = () => React.useContext(InteractionsContext).setSelectedCells;
 export const useSetHighlightedCells = () => React.useContext(InteractionsContext).setHighlightedCells;
 export const useSetEditedCells = () => React.useContext(InteractionsContext).setEditedCells;
@@ -187,6 +242,9 @@ export const useSetHoveredCell = () => React.useContext(InteractionsContext).set
 export const useSetFocusedCell = () => React.useContext(InteractionsContext).setFocusedCell;
 export const useAddSelectedCells = () => React.useContext(InteractionsContext).addSelectedCells;
 export const useAddEditedCells = () => React.useContext(InteractionsContext).addEditedCells;
+export const useAddFilters = () => React.useContext(InteractionsContext).addFilters;
+export const useRemoveEditedCells = () => React.useContext(InteractionsContext).removeEditedCells;
+export const useRemoveFilters = () => React.useContext(InteractionsContext).removeFilters;
 export const useFixedSize = () => React.useContext(SizeContext).fixedSize;
 export const useTotalSize = () => React.useContext(SizeContext).totalSize;
 export const useBorderWidth = () => React.useContext(SizeContext).borderWidth;

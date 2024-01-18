@@ -14,6 +14,11 @@ const GridInput = forwardRef(({ text, onTextChange, placement, isValid }, ref) =
             case 'Enter':
             case 'Escape':
                 break;
+            case 'Delete':
+            case 'Backspace':
+                if (internalText.current !== '')
+                    event.stopPropagation();
+                break;
             default:
                 event.stopPropagation();
                 break;
@@ -49,6 +54,7 @@ const GridInput = forwardRef(({ text, onTextChange, placement, isValid }, ref) =
     if (!placement)
         return <></>;
 
+    // TODO: It's currently not possible to clear the text as the input hides before the text is cleared.
     return <input
         ref={setElementAndRef}
         autoFocus

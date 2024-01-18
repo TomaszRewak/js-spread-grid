@@ -7,7 +7,7 @@ const defaultColumns = data => data.length > 0 ? Object.keys(data[0]).map(key =>
 const defaultRows = data => [{ id: 'top-header', type: 'HEADER', height: 20 }, ...data.map((_, index) => ({ id: index, height: 20 }))];
 const defaultFormatting = [];
 const defaultDataSelector = ({data, row, column}) => data[row.id][column.id];
-const defaultPinnedTop = 1;
+const defaultPinnedTop = 0;
 const defaultPinnedBottom = 0;
 const defaultPinnedLeft = 0;
 const defaultPinnedRight = 0;
@@ -17,6 +17,7 @@ export default function SpreadGrid(props) {
     const [localSelectedCells, setLocalSelectedCells] = useState([]);
     const [localHighlightedCells, setLocalHighlightedCells] = useState([]);
     const [localEditedCells, setLocalEditedCells] = useState([]);
+    const [localFilters, setLocalFilters] = useState([]);
     const [localHoveredCell, setLocalHoveredCell] = useState(null);
     const [localFocusedCell, setLocalFocusedCell] = useState(null);
 
@@ -32,6 +33,7 @@ export default function SpreadGrid(props) {
     const selectedCells = 'selectedCells' in props ? props.selectedCells : localSelectedCells;
     const highlightedCells = 'highlightedCells' in props ? props.highlightedCells : localHighlightedCells;
     const editedCells = 'editedCells' in props ? props.editedCells : localEditedCells;
+    const filters = 'filters' in props ? props.filters : localFilters;
     const hoveredCell = 'hoveredCell' in props ? props.hoveredCell : localHoveredCell;
     const focusedCell = 'focusedCell' in props ? props.focusedCell : localFocusedCell;
     const borderWidth = 'borderWidth' in props ? props.borderWidth : defaultBorderWidth;
@@ -47,6 +49,10 @@ export default function SpreadGrid(props) {
     const onEditedCellsChange = editedCells => {
         setLocalEditedCells(editedCells);
         props.onEditedCellsChange?.(editedCells);
+    }
+    const onFiltersChange = filters => {
+        setLocalFilters(filters);
+        props.onFiltersChange?.(filters);
     }
     const onHoveredCellChange = hoveredCell => {
         setLocalHoveredCell(hoveredCell);
@@ -71,12 +77,14 @@ export default function SpreadGrid(props) {
             selectedCells={selectedCells}
             highlightedCells={highlightedCells}
             editedCells={editedCells}
+            filters={filters}
             hoveredCell={hoveredCell}
             focusedCell={focusedCell}
             borderWidth={borderWidth}
             onSelectedCellsChange={onSelectedCellsChange}
             onHighlightedCellsChange={onHighlightedCellsChange}
             onEditedCellsChange={onEditedCellsChange}
+            onFiltersChange={onFiltersChange}
             onHoveredCellChange={onHoveredCellChange}
             onFocusedCellChange={onFocusedCellChange}
         >

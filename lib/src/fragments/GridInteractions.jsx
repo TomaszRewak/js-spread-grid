@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import stringifyId from '../utils/stringifyId';
 import { useFocus, useInteraction, useIsMouseDown, useMousePosition } from '../contexts/MouseAndKeyboardContext';
-import { useAddEditedCells, useAddSelectedCells, useBorderWidth, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useInputFormatResolver, useRows, useSelectedCells, useSetEditedCells, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
+import { useAddEditedCells, useAddFilters, useAddSelectedCells, useBorderWidth, useColumns, useFixedSize, useFocusedCell, useHoveredCell, useInputFormatResolver, useRemoveEditedCells, useRemoveFilters, useRows, useSelectedCells, useSetEditedCells, useSetFilters, useSetFocusedCell, useSetHighlightedCells, useSetHoveredCell, useSetSelectedCells, useTotalSize } from '../contexts/StateContext';
 import { useClientSize, useScrollOffset } from '../contexts/SizeAndScrollContext';
 import { useState } from 'react';
 import GridInput from './GridInput';
@@ -127,6 +127,14 @@ function findHighlightedCells(focusedCell, hoveredCell, columns, rows, columnLoo
     });
 }
 
+function getCellType(column, row) {
+    if (column.type === 'FILTER' ^ row.type === 'FILTER')
+        return 'FILTER';
+    if (column.type === 'DATA' && row.type === 'DATA')
+        return 'DATA';
+    return 'OTHER';
+}
+
 function getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup) {
     return selectedCells.map(cell => {
         const columnKey = stringifyId(cell.columnId);
@@ -142,7 +150,8 @@ function getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup
 
         return {
             edit: formatResolver.resolve(row, column).edit,
-            cell: cell
+            cell: cell,
+            type: getCellType(column, row)
         }
     }).filter(cell => cell?.edit);
 }
@@ -169,6 +178,9 @@ export default function GridInteractions() {
     const setFocusedCell = useSetFocusedCell();
     const addSelectedCells = useAddSelectedCells();
     const addEditedCells = useAddEditedCells();
+    const addFilters = useAddFilters();
+    const removeEditedCells = useRemoveEditedCells();
+    const removeFilters = useRemoveFilters();
 
     const columns = useColumns();
     const rows = useRows();
@@ -322,9 +334,19 @@ export default function GridInteractions() {
             if (!editableCells.every(cell => cell.edit.validate({ string: text })))
                 return;
 
-            addEditedCells(editableCells.map(cell => ({ ...cell.cell, value: text })));
+            const dataCells = editableCells.filter(cell => cell.type === 'DATA');
+            const filterCells = editableCells.filter(cell => cell.type === 'FILTER');
+
+            addEditedCells(dataCells.map(cell => ({ ...cell.cell, value: cell.edit.parse({ string: text }) })));
+            addFilters(filterCells.map(cell => ({ ...cell.cell, expression: cell.edit.parse({ string: text }) })));
+
             setText('');
         };
+
+        const clear = () => {
+            removeEditedCells(selectedCells);
+            removeFilters(selectedCells);
+        }
 
         switch (event.key) {
             case 'Escape':
@@ -350,6 +372,11 @@ export default function GridInteractions() {
             case 'ArrowRight':
                 preventDefault();
                 arrowHorizontally(event.ctrlKey ? columns.length : 1, event);
+                break;
+            case 'Delete':
+            case 'Backspace':
+                console.log('delete');
+                clear();
                 break;
             default:
                 return;
