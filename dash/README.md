@@ -1,6 +1,8 @@
-# dash-spread-grid
+# dash spread grid
 
-dash-spread-grid is a Dash component library.
+dash spread grid is a Dash component library.
+
+Fast grid for Dash applications
 
 Get started with:
 1. Install Dash and its dependencies: https://dash.plotly.com/installation

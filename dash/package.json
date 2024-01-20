@@ -1,19 +1,26 @@
 {
   "name": "dash_spread_grid",
   "version": "0.0.1",
-  "description": "Project Description",
+  "description": "Fast grid for Dash applications",
+"repository": {
+    "type": "git",
+    "url": "git://github.com/https://github.com/TomaszRewak/js-spread-grid/dash-spread-grid.git"
+  },
+  "bugs": {
+    "url": "https://github.com/https://github.com/TomaszRewak/js-spread-grid/dash-spread-grid/issues"
+  },
+  "homepage": "https://github.com/https://github.com/TomaszRewak/js-spread-grid/dash-spread-grid",
   "main": "build/index.js",
   "scripts": {
     "start": "webpack serve --config ./webpack.serve.config.js --open",
     "validate-init": "python _validate_init.py",
     "prepublishOnly": "npm run validate-init",
+    "copy-source": "rsync -a --delete ./../lib/src/ ./src/lib/lib",
     "build:js": "webpack --mode production",
     "build:backends": "dash-generate-components ./src/lib/components dash_spread_grid -p package-info.json --r-prefix '' --jl-prefix '' --ignore \\.test\\.",
-    "build:backends-activated": "(. venv/bin/activate || venv\\scripts\\activate && npm run build:py_and_r)",
-    "build": "npm run build:js && npm run build:backends",
-    "build:activated": "npm run build:js && npm run build:backends-activated",
-    "watch": "watch 'npm run build' ./../src",
-    "test": "jest ./../src"
+    "build:backends-activated": "(. venv/bin/activate || venv\\scripts\\activate && npm run build:backends)",
+    "build": "npm run copy-source && npm run build:js && npm run build:backends",
+    "build:activated": "npm run build:js && npm run build:backends-activated"
   },
   "author": "Tomasz Rewak <tomasz.rewak@gmail.com>",
   "license": "MIT",
@@ -35,15 +42,12 @@
     "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-react": "^7.14.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "jest": "^29.7.0",
     "prop-types": "^15.8.1",
     "react": "^16.8.6",
     "react-docgen": "^5.4.3",
     "react-dom": "^16.8.6",
     "style-loader": "^3.3.3",
     "styled-jsx": "^5.1.2",
-    "watch": "^0.13.0",
     "webpack": "^5.84.1",
     "webpack-cli": "^5.1.1",
     "webpack-dev-server": "^4.15.0"

@@ -1,5 +1,5 @@
 {
-  "extends": ["eslint:recommended", "prettier", "plugin:react/recommended", "plugin:react-hooks/recommended"],
+  "extends": ["eslint:recommended", "prettier"],
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 6,
@@ -29,7 +29,6 @@
   },
   "plugins": [
     "react",
-    "react-hooks",
     "import"
   ],
   "rules": {
@@ -101,7 +100,6 @@
     "react/no-unknown-property": ["error"],
     "react/prefer-es6-class": ["error", "always"],
     "react/prop-types": "error",
-    "react-hooks/exhaustive-deps": ["error"],
     "valid-jsdoc": ["off"],
     "yoda": ["error"],
     "spaced-comment": ["error", "always", {
@@ -119,14 +117,5 @@
         "ignore": [-1, 0, 1, 2, 3, 100, 10, 0.5]
     }],
     "no-underscore-dangle": ["off"]
-  },
-  "overrides": [
-    {
-      "files": ["*.react.js"],
-      "excludedFiles": ["src/lib/components/*.react.js"],
-      "rules": {
-        "react/prop-types": "off"
-      }
-    }
-  ]
+  }
 }

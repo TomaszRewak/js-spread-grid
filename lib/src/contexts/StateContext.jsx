@@ -166,8 +166,8 @@ export function StateProvider(props) {
         right: sections.right.width
     }), [sections.top.height, sections.bottom.height, sections.left.width, sections.right.width]);
     const totalSize = useMemo(() => ({
-        width: columns.at(-1).rightWithBorder,
-        height: rows.at(-1).bottomWithBorder
+        width: columns.length ? columns.at(-1).rightWithBorder : 0,
+        height: rows.length ? rows.at(-1).bottomWithBorder : 0
     }), [columns, rows]);
 
     const setSelectedCells = useChangeCallback(props.selectedCells, props.onSelectedCellsChange, compareSelectedCells);
