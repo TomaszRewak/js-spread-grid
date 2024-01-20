@@ -1,29 +1,11 @@
 /* eslint-disable import/prefer-default-export */
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import SpreadGrid from '../../../../src/components/SpreadGrid';
+import SpreadGrid from './../lib/components/SpreadGrid';
 
 function isString(value) {
     return typeof value === 'string' || value instanceof String;
-}
-
-function useResolvedColumns(columns) {
-    return useMemo(() => {
-        if (isString(columns))
-            return eval(`(data) => (${columns})`);
-
-        return columns;
-    }, [columns]);
-}
-
-function useResolvedRows(rows) {
-    return useMemo(() => {
-        if (isString(rows))
-            return eval(`(data) => (${rows})`);
-
-        return rows;
-    }, [rows]);
 }
 
 function useResolvedFormatting(formatting) {
@@ -36,27 +18,17 @@ function useResolvedFormatting(formatting) {
             if ('row' in rule)
                 mappedRule.row = rule.row;
             if ('condition' in rule)
-                mappedRule.condition = eval(`(data, rows, columns, row, column, value) => (${rule.condition})`);
+                mappedRule.condition = eval(`({data, rows, columns, row, column, value, newValue, text}) => (${rule.condition})`);
             if ('style' in rule)
-                mappedRule.style = isString(rule.style) ? eval(`(data, rows, columns, row, column, value) => (${rule.style})`) : rule.style;
+                mappedRule.style = isString(rule.style) ? eval(`({data, rows, columns, row, column, value, newValue, text}) => (${rule.style})`) : rule.style;
             if ('value' in rule)
-                mappedRule.value = eval(`(data, rows, columns, row, column, value) => (${rule.value})`);
+                mappedRule.value = eval(`({data, rows, columns, row, column, value, newValue, text})=> (${rule.value})`);
+            if ('text' in rule)
+                mappedRule.text = eval(`({data, rows, columns, row, column, value, newValue, text}) => (${rule.text})`);
 
             return mappedRule;
         });
     }, [formatting]);
-}
-
-function useCombinedFormatting(defaultFormatting, formatting) {
-    const resolvedDefaultFormatting = useResolvedFormatting(defaultFormatting);
-    const resolvedFormatting = useResolvedFormatting(formatting);
-
-    return useMemo(() => {
-        return [
-            ...resolvedDefaultFormatting,
-            ...resolvedFormatting
-        ];
-    }, [resolvedDefaultFormatting, resolvedFormatting]);
 }
 
 // TODO: Write description
@@ -65,40 +37,31 @@ function DashSpreadGrid(props) {
     console.count('render DashSpreadGrid');
 
     const data = props.data;
-    const columns = useResolvedColumns(props.columns);
-    const columnsLeft = useResolvedColumns(props.columnsLeft);
-    const columnsRight = useResolvedColumns(props.columnsRight);
-    const rows = useResolvedRows(props.rows);
-    const rowsTop = useResolvedRows(props.rowsTop);
-    const rowsBottom = useResolvedRows(props.rowsBottom);
-    const formatting = useCombinedFormatting(props.defaultFormatting, props.formatting);
-    const hoveredCell = props.hoveredCell;
-    const focusedCell = props.focusedCell;
-    const selectedCells = props.selectedCells;
+    const columns = props.columns;
+    const rows = props.rows;
+    const formatting = useResolvedFormatting(props.formatting);
+    const pinnedTop = props.pinnedTop;
+    const pinnedBottom = props.pinnedBottom;
+    const pinnedLeft = props.pinnedLeft;
+    const pinnedRight = props.pinnedRight;
 
     // eslint-disable-next-line react/prop-types
-    const setProps = props.setProps;
+    // const setProps = props.setProps;
 
-    const setSelectedCells = useCallback(selectedCells => setProps({ selectedCells }), [setProps]);
-    const setHoveredCell = useCallback(hoveredCell => setProps({ hoveredCell }), [setProps]);
-    const setFocusedCell = useCallback(focusedCell => setProps({ focusedCell }), [setProps]);
+    // const setSelectedCells = useCallback(selectedCells => setProps({ selectedCells }), [setProps]);
+    // const setHoveredCell = useCallback(hoveredCell => setProps({ hoveredCell }), [setProps]);
+    // const setFocusedCell = useCallback(focusedCell => setProps({ focusedCell }), [setProps]);
 
     return (
         <SpreadGrid
             data={data}
-            columnsLeft={columnsLeft}
             columns={columns}
-            columnsRight={columnsRight}
-            rowsTop={rowsTop}
             rows={rows}
-            rowsBottom={rowsBottom}
-            selectedCells={selectedCells}
-            hoveredCell={hoveredCell}
-            focusedCell={focusedCell}
             formatting={formatting}
-            onSelectedCellsChange={setSelectedCells}
-            onHoveredCellChange={setHoveredCell}
-            onFocusedCellChange={setFocusedCell}
+            pinnedTop={pinnedTop}
+            pinnedBottom={pinnedBottom}
+            pinnedLeft={pinnedLeft}
+            pinnedRight={pinnedRight}
         />
     );
 };
@@ -106,79 +69,35 @@ function DashSpreadGrid(props) {
 // TODO: add descriptions
 // TODO: Fix types
 DashSpreadGrid.propTypes = {
-    //
+    // _
     id: PropTypes.string,
-    //
+    // _
     data: PropTypes.array,
-    //
-    columns: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-    //
-    columnsLeft: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-    //
-    columnsRight: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-    //
-    rows: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-    //
-    rowsTop: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-    //
-    rowsBottom: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-    //
-    defaultFormatting: PropTypes.arrayOf(PropTypes.any), // TODO: Fix type
-    //
-    formatting: PropTypes.arrayOf(
-        PropTypes.shape({
-            column: PropTypes.oneOfType([
-                PropTypes.shape({ match: PropTypes.oneOf(['ANY', 'LEFT', 'RIGHT', 'HEADER']) }),
-                PropTypes.shape({ id: PropTypes.any }),
-                PropTypes.shape({ index: PropTypes.number }),
-            ]),
-            row: PropTypes.oneOfType([
-                PropTypes.shape({ match: PropTypes.oneOf(['ANY', 'TOP', 'BOTTOM', 'HEADER']) }),
-                PropTypes.shape({ id: PropTypes.any }),
-                PropTypes.shape({ index: PropTypes.number }),
-            ]),
-            condition: PropTypes.string,
-            // TODO: Make this also accept style objects
-            style: PropTypes.oneOfType([PropTypes.string, PropTypes.any]),
-            text: PropTypes.string
-        })
-    ),
-    //
-    hoveredCell: PropTypes.shape({
-        rowId: PropTypes.any,
-        columnId: PropTypes.any
-    }),
-    //
-    focusedCell: PropTypes.shape({
-        rowId: PropTypes.any,
-        columnId: PropTypes.any
-    }),
-    //
-    selectedCells: PropTypes.arrayOf(
-        PropTypes.shape({
-            rowId: PropTypes.any,
-            columnId: PropTypes.any
-        })
-    )
+    // _
+    columns: PropTypes.array,
+    // _
+    rows: PropTypes.array,
+    // _
+    formatting: PropTypes.array,
+    // _
+    pinnedTop: PropTypes.number,
+    // _
+    pinnedBottom: PropTypes.number,
+    // _
+    pinnedLeft: PropTypes.number,
+    // _
+    pinnedRight: PropTypes.number,
 };
 
 DashSpreadGrid.defaultProps = {
     data: [],
-    columns: 'data.length > 0 ? Object.keys(data[0]).map((key) => ({id: key, header: key, width: 100})) : []',
-    columnsLeft: [],
-    columnsRight: [],
-    rows: 'data.map((_, index) => ({id: index, height: 20}))',
-    rowsTop: [{ type: 'HEADER', height: 20 }],
-    rowsBottom: [],
-    defaultFormatting: [
-        { column: { match: 'ANY' }, row: { match: 'HEADER' }, style: '{background: "#F5F5F5", border: {width: 1, color: "gray"}}', value: 'column.header' },
-        // TODO: Make sure that rules with "value" don't have any other fields
-        { value: 'data[row.id][column.id]' }
-    ],
+    columns: [],
+    rows: [],
     formatting: [],
-    hoveredCell: null,
-    focusedCell: null,
-    selectedCells: []
+    pinnedTop: 0,
+    pinnedBottom: 0,
+    pinnedLeft: 0,
+    pinnedRight: 0,
 };
 
 export default DashSpreadGrid;

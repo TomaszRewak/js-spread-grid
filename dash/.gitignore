@@ -289,5 +289,4 @@ man/
 src/jl
 src/*.jl
 
-# Temporary test files
-*.latest.png
+src/lib/lib/
