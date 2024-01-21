@@ -157,7 +157,6 @@ function getEditableCells(selectedCells, formatResolver, columnLookup, rowLookup
 }
 
 export default function GridInteractions() {
-    // console.count('render GridInteractions');
     const [text, setText] = useState('');
     const [input, setInput] = useState(null);
 
@@ -261,8 +260,6 @@ export default function GridInteractions() {
     });
 
     useInteraction('keydown', event => {
-        console.log('onKeyDown', event.key);
-
         const arrowTo = (cell, event) => {
             setFocusedCell(cell);
 
@@ -375,7 +372,6 @@ export default function GridInteractions() {
                 break;
             case 'Delete':
             case 'Backspace':
-                console.log('delete');
                 clear();
                 break;
             default:
@@ -404,7 +400,6 @@ export default function GridInteractions() {
     });
 
     useInteraction('focus', () => {
-        console.log('refocusing on input');
         input?.focus();
     });
 

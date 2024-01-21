@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef } from "react";
 import useDeepState from "../hooks/useDeepState";
 import useEventListener from "../hooks/useEventListener";
+import useThrottled from "../hooks/useThrottled";
 
 const MouseAndKeyboardContext = createContext();
 
@@ -76,8 +77,10 @@ export function MouseAndKeyboardProvider({ element, children }) {
         interactions
     }), [mousePosition, isMouseDown, focus]);
 
+    const throttledValue = useThrottled(value);
+
     return (
-        <MouseAndKeyboardContext.Provider value={value}>
+        <MouseAndKeyboardContext.Provider value={throttledValue}>
             {children}
         </MouseAndKeyboardContext.Provider>
     );

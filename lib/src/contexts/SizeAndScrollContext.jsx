@@ -2,6 +2,7 @@ import React, { createContext, useContext, useMemo } from "react";
 import useDeepState from "../hooks/useDeepState";
 import useEventListener from "../hooks/useEventListener";
 import useDomObserver from "../hooks/useDomObserver";
+import useThrottled from "../hooks/useThrottled";
 
 const SizeAndScrollContext = createContext();
 
@@ -42,8 +43,10 @@ export function SizeAndScrollProvider({ element, children }) {
         clientSize
     }), [scrollOffset, size, clientSize]);
 
+    const throttledValue = useThrottled(value);
+
     return (
-        <SizeAndScrollContext.Provider value={value}>
+        <SizeAndScrollContext.Provider value={throttledValue}>
             {children}
         </SizeAndScrollContext.Provider>
     );

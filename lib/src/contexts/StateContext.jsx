@@ -197,8 +197,6 @@ export function StateProvider(props) {
         return oldFilters.filter(filter => !selection.isIdSelected(filter.rowId, filter.columnId));
     }), [setFilters]);
 
-    useEffect(() => { console.log(props.selectedCells) }, [props.selectedCells]);
-
     const contexts = [
         [DataContext, useMemo(() => ({
             data

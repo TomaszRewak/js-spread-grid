@@ -21,7 +21,7 @@ export function ScrollRectProvider({ children }) {
     const size = useSize();
     const scrollOffset = useScrollOffset();
 
-    const scrollRect = useRefMemo(previous => {
+    const value = useRefMemo(previous => {
         const prevScrollRect = previous || emptyRect;
 
         const totalRect = { left: 0, top: 0, ...totalSize };
@@ -43,7 +43,7 @@ export function ScrollRectProvider({ children }) {
     }, [fixedSize, size, scrollOffset]);
 
     return (
-        <ScrollRectContext.Provider value={scrollRect}>
+        <ScrollRectContext.Provider value={value}>
             {children}
         </ScrollRectContext.Provider>
     )

@@ -32,7 +32,9 @@ export default function GridCanvas({
 
     // TODO: Read and apply: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas?retiredLocale=pl
     // TODO: Redraw only the cells that have actually changed
+    console.log('draw required');
     useEffect(() => {
+        console.log('draw requested');
         const draw = () => {
             if (!canvas)
                 return;
@@ -42,7 +44,7 @@ export default function GridCanvas({
 
             // TODO: Borders are still blurry after scrolling at high zoom-out levels
 
-            const ctx = canvas.getContext("2d");
+            const ctx = canvas.getContext("2d", { alpha: false });
             // TODO: Make that "1" configurable as cell spacing
             const borderOffset = borderWidth / 2;
             const rowCount = rows.length;
