@@ -6,8 +6,8 @@ function App() {
     const [offset, setOffset] = React.useState(0);
     // useEffect(() => {
     //     const interval = setInterval(() => {
-    //         setOffset(Math.random() * 1000);
-    //     }, 100);
+    //         setOffset(Math.round(Math.random() * 1000));
+    //     }, 50);
     //     return () => clearInterval(interval);
     // }, []);
 
