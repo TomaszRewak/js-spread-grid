@@ -30,148 +30,146 @@ function App() {
     }));
 
     return (
-        <div style={{ maxHeight: 'calc(100vh - 20px)', display: 'flex' }}>
-            <SpreadGrid
-                data={data}
-                columns={columns}
-                pinnedLeft={2}
-                pinnedRight={1}
-                rows={[
-                    { id: 'a', type: 'HEADER', height: 20 },
-                    ...rows.slice(0, 4),
-                    { id: 'b', type: 'HEADER', height: 20 },
-                    { id: 'search_row', type: 'FILTER', height: 20 },
-                    ...rows.slice(4, -2),
-                    { id: 'c', type: 'HEADER', height: 20 },
-                    ...rows.slice(-2),
-                    { id: 'd', type: 'HEADER', height: 20 }
-                ]}
-                pinnedTop={7}
-                pinnedBottom={4}
-                formatting={[
-                    {
-                        row: { id: 'search_row' },
-                        column: { id: 'column_8' },
-                        edit: {
-                            validate: ({ string }) => !isNaN(Number(string)),
-                            parse: ({ string }) => Number(string),
-                        }
-                    },
-                    {
-                        column: { id: 'column_8' },
-                        condition: ({ row }) => !row.pinned,
-                        filter: {
-                            by: { type: 'ROW', id: 'search_row' },
-                            condition: ({ value, expression }) => value > expression
-                        }
-                    },
-                    {
-                        column: { id: 'column_9' },
-                        condition: ({ row }) => !row.pinned,
-                        filter: {
-                            by: { type: 'ROW', id: 'search_row' },
-                            condition: ({ value, expression }) => `${value}`.includes(expression)
-                        }
-                    },
-                    {
-                        condition: ({ row }) => row.index % 2 === 0,
-                        style: { background: '#fbfbfb' }
-                    },
-                    {
-                        condition: ({ column, row }) => row.key < 25 && column.index > 3,
-                        edit: {
-                            validate: ({ string }) => !isNaN(Number(string)),
-                            parse: ({ string }) => Number(string),
-                        },
-                        value: context => 'newValue' in context ? context.newValue : context.value,
-                    },
-                    {
-                        column: { id: 'column_11' },
-                        style: ({ value }) => ({ background: `rgb(${value % 255}, 100, 100)` })
-                    },
-                    {
-                        column: { id: 'column_5' },
-                        style: { background: 'lightgreen' }
-                    },
-                    {
-                        row: { id: 6 },
-                        style: { background: 'lightblue' }
-                    },
-                    {
-                        row: { id: 6 },
-                        column: { id: 'column_5' },
-                        style: { background: 'lightcoral' }
-                    },
-                    {
-                        column: { id: 'column_13' },
-                        draw: ({ ctx, value, column, row }) => {
-                            ctx.fillStyle = 'pink';
-                            ctx.fillRect(4, 4, Math.min(value / 20, column.width - 8), row.height - 8);
-                        }
-                    },
-                    {
-                        row: { id: 5 },
-                        column: { id: 'column_5' },
-                        style: { borderLeft: { width: 3 }, borderTop: { width: 3 }, borderRight: { width: 3 } }
-                    },
-                    {
-                        row: { id: 6 },
-                        column: { id: 'column_4' },
-                        style: { borderLeft: { width: 3 }, borderTop: { width: 3 }, borderBottom: { width: 3 } }
-                    },
-                    {
-                        row: { id: 6 },
-                        column: { id: 'column_6' },
-                        style: { borderTop: { width: 3 }, borderBottom: { width: 3 }, borderRight: { width: 3 } }
-                    },
-                    {
-                        row: { id: 7 },
-                        column: { id: 'column_5' },
-                        style: { borderLeft: { width: 3 }, borderRight: { width: 3 }, borderBottom: { width: 3 } }
-                    },
-                    {
-                        column: { index: 0 },
-                        style: { borderLeft: { width: 1 } }
-                    },
-                    {
-                        column: { index: 1 },
-                        style: { borderRight: { width: 1, color: 'red' }, background: 'lightgrey' }
-                    },
-                    {
-                        column: { index: 6 },
-                        style: { borderLeft: { width: 5, dash: [15, 15] }, borderRight: { width: 5, dash: [15, 15] }, background: 'lightgrey' }
-                    },
-                    {
-                        condition: ({ value }) => value < 100,
-                        text: ({ value }) => `small [${value}]`
-                    },
-                    {
-                        row: { id: 20 },
-                        text: 'ABCDEFGHIJKLMNOPQRSTUVXYZ'
-                    },
-                    {
-                        column: { id: 'column_5' },
-                        style: { textAlign: 'right' }
-                    },
-                    {
-                        column: { id: 'column_3' },
-                        style: { textAlign: 'center', textBaseline: 'bottom' }
-                    },
-                    {
-                        row: { id: 101 },
-                        style: { textBaseline: 'top' }
-                    },
-                    {
-                        row: { id: 102 },
-                        style: { textBaseline: 'middle' }
-                    },
-                    {
-                        row: { id: 103 },
-                        style: { textBaseline: 'bottom' }
+        <SpreadGrid
+            data={data}
+            columns={columns}
+            pinnedLeft={2}
+            pinnedRight={1}
+            rows={[
+                { id: 'a', type: 'HEADER', height: 20 },
+                ...rows.slice(0, 4),
+                { id: 'b', type: 'HEADER', height: 20 },
+                { id: 'search_row', type: 'FILTER', height: 20 },
+                ...rows.slice(4, -2),
+                { id: 'c', type: 'HEADER', height: 20 },
+                ...rows.slice(-2),
+                { id: 'd', type: 'HEADER', height: 20 }
+            ]}
+            pinnedTop={7}
+            pinnedBottom={4}
+            formatting={[
+                {
+                    row: { id: 'search_row' },
+                    column: { id: 'column_8' },
+                    edit: {
+                        validate: ({ string }) => !isNaN(Number(string)),
+                        parse: ({ string }) => Number(string),
                     }
-                ]}
-            />
-        </div>
+                },
+                {
+                    column: { id: 'column_8' },
+                    condition: ({ row }) => !row.pinned,
+                    filter: {
+                        by: { type: 'ROW', id: 'search_row' },
+                        condition: ({ value, expression }) => value > expression
+                    }
+                },
+                {
+                    column: { id: 'column_9' },
+                    condition: ({ row }) => !row.pinned,
+                    filter: {
+                        by: { type: 'ROW', id: 'search_row' },
+                        condition: ({ value, expression }) => `${value}`.includes(expression)
+                    }
+                },
+                {
+                    condition: ({ row }) => row.index % 2 === 0,
+                    style: { background: '#fbfbfb' }
+                },
+                {
+                    condition: ({ column, row }) => row.key < 25 && column.index > 3,
+                    edit: {
+                        validate: ({ string }) => !isNaN(Number(string)),
+                        parse: ({ string }) => Number(string),
+                    },
+                    value: context => 'newValue' in context ? context.newValue : context.value,
+                },
+                {
+                    column: { id: 'column_11' },
+                    style: ({ value }) => ({ background: `rgb(${value % 255}, 100, 100)` })
+                },
+                {
+                    column: { id: 'column_5' },
+                    style: { background: 'lightgreen' }
+                },
+                {
+                    row: { id: 6 },
+                    style: { background: 'lightblue' }
+                },
+                {
+                    row: { id: 6 },
+                    column: { id: 'column_5' },
+                    style: { background: 'lightcoral' }
+                },
+                {
+                    column: { id: 'column_13' },
+                    draw: ({ ctx, value, column, row }) => {
+                        ctx.fillStyle = 'pink';
+                        ctx.fillRect(4, 4, Math.min(value / 20, column.width - 8), row.height - 8);
+                    }
+                },
+                {
+                    row: { id: 5 },
+                    column: { id: 'column_5' },
+                    style: { borderLeft: { width: 3 }, borderTop: { width: 3 }, borderRight: { width: 3 } }
+                },
+                {
+                    row: { id: 6 },
+                    column: { id: 'column_4' },
+                    style: { borderLeft: { width: 3 }, borderTop: { width: 3 }, borderBottom: { width: 3 } }
+                },
+                {
+                    row: { id: 6 },
+                    column: { id: 'column_6' },
+                    style: { borderTop: { width: 3 }, borderBottom: { width: 3 }, borderRight: { width: 3 } }
+                },
+                {
+                    row: { id: 7 },
+                    column: { id: 'column_5' },
+                    style: { borderLeft: { width: 3 }, borderRight: { width: 3 }, borderBottom: { width: 3 } }
+                },
+                {
+                    column: { index: 0 },
+                    style: { borderLeft: { width: 1 } }
+                },
+                {
+                    column: { index: 1 },
+                    style: { borderRight: { width: 1, color: 'red' }, background: 'lightgrey' }
+                },
+                {
+                    column: { index: 6 },
+                    style: { borderLeft: { width: 5, dash: [15, 15] }, borderRight: { width: 5, dash: [15, 15] }, background: 'lightgrey' }
+                },
+                {
+                    condition: ({ value }) => value < 100,
+                    text: ({ value }) => `small [${value}]`
+                },
+                {
+                    row: { id: 20 },
+                    text: 'ABCDEFGHIJKLMNOPQRSTUVXYZ'
+                },
+                {
+                    column: { id: 'column_5' },
+                    style: { textAlign: 'right' }
+                },
+                {
+                    column: { id: 'column_3' },
+                    style: { textAlign: 'center', textBaseline: 'bottom' }
+                },
+                {
+                    row: { id: 101 },
+                    style: { textBaseline: 'top' }
+                },
+                {
+                    row: { id: 102 },
+                    style: { textBaseline: 'middle' }
+                },
+                {
+                    row: { id: 103 },
+                    style: { textBaseline: 'bottom' }
+                }
+            ]}
+        />
     );
 }
 
