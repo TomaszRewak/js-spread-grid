@@ -78,7 +78,7 @@ function App() {
                         style: { background: '#fbfbfb' }
                     },
                     {
-                        condition: ({ column, row }) => row.index < 25 && column.index > 3,
+                        condition: ({ column, row }) => row.key < 25 && column.index > 3,
                         edit: {
                             validate: ({ string }) => !isNaN(Number(string)),
                             parse: ({ string }) => Number(string),
