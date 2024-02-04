@@ -7,6 +7,9 @@
             "path": "../example"
         },
         {
+            "path": "../docs"
+        },
+        {
             "path": "../dash"
         },
         {
