@@ -1,4 +1,4 @@
-import { describe, it, expectScreenshot } from '../utils/puppeteerTesting'
+import { describe, it, expectScreenshot } from '../test-utils/puppeteerTesting';
 import SpreadGrid from './SpreadGrid';
 
 const generateSpreadGrid = (textAlign, textBaseline) => {
