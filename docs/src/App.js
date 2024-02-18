@@ -1,23 +1,32 @@
-import logo from './logo.svg';
 import './App.css';
+import SpreadGrid from './spread-grid/components/SpreadGrid';
 
 function App() {
+  const example = <SpreadGrid
+    data={[
+      { name: 'John', age: 25, score: 100 },
+      { name: 'Jane', age: 24, score: 90 },
+      { name: 'Jack', age: 26, score: 80 },
+    ]}
+  />;
+  const exampleCode = [
+    '<SpreadGrid',
+    '  data={[',
+    '    { name: \'John\', age: 25, score: 100 },',
+    '    { name: \'Jane\', age: 24, score: 90 },',
+    '    { name: \'Jack\', age: 26, score: 80 },',
+    '  ]}',
+    '/>'
+  ].join('\n');
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <code className="language-js">
+        <pre>
+          {exampleCode}
+        </pre>
+      </code>
+      {example}
     </div>
   );
 }
