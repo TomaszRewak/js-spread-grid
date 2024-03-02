@@ -1,0 +1,55 @@
+.CodeBlock {
+    --border-color: #3a3a3a;
+    --editor-background: #1f2229;
+
+    background-color: #282c34;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.CodeBlock-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 5px 5px 0 5px;
+}
+
+.CodeBlock-header button {
+    background: transparent;
+    border: solid var(--border-color);
+    border-width: 1px 1px 0 1px;
+    border-radius: 5px 5px 0 0;
+    color: white;
+    padding: 3px 10px;
+    margin: 0 5px -1px 0;
+}
+
+.CodeBlock-header button.selected {
+    background: var(--editor-background);
+}
+
+.CodeBlock-header button>span {
+    color: #ffffff22;
+}
+
+.CodeBlock-body {
+    background: var(--editor-background);
+    color: lightpink;
+    padding: 5px;
+    margin: 0;
+}
+
+.CodeBlock-footer {
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.CodeBlock-footer button {
+    background: transparent;
+    border: solid var(--border-color);
+    border-width: 0 0 0 1px;
+    color: #ffffff22;
+    padding: 3px 10px;
+}

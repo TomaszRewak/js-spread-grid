@@ -1,0 +1,17 @@
+.Example {
+    --background-color-1: #202228;
+    --background-color-2: #292c33;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #3a3a3a;
+    background: repeating-linear-gradient(45deg,
+            var(--background-color-1),
+            var(--background-color-1) 10px,
+            var(--background-color-2) 10px,
+            var(--background-color-2) 20px);
+}

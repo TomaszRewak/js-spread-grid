@@ -1,61 +1,62 @@
 import './App.css';
-import SpreadGrid from './spread-grid/components/SpreadGrid';
-import CodeBlock from './CodeBlock';
-import { Drawer, List, ListItem, ListItemButton } from '@mui/material';
+import Installation from './pages/basics/installation';
+import YourFirstGrid from './pages/basics/your-first-grid';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import Headers from './pages/columns-and-rows/headers';
+
+const routes = [
+  {
+    chapter: 'basics',
+    pages: [
+      { title: 'installation', page: Installation },
+      { title: 'your first grid', page: YourFirstGrid }
+    ]
+  },
+  {
+    chapter: 'columns and rows',
+    pages: [
+      { title: 'headers', page: Headers }
+    ]
+  }
+].map(({ chapter, pages }) => ({
+  chapter,
+  pages: pages.map(({ title, page }) => ({
+    title,
+    Page: page,
+    path: `/${chapter.replaceAll(' ', '-')}/${title.replaceAll(' ', '-')}`
+  }))
+}));
+
+console.dir(routes);
 
 function App() {
-  const example = <SpreadGrid
-    data={[
-      { name: 'John', age: 25, score: 100 },
-      { name: 'Jane', age: 24, score: 90 },
-      { name: 'Jack', age: 26, score: 80 },
-    ]}
-  />;
-  const exampleCode = [
-    {
-      framework: 'React',
-      grammar: 'javascript',
-      language: 'jsx',
-      code: [
-        '<SpreadGrid',
-        '  data={[',
-        '    { name: \'John\', age: 25, score: 100 },',
-        '    { name: \'Jane\', age: 24, score: 90 },',
-        '    { name: \'Jack\', age: 26, score: 80 },',
-        '  ]}',
-        '/>'
-      ].join('\n')
-    },
-    {
-      framework: 'js',
-      grammar: 'javascript',
-      language: 'javascript',
-      code: [
-        'createGrid(div, {',
-        '  data: [',
-        '    { name: \'John\', age: 25, score: 100 },',
-        '    { name: \'Jane\', age: 24, score: 90 },',
-        '    { name: \'Jack\', age: 26, score: 80 },',
-        '  ]',
-        '});'
-      ].join('\n')
-    }
-  ];
-
   return (
-    <>
-      <Drawer variant="permanent">
-        <List>
-          <ListItemButton>Item 1</ListItemButton>
-          <ListItemButton>Item 2</ListItemButton>
-          <ListItemButton>Item 3</ListItemButton>
-        </List>
-      </Drawer>
-      <main className="App">
-        <CodeBlock language="javascript" options={exampleCode} />
-        {example}
-      </main>
-    </>
+    <BrowserRouter>
+      <div className="App">
+        <div className="App-navbar">
+          {routes.map(({ chapter, pages }) => (
+            <>
+              <div className="App-navbar-header">{chapter}</div>
+              {pages.map(({ title, path }) => (
+                <Link key={title} to={path} className="App-navbar-item">{title}</Link>
+              ))}
+            </>
+          ))}
+        </div>
+        <div className="App-content">
+          <div className="App-content-body">
+            <Routes>
+              <Route path="/" element={<YourFirstGrid />} />
+              {routes.map(({ pages }) => (
+                pages.map(({ title, path, Page }) => (
+                  <Route key={title} path={path} element={<Page/>} />
+                ))
+              )).flat()}
+            </Routes>
+          </div>
+        </div>
+      </div>
+    </BrowserRouter>
   );
 }
 

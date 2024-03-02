@@ -1,8 +1,46 @@
 .App {
-  background-color: #282c34;
-  min-height: 100vh;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: "App-navbar App-content";
+  height: 100vh;
+  width: 100vw;
+}
+
+.App-navbar {
+  grid-area: App-navbar;
+  background-color: #171717;
+  color: white;
+  padding: 1rem;
+  font-size: 0.9em;
+}
+
+.App-navbar > .App-navbar-header {
+  margin-top: 10px;
+  color: #4b505d;
+  font-weight: bold;
+}
+
+.App-navbar > .App-navbar-item {
+  border-left: 1px solid #4c505c;
+  padding-left: 10px;
+  margin-left: 5px;
+  display: block;
+  text-decoration: none;
+  color: white;
+}
+
+.App-content {
+  grid-area: App-content;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  background-color: #1e1e1e;
+}
+
+.App-content-body {
+  width: 100%;
+  max-width: 800px;
+  padding: 1rem;
+  color: white;
 }
