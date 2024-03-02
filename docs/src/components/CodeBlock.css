@@ -2,15 +2,12 @@
     --border-color: #3a3a3a;
     --editor-background: #1f2229;
 
-    background-color: #282c34;
     border-radius: 10px;
-    border: 1px solid var(--border-color);
     margin-bottom: 10px;
     font-size: 0.9em;
 }
 
 .CodeBlock-header {
-    border-bottom: 1px solid var(--border-color);
     padding: 5px 5px 0 5px;
 }
 
@@ -34,22 +31,8 @@
 
 .CodeBlock-body {
     background: var(--editor-background);
+    border: 1px solid var(--border-color);
     color: lightpink;
     padding: 5px;
     margin: 0;
-}
-
-.CodeBlock-footer {
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-}
-
-.CodeBlock-footer button {
-    background: transparent;
-    border: solid var(--border-color);
-    border-width: 0 0 0 1px;
-    color: #ffffff22;
-    padding: 3px 10px;
 }

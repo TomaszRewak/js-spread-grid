@@ -7,7 +7,6 @@
     align-items: center;
     background: #ffffff;
     padding: 15px;
-    border-radius: 10px;
     border: 1px solid #3a3a3a;
     background: repeating-linear-gradient(45deg,
             var(--background-color-1),

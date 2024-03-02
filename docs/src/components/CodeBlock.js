@@ -58,9 +58,6 @@ export default function CodeBlock({ options }) {
             <pre className='CodeBlock-body'>
                 <code dangerouslySetInnerHTML={{ __html: html }} />
             </pre>
-            <div className='CodeBlock-footer'>
-                <button size='small'>copy</button>
-            </div>
         </div>
     );
 }
