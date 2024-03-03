@@ -4,10 +4,16 @@
             "path": "../lib"
         },
         {
+            "path": "../tests"
+        },
+        {
             "path": "../example"
         },
         {
             "path": "../docs"
+        },
+        {
+            "path": "../react"
         },
         {
             "path": "../dash"
@@ -21,7 +27,9 @@
         "jest.disabledWorkspaceFolders": [
             "root",
             "dash",
-            "docs"
+            "docs",
+            "react",
+            "tests"
         ]
     },
 }

@@ -2,7 +2,7 @@ import CodeBlock from "../../components/CodeBlock";
 import Example from "../../components/Example";
 import Header from "../../components/Header";
 import Paragraph from "../../components/Paragraph";
-import SpreadGrid from "../../spread-grid/components/SpreadGrid";
+import SpreadGrid from "../../components/SpreadGrid";
 
 export default function YourFirstGrid() {
   return (

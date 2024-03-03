@@ -1,12 +1,17 @@
 {
-    "name": "js-spread-grid",
+    "name": "react-spread-grid",
     "private": true,
+    "dependencies": {},
     "scripts": {
         "watch": "webpack --watch --mode=development",
         "build": "webpack --mode=production"
     },
     "devDependencies": {
+        "react": "^18.2.0",
         "webpack": "^5.90.3",
         "webpack-cli": "^5.1.4"
+    },
+    "peerDependencies": {
+        "react": "^18.2.0"
     }
 }
