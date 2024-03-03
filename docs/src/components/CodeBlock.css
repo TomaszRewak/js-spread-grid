@@ -16,13 +16,14 @@
     border: solid var(--border-color);
     border-width: 1px 1px 0 1px;
     border-radius: 5px 5px 0 0;
-    color: white;
+    color: #999999;
     padding: 3px 10px;
     margin: 0 5px -1px 0;
 }
 
 .CodeBlock-header button.selected {
     background: var(--editor-background);
+    color: white;
 }
 
 .CodeBlock-header button>span {

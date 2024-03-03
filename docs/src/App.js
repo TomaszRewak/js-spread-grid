@@ -3,6 +3,7 @@ import Installation from './pages/basics/installation';
 import YourFirstGrid from './pages/basics/your-first-grid';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import Headers from './pages/columns-and-rows/headers';
+import { Fragment } from 'react';
 
 const routes = [
   {
@@ -27,20 +28,18 @@ const routes = [
   }))
 }));
 
-console.dir(routes);
-
 function App() {
   return (
     <BrowserRouter>
       <div className="App">
         <div className="App-navbar">
           {routes.map(({ chapter, pages }) => (
-            <>
+            <Fragment key={chapter}>
               <div className="App-navbar-header">{chapter}</div>
               {pages.map(({ title, path }) => (
                 <Link key={title} to={path} className="App-navbar-item">{title}</Link>
               ))}
-            </>
+            </Fragment>
           ))}
         </div>
         <div className="App-content">
