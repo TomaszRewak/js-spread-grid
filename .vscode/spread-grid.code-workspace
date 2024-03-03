@@ -7,6 +7,9 @@
             "path": "../example"
         },
         {
+            "path": "../docs"
+        },
+        {
             "path": "../dash"
         },
         {
@@ -17,7 +20,8 @@
     "settings": {
         "jest.disabledWorkspaceFolders": [
             "root",
-            "dash"
+            "dash",
+            "docs"
         ]
     },
 }
