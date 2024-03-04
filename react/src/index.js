@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import createGrid from "../../lib/dist/main";
+import createGrid from "js-spread-grid";
 
 export default function SpreadGrid(props) {
     const [element, setElement] = useState(null);

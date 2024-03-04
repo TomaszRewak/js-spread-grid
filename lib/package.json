@@ -1,9 +1,11 @@
 {
     "name": "js-spread-grid",
-    "private": true,
+    "version": "1.0.0",
+    "main": "dist/index.js",
     "scripts": {
-        "watch": "webpack --watch --mode=development",
-        "build": "webpack --mode=production"
+        "watch": "webpack --watch --mode=development --output-library-type=umd --output-filename ./index.js",
+        "build": "webpack --mode=production --output-library-type=umd --output-filename ./index.js",
+        "prepublish": "npm run build"
     },
     "devDependencies": {
         "webpack": "^5.90.3",

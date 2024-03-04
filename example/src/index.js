@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import SpreadGrid from './spread-grid/components/SpreadGrid';
+import SpreadGrid from 'react-spread-gird';
 
 function App() {
     const [offset, setOffset] = React.useState(0);
