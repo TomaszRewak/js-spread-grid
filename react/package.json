@@ -1,17 +1,16 @@
 {
     "name": "react-spread-grid",
     "version": "1.0.0",
-    "main": "dist/index.js",
+    "main": "src/index.js",
     "scripts": {
-        "watch": "webpack --watch --mode=development --output-library-type=umd --output-filename ./index.js --externals react",
-        "build": "webpack --mode=production --output-library-type=umd --output-filename ./index.js --externals react",
+        "watch": "webpack --watch --mode=development --output-library-type=umd --output-filename ./index.js --externals=react",
+        "build": "webpack --mode=production --output-library-type=umd --output-filename ./index.js --externals=react",
         "prepublish": "npm run build"
     },
     "dependencies": {
         "js-spread-grid": "file:../lib"
     },
     "devDependencies": {
-        "react": "^18.2.0",
         "webpack": "^5.90.3",
         "webpack-cli": "^5.1.4"
     },

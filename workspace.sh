@@ -14,8 +14,8 @@ tmux send-keys -t "$workspace:2" "tmux kill-session -t $workspace"
 
 tmux new-window -t "$workspace:3" -n "js"
 tmux split-window -h -t "$workspace:3"
-tmux send-keys -t "$workspace:3.0" "cd js" C-m "npm run watch" C-m
-tmux send-keys -t "$workspace:3.1" "cd js" C-m "npm run build"
+tmux send-keys -t "$workspace:3.0" "cd lib" C-m "npm run watch" C-m
+tmux send-keys -t "$workspace:3.1" "cd lib" C-m "npm run build"
 
 tmux new-window -t "$workspace:4" -n "react"
 tmux split-window -h -t "$workspace:4"
