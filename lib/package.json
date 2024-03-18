@@ -3,9 +3,7 @@
     "version": "1.0.0",
     "main": "src/index.js",
     "scripts": {
-        "watch": "webpack --watch --mode=development --output-library-type=umd --output-filename ./index.js",
-        "build": "webpack --mode=production --output-library-type=umd --output-filename ./index.js",
-        "prepublish": "npm run build"
+        "build-bundle": "webpack --mode=production --output-library-type=umd --output-filename ./index.js"
     },
     "devDependencies": {
         "webpack": "^5.90.3",
