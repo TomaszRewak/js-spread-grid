@@ -1,3 +1,4 @@
 {
-    "jest.autoRun": "off"
+    "jest.autoRun": "off",
+    "jest.testCommand": "npm test"
 }

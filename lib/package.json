@@ -2,10 +2,13 @@
     "name": "js-spread-grid",
     "version": "1.0.0",
     "main": "src/index.js",
+    "type": "module",
     "scripts": {
-        "build-bundle": "webpack --mode=production --output-library-type=umd --output-filename ./index.js"
+        "build-bundle": "webpack --mode=production --output-library-type=umd --output-filename ./index.js",
+        "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
     },
     "devDependencies": {
+        "jest": "^29.7.0",
         "webpack": "^5.90.3",
         "webpack-cli": "^5.1.4"
     }
