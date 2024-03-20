@@ -3,17 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "react-spread-gird": "file:../react",
+    "js-spread-grid": "file:../lib",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "jest-image-snapshot": "^6.4.0",
+    "puppeteer": "18.1.0"
   },
   "scripts": {
     "start": "DISABLE_ESLINT_PLUGIN=true BROWSER=none react-scripts start",
-    "test": "react-scripts test"
+    "test": "node --experimental-vm-modules ./node_modules/.bin/react-scripts test"
   },
   "eslintConfig": {
     "extends": [
@@ -24,6 +26,11 @@
   "browserslist": {
     "development": [
       "last 1 chrome version"
+    ]
+  },
+  "jest": {
+    "testMatch": [
+      "<rootDir>/src/**/*.test.{js,jsx}"
     ]
   }
 }

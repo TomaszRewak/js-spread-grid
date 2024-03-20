@@ -2,6 +2,7 @@
     "name": "react-spread-grid",
     "version": "1.0.0",
     "main": "src/index.js",
+    "type": "module",
     "scripts": {},
     "dependencies": {
         "js-spread-grid": "file:../lib"

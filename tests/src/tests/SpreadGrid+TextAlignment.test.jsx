@@ -1,5 +1,5 @@
-import { describe, it, expectScreenshot } from '../test-utils/puppeteerTesting';
-import SpreadGrid from './SpreadGrid';
+import { describe, it, expectScreenshot } from '../test-utils/puppeteerTesting.js';
+import SpreadGrid from '../spread-grid.js';
 
 const generateSpreadGrid = (textAlign, textBaseline) => {
     return (

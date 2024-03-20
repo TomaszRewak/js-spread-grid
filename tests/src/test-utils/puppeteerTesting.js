@@ -24,10 +24,10 @@ export function describe(name, fn) {
 
             jest_globals.beforeAll(async () => {
                 server = child_process.spawn('npm', ['start'], {
-                    cwd: process.cwd() + '/test-env',
+                    cwd: process.cwd(),
                     env: {
                         ...process.env,
-                        REACT_APP_FILE_NAME: module.parent.filename.replace(process.cwd() + '/', './'),
+                        REACT_APP_FILE_NAME: module.parent.filename.replace(process.cwd() + '/src/', './'),
                         PORT: port
                     },
                     stdio: ['ignore', 'ignore', 'ignore'],

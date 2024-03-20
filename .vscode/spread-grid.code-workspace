@@ -29,7 +29,7 @@
             "dash",
             "docs",
             "react",
-            "tests"
+            "example"
         ]
     },
 }

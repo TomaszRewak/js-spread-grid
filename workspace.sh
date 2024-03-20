@@ -34,5 +34,8 @@ tmux split-window -h -t "$workspace:6"
 tmux send-keys -t "$workspace:6.0" "cd docs" C-m "PORT=3001 npm start" C-m
 tmux send-keys -t "$workspace:6.1" "cd docs" C-m "npm publish"
 
+tmux new-window -t "$workspace:7" -n "tests"
+tmux send-keys -t "$workspace:7" "cd tests" C-m "npm test"
+
 tmux select-window -t "$workspace:3"
 tmux attach-session -t "$workspace"
