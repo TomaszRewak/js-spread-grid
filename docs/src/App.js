@@ -4,6 +4,7 @@ import YourFirstGrid from './pages/basics/your-first-grid';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import Headers from './pages/columns-and-rows/headers';
 import { Fragment } from 'react';
+import Exceptions from './pages/error-handling/exceptions';
 
 const routes = [
   {
@@ -17,6 +18,12 @@ const routes = [
     chapter: 'columns and rows',
     pages: [
       { title: 'headers', page: Headers }
+    ]
+  },
+  {
+    chapter: 'error handling',
+    pages: [
+      { title: 'exceptions', page: Exceptions }
     ]
   }
 ].map(({ chapter, pages }) => ({
