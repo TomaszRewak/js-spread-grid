@@ -4,7 +4,8 @@ import YourFirstGrid from './pages/basics/your-first-grid';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import Headers from './pages/columns-and-rows/headers';
 import { Fragment } from 'react';
-import Exceptions from './pages/error-handling/exceptions';
+import ErrorOverlay from './pages/error-handling/error-overlay';
+import CellClick from './pages/events/cell-click';
 
 const routes = [
   {
@@ -21,9 +22,15 @@ const routes = [
     ]
   },
   {
+    chapter: 'events',
+    pages: [
+      { title: 'cell click', page: CellClick }
+    ]
+  },
+  {
     chapter: 'error handling',
     pages: [
-      { title: 'exceptions', page: Exceptions }
+      { title: 'error overlay', page: ErrorOverlay }
     ]
   }
 ].map(({ chapter, pages }) => ({

@@ -21,13 +21,13 @@ class ErrorBoundary extends Component {
   }
 }
 
-export default function Exceptions() {
+export default function ErrorOverlay() {
   return (
     <>
       <Header>Exceptions</Header>
       <SubHeader>Rendering errors</SubHeader>
       <Paragraph>
-        If an error is thrown while rendering the grid, the grid will not render and the error will be displayed to the user.
+        If an exception is thrown while rendering the grid, the grid will not be rendered and the error (together with the stack trace) will be displayed instead.
       </Paragraph>
       <CodeBlock options={[
         {
