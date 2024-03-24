@@ -57,12 +57,27 @@ export default function Filtering() {
                     data={[
                         { name: 'John', age: 25, score: 100 },
                         { name: 'Jane', age: 24, score: 90 },
-                        { name: 'Jack', age: 26, score: 80 }
+                        { name: 'Jack', age: 26, score: 80 },
+                        { name: 'Jill', age: 27, score: 70 },
+                        { name: 'James', age: 28, score: 60 },
+                        { name: 'Jenny', age: 29, score: 50 },
                     ]}
                     rows={[
                         { type: 'HEADER' },
-                        { type: 'FILTER' },
+                        { type: 'FILTER', id: 'search_row' },
                         { type: 'DATA-BLOCK' }
+                    ]}
+                    formatting={[
+                        {
+                            row: { match: 'DATA' },
+                            filter: {
+                                // TODO: Split into `type` and `by`
+                                // TODO: Make both optional
+                                // TODO: if both are omitted, support also providing just a function
+                                by: { type: 'ROW', id: 'search_row' },
+                                condition: ({ value, expression }) => `${value}`.includes(expression)
+                            }
+                        }
                     ]}
                 />
             </Example>
