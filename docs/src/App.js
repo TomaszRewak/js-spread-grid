@@ -6,6 +6,7 @@ import Headers from './pages/columns-and-rows/headers';
 import { Fragment } from 'react';
 import ErrorOverlay from './pages/error-handling/error-overlay';
 import CellClick from './pages/events/cell-click';
+import Filtering from './pages/data-shaping/filtering';
 
 const routes = [
   {
@@ -19,6 +20,12 @@ const routes = [
     chapter: 'columns and rows',
     pages: [
       { title: 'headers', page: Headers }
+    ]
+  },
+  {
+    chapter: 'data shaping',
+    pages: [
+      { title: 'filtering', page: () => <Filtering/> }
     ]
   },
   {
