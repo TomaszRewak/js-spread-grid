@@ -64,12 +64,11 @@ export default function Filtering() {
                     ]}
                     rows={[
                         { type: 'HEADER' },
-                        { type: 'FILTER', id: 'search_row' },
+                        { type: 'FILTER' },
                         { type: 'DATA-BLOCK' }
                     ]}
                     filtering={[
                         {
-                            by: 'search_row',
                             condition: ({ text, expression }) => text.includes(expression)
                         },
                     ]}

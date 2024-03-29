@@ -47,6 +47,18 @@ function App() {
             ]}
             pinnedTop={7}
             pinnedBottom={4}
+            filtering={[
+                {
+                    by: 'search_row',
+                    column: { id: 'column_8' },
+                    condition: ({ value, expression }) => value > expression
+                },
+                {
+                    by: 'search_row',
+                    column: { id: 'column_9' },
+                    condition: ({ value, expression }) => `${value}`.includes(expression)
+                }
+            ]}
             formatting={[
                 {
                     row: { id: 'search_row' },
@@ -54,22 +66,7 @@ function App() {
                     edit: {
                         validate: ({ string }) => !isNaN(Number(string)),
                         parse: ({ string }) => Number(string),
-                    }
-                },
-                {
-                    column: { id: 'column_8' },
-                    condition: ({ row }) => !row.pinned,
-                    filter: {
-                        by: { type: 'ROW', id: 'search_row' },
-                        condition: ({ value, expression }) => value > expression
-                    }
-                },
-                {
-                    column: { id: 'column_9' },
-                    condition: ({ row }) => !row.pinned,
-                    filter: {
-                        by: { type: 'ROW', id: 'search_row' },
-                        condition: ({ value, expression }) => `${value}`.includes(expression)
+                        autoCommit: true
                     }
                 },
                 {
