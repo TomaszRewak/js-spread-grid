@@ -63,14 +63,9 @@ export default function Filtering() {
                         { name: 'Jenny', age: 29, score: 50 },
                     ]}
                     rows={[
-                        { type: 'HEADER' },
                         { type: 'FILTER' },
-                        { type: 'DATA-BLOCK' }
-                    ]}
-                    filtering={[
-                        {
-                            condition: ({ text, expression }) => text.includes(expression)
-                        },
+                        { type: 'HEADER' },
+                        { type: 'DATA-BLOCK' },
                     ]}
                 />
             </Example>
