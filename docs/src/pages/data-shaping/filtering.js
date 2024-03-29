@@ -67,17 +67,11 @@ export default function Filtering() {
                         { type: 'FILTER', id: 'search_row' },
                         { type: 'DATA-BLOCK' }
                     ]}
-                    formatting={[
+                    filtering={[
                         {
-                            row: { match: 'DATA' },
-                            filter: {
-                                // TODO: Split into `type` and `by`
-                                // TODO: Make both optional
-                                // TODO: if both are omitted, support also providing just a function
-                                by: { type: 'ROW', id: 'search_row' },
-                                condition: ({ value, expression }) => `${value}`.includes(expression)
-                            }
-                        }
+                            by: 'search_row',
+                            condition: ({ text, expression }) => text.includes(expression)
+                        },
                     ]}
                 />
             </Example>
