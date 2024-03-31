@@ -6,7 +6,7 @@ import './CodeBlockTheme.css';
 
 
 function getLanguage(framework) {
-    switch(framework) {
+    switch (framework) {
         case 'js':
             return 'javascript';
         case 'jsx':
@@ -36,9 +36,18 @@ export default function CodeBlock({ options }) {
     const [framework, setFramework] = React.useState(options[0].framework);
 
     const { code } = options.find(option => option.framework === framework);
+    const blocks = [];
+    for (const line of code) {
+        if (typeof line === 'string') {
+            blocks.at(-1).push(line);
+        } else {
+            blocks.push([]);
+            blocks.at(-1).collapse = line.collapse;
+        }
+    }
     const language = getLanguage(framework);
     const grammar = getGrammar(framework);
-    const html = Prism.highlight(code, Prism.languages[grammar], language);
+    const htmlBlocks = blocks.map(block => Prism.highlight(block.join('\n'), Prism.languages[grammar], language));
 
     return (
         <div className='CodeBlock'>
@@ -56,7 +65,15 @@ export default function CodeBlock({ options }) {
                 ))}
             </div>
             <pre className='CodeBlock-body'>
-                <code dangerouslySetInnerHTML={{ __html: html }} />
+                {
+                    htmlBlocks.map((block, i) => (
+                        <code
+                            key={i}
+                            tabIndex={-1}
+                            dangerouslySetInnerHTML={{ __html: block }}
+                            className={blocks[i].collapse ? 'collapse' : ''} />
+                    ))
+                }
             </pre>
         </div>
     );

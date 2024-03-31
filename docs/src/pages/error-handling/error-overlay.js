@@ -33,11 +33,14 @@ export default function ErrorOverlay() {
         {
           framework: 'jsx',
           code: [
+            { collapse: false },
             '<SpreadGrid',
             '  data={[',
+            { collapse: true },
             '    { name: \'John\', age: 25, score: 100 },',
             '    { name: \'Jane\', age: 24, score: 90 },',
             '    { name: \'Jack\', age: 26, score: 80 },',
+            { collapse: false },
             '  ]}',
             '  formatting={[',
             '    {',
@@ -45,16 +48,19 @@ export default function ErrorOverlay() {
             '    }',
             '  ]}',
             '/>'
-          ].join('\n')
+          ]
         },
         {
           framework: 'js',
           code: [
+            { collapse: false },
             'createGrid(div, {',
             '  data: [',
+            { collapse: true },
             '    { name: \'John\', age: 25, score: 100 },',
             '    { name: \'Jane\', age: 24, score: 90 },',
             '    { name: \'Jack\', age: 26, score: 80 },',
+            { collapse: false },
             '  ]',
             '  formatting: [',
             '    {',
@@ -62,16 +68,19 @@ export default function ErrorOverlay() {
             '    }',
             '  ]',
             '});'
-          ].join('\n')
+          ]
         },
         {
           framework: 'py',
           code: [
+            { collapse: false },
             'app.layout = DashSpreadGrid(',
             '  data=[',
+            { collapse: true },
             '    {"name": "John", "age": 25, "score": 100},',
             '    {"name": "Jane", "age": 24, "score": 90},',
             '    {"name": "Jack", "age": 26, "score": 80}',
+            { collapse: false },
             '  ]',
             '  formatting=[',
             '    {',
@@ -79,7 +88,7 @@ export default function ErrorOverlay() {
             '    }',
             '  ]',
             ')',
-          ].join('\n')
+          ]
         }
       ]} />
       <Example>
@@ -106,41 +115,50 @@ export default function ErrorOverlay() {
         {
           framework: 'jsx',
           code: [
+            { collapse: false },
             '<SpreadGrid',
             '  data={[',
+            { collapse: true },
             '    { name: \'John\', age: 25, score: 100 },',
             '    { name: \'Jane\', age: 24, score: 90 },',
             '    { name: \'Jack\', age: 26, score: 80 },',
+            { collapse: false },
             '  ]}',
             '  formatting=\'not an array\'',
             '/>'
-          ].join('\n')
+          ]
         },
         {
           framework: 'js',
           code: [
+            { collapse: false },
             'createGrid(div, {',
             '  data: [',
+            { collapse: true },
             '    { name: \'John\', age: 25, score: 100 },',
             '    { name: \'Jane\', age: 24, score: 90 },',
             '    { name: \'Jack\', age: 26, score: 80 },',
+            { collapse: false },
             '  ]',
             '  formatting: \'not an array\'',
             '});'
-          ].join('\n')
+          ]
         },
         {
           framework: 'py',
           code: [
+            { collapse: false },
             'app.layout = DashSpreadGrid(',
             '  data=[',
+            { collapse: true },
             '    {"name": "John", "age": 25, "score": 100},',
             '    {"name": "Jane", "age": 24, "score": 90},',
             '    {"name": "Jack", "age": 26, "score": 80}',
+            { collapse: false },
             '  ]',
             '  formatting="not an array"',
             ')',
-          ].join('\n')
+          ]
         }
       ]} />
       <Example>
@@ -163,28 +181,34 @@ export default function ErrorOverlay() {
         {
           framework: 'jsx',
           code: [
+            { collapse: false },
             '<SpreadGrid',
             '  data={[',
+            { collapse: true },
             '    { name: \'John\', age: 25, score: 100 },',
             '    { name: \'Jane\', age: 24, score: 90 },',
             '    { name: \'Jack\', age: 26, score: 80 },',
+            { collapse: false },
             '  ]}',
             '  onCellClick={() => { throw new Error(\'This is an error\') }}',
             '/>'
-          ].join('\n')
+          ]
         },
         {
           framework: 'js',
           code: [
+            { collapse: false },
             'createGrid(div, {',
             '  data: [',
+            { collapse: true },
             '    { name: \'John\', age: 25, score: 100 },',
             '    { name: \'Jane\', age: 24, score: 90 },',
             '    { name: \'Jack\', age: 26, score: 80 },',
+            { collapse: false },
             '  ]',
             '  onCellClick: () => { throw new Error(\'This is an error\') }',
             '});'
-          ].join('\n')
+          ]
         }
       ]} />
       <Example>

@@ -9,63 +9,98 @@ export default function Filtering() {
         <>
             <Header>Filtering</Header>
             <Paragraph>
-                The SpreadGrid component supports filtering data. You can filter data by specifying a filter function that takes a row and returns a boolean.
+                TODO
             </Paragraph>
             <CodeBlock options={[
                 {
                     framework: 'jsx',
                     code: [
+                        { collapse: false },
                         '<SpreadGrid',
                         '  data={[',
-                        '    { name: \'John\', age: 25, score: 100 },',
-                        '    { name: \'Jane\', age: 24, score: 90 },',
-                        '    { name: \'Jack\', age: 26, score: 80 },',
+                        { collapse: true },
+                        '    { name: \'John\', age: 25, score: 100, registered: true, team: \'red\' },',
+                        '    { name: \'Alice\', age: 24, score: 70, registered: false, team: \'blue\' },',
+                        '    { name: \'Bob\', age: 26, score: 35, registered: true, team: \'blue\' },',
+                        '    { name: \'Charlie\', age: 27, score: 60, registered: false, team: \'red\' },',
+                        '    { name: \'David\', age: 18, score: 60, registered: true, team: \'red\' },',
+                        '    { name: \'Eve\', age: 29, score: 80, registered: false, team: \'green\' },',
+                        '    { name: \'Frank\', age: 30, score: 50, registered: true, team: \'blue\' }',
+                        { collapse: false },
                         '  ]}',
-                        '  filter={row => row.score > 90}',
+                        '  rows={[',
+                        '    { type: \'HEADER\' },',
+                        '    { type: \'FILTER\' },',
+                        '    { type: \'DATA-BLOCK\' }',
+                        '  ]}',
                         '/>'
-                    ].join('\n')
+                    ],
+                    collapse: [3, 9]
                 },
                 {
                     framework: 'js',
                     code: [
+                        { collapse: false },
                         'createGrid(div, {',
                         '  data: [',
-                        '    { name: \'John\', age: 25, score: 100 },',
-                        '    { name: \'Jane\', age: 24, score: 90 },',
-                        '    { name: \'Jack\', age: 26, score: 80 },',
+                        { collapse: true },
+                        '    { name: \'John\', age: 25, score: 100, registered: true, team: \'red\' },',
+                        '    { name: \'Alice\', age: 24, score: 70, registered: false, team: \'blue\' },',
+                        '    { name: \'Bob\', age: 26, score: 35, registered: true, team: \'blue\' },',
+                        '    { name: \'Charlie\', age: 27, score: 60, registered: false, team: \'red\' },',
+                        '    { name: \'David\', age: 18, score: 60, registered: true, team: \'red\' },',
+                        '    { name: \'Eve\', age: 29, score: 80, registered: false, team: \'green\' },',
+                        '    { name: \'Frank\', age: 30, score: 50, registered: true, team: \'blue\' }',
+                        { collapse: false },
                         '  ],',
-                        '  filter: row => row.score > 90',
+                        '  rows: [',
+                        '    { type: \'HEADER\' },',
+                        '    { type: \'FILTER\' },',
+                        '    { type: \'DATA-BLOCK\' }',
+                        '  ]',
                         '});'
-                    ].join('\n')
+                    ]
                 },
                 {
                     framework: 'py',
                     code: [
+                        { collapse: false },
                         'app.layout = DashSpreadGrid(',
                         '  data=[',
-                        '    {"name": "John", "age": 25, "score": 100},',
-                        '    {"name": "Jane", "age": 24, "score": 90},',
-                        '    {"name": "Jack", "age": 26, "score": 80}',
+                        { collapse: true },
+                        '    {"name": "John", "age": 25, "score": 100, "registered": True, "team": "red"},',
+                        '    {"name": "Alice", "age": 24, "score": 70, "registered": False, "team": "blue"},',
+                        '    {"name": "Bob", "age": 26, "score": 35, "registered": True, "team": "blue"},',
+                        '    {"name": "Charlie", "age": 27, "score": 60, "registered": False, "team": "red"},',
+                        '    {"name": "David", "age": 18, "score": 60, "registered": True, "team": "red"},',
+                        '    {"name": "Eve", "age": 29, "score": 80, "registered": False, "team": "green"},',
+                        '    {"name": "Frank", "age": 30, "score": 50, "registered": True, "team": "blue"}',
+                        { collapse: false },
                         '  ],',
-                        '  filter=lambda row: row["score"] > 90',
+                        '  rows=[',
+                        '    {"type": "HEADER"},',
+                        '    {"type": "FILTER"},',
+                        '    {"type": "DATA-BLOCK"}',
+                        '  ]',
                         ')',
-                    ].join('\n')
+                    ]
                 }
             ]} />
             <Example>
                 <SpreadGrid
                     data={[
-                        { name: 'John', age: 25, score: 100 },
-                        { name: 'Jane', age: 24, score: 90 },
-                        { name: 'Jack', age: 26, score: 80 },
-                        { name: 'Jill', age: 27, score: 70 },
-                        { name: 'James', age: 28, score: 60 },
-                        { name: 'Jenny', age: 29, score: 50 },
+                        { name: 'John', age: 25, score: 100, registered: true, team: 'red' },
+                        { name: 'Alice', age: 24, score: 70, registered: false, team: 'blue' },
+                        { name: 'Bob', age: 26, score: 35, registered: true, team: 'blue' },
+                        { name: 'Charlie', age: 27, score: 60, registered: false, team: 'red' },
+                        { name: 'David', age: 18, score: 60, registered: true, team: 'red' },
+                        { name: 'Eve', age: 29, score: 80, registered: false, team: 'green' },
+                        { name: 'Frank', age: 30, score: 50, registered: true, team: 'blue' }
                     ]}
                     rows={[
-                        { type: 'FILTER' },
                         { type: 'HEADER' },
-                        { type: 'DATA-BLOCK' },
+                        { type: 'FILTER' },
+                        { type: 'DATA-BLOCK' }
                     ]}
                 />
             </Example>
