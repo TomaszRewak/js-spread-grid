@@ -1,6 +1,8 @@
+import './Paragraph.css';
+
 export default function Paragraph({ children }) {
   return (
-    <p>
+    <p className="Paragraph">
       {children}
     </p>
   );

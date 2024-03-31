@@ -7,6 +7,7 @@ import { Fragment } from 'react';
 import ErrorOverlay from './pages/error-handling/error-overlay';
 import CellClick from './pages/events/cell-click';
 import Filtering from './pages/data-shaping/filtering';
+import Size from './pages/columns-and-rows/size';
 
 const routes = [
   {
@@ -19,7 +20,8 @@ const routes = [
   {
     chapter: 'columns and rows',
     pages: [
-      { title: 'headers', page: Headers }
+      { title: 'headers', page: Headers },
+      { title: 'size', page: Size }
     ]
   },
   {
