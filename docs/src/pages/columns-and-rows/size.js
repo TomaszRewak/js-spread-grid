@@ -84,7 +84,7 @@ export default function Size() {
     ];
 
     const [index, setIndex] = useState(0);
-    useInterval(() => { setIndex((index + 1) % 3); }, 2000);
+    useInterval(() => { setIndex((index + 1) % 3); }, 1000);
 
     const data = dataOptions[index];
 

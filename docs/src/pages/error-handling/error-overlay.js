@@ -5,6 +5,7 @@ import Header from "../../components/Header";
 import Paragraph from "../../components/Paragraph";
 import SpreadGrid from "react-spread-gird";
 import SubHeader from "../../components/SubHeader";
+import { defaultData, defaultDataCode } from "../../utils/defaults";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -37,9 +38,7 @@ export default function ErrorOverlay() {
             '<SpreadGrid',
             '  data={[',
             { collapse: true },
-            '    { name: \'John\', age: 25, score: 100 },',
-            '    { name: \'Jane\', age: 24, score: 90 },',
-            '    { name: \'Jack\', age: 26, score: 80 },',
+            ...defaultDataCode['js'],
             { collapse: false },
             '  ]}',
             '  formatting={[',
@@ -57,9 +56,7 @@ export default function ErrorOverlay() {
             'createGrid(div, {',
             '  data: [',
             { collapse: true },
-            '    { name: \'John\', age: 25, score: 100 },',
-            '    { name: \'Jane\', age: 24, score: 90 },',
-            '    { name: \'Jack\', age: 26, score: 80 },',
+            ...defaultDataCode['js'],
             { collapse: false },
             '  ]',
             '  formatting: [',
@@ -77,9 +74,7 @@ export default function ErrorOverlay() {
             'app.layout = DashSpreadGrid(',
             '  data=[',
             { collapse: true },
-            '    {"name": "John", "age": 25, "score": 100},',
-            '    {"name": "Jane", "age": 24, "score": 90},',
-            '    {"name": "Jack", "age": 26, "score": 80}',
+            ...defaultDataCode['py'],
             { collapse: false },
             '  ]',
             '  formatting=[',
@@ -94,11 +89,7 @@ export default function ErrorOverlay() {
       <Example>
         <ErrorBoundary>
           <SpreadGrid
-            data={[
-              { name: 'John', age: 25, score: 100 },
-              { name: 'Jane', age: 24, score: 90 },
-              { name: 'Jack', age: 26, score: 80 },
-            ]}
+            data={defaultData}
             formatting={[
               {
                 style: () => { throw new Error('This is an error') }
@@ -119,9 +110,7 @@ export default function ErrorOverlay() {
             '<SpreadGrid',
             '  data={[',
             { collapse: true },
-            '    { name: \'John\', age: 25, score: 100 },',
-            '    { name: \'Jane\', age: 24, score: 90 },',
-            '    { name: \'Jack\', age: 26, score: 80 },',
+            ...defaultDataCode['js'],
             { collapse: false },
             '  ]}',
             '  formatting=\'not an array\'',
@@ -135,9 +124,7 @@ export default function ErrorOverlay() {
             'createGrid(div, {',
             '  data: [',
             { collapse: true },
-            '    { name: \'John\', age: 25, score: 100 },',
-            '    { name: \'Jane\', age: 24, score: 90 },',
-            '    { name: \'Jack\', age: 26, score: 80 },',
+            ...defaultDataCode['js'],
             { collapse: false },
             '  ]',
             '  formatting: \'not an array\'',
@@ -151,9 +138,7 @@ export default function ErrorOverlay() {
             'app.layout = DashSpreadGrid(',
             '  data=[',
             { collapse: true },
-            '    {"name": "John", "age": 25, "score": 100},',
-            '    {"name": "Jane", "age": 24, "score": 90},',
-            '    {"name": "Jack", "age": 26, "score": 80}',
+            ...defaultDataCode['py'],
             { collapse: false },
             '  ]',
             '  formatting="not an array"',
@@ -164,11 +149,7 @@ export default function ErrorOverlay() {
       <Example>
         <ErrorBoundary>
           <SpreadGrid
-            data={[
-              { name: 'John', age: 25, score: 100 },
-              { name: 'Jane', age: 24, score: 90 },
-              { name: 'Jack', age: 26, score: 80 },
-            ]}
+            data={defaultData}
             formatting='not an array'
           />
         </ErrorBoundary>
@@ -185,9 +166,7 @@ export default function ErrorOverlay() {
             '<SpreadGrid',
             '  data={[',
             { collapse: true },
-            '    { name: \'John\', age: 25, score: 100 },',
-            '    { name: \'Jane\', age: 24, score: 90 },',
-            '    { name: \'Jack\', age: 26, score: 80 },',
+            ...defaultDataCode['js'],
             { collapse: false },
             '  ]}',
             '  onCellClick={() => { throw new Error(\'This is an error\') }}',
@@ -201,9 +180,7 @@ export default function ErrorOverlay() {
             'createGrid(div, {',
             '  data: [',
             { collapse: true },
-            '    { name: \'John\', age: 25, score: 100 },',
-            '    { name: \'Jane\', age: 24, score: 90 },',
-            '    { name: \'Jack\', age: 26, score: 80 },',
+            ...defaultDataCode['js'],
             { collapse: false },
             '  ]',
             '  onCellClick: () => { throw new Error(\'This is an error\') }',
@@ -214,11 +191,7 @@ export default function ErrorOverlay() {
       <Example>
         <ErrorBoundary>
           <SpreadGrid
-            data={[
-              { name: 'John', age: 25, score: 100 },
-              { name: 'Jane', age: 24, score: 90 },
-              { name: 'Jack', age: 26, score: 80 },
-            ]}
+            data={defaultData}
             onCellClick={() => { throw new Error('This is an error') }}
           />
         </ErrorBoundary>

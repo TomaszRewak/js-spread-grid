@@ -16,23 +16,29 @@ export default function YourFirstGrid() {
           framework: 'jsx',
           code: [
             { collapse: false},
-            '<SpreadGrid',
-            '  data={[',
-            '    { name: \'John\', age: 25, score: 100, registered: true, team: \'red\' },',
-            '    { name: \'Alice\', age: 24, score: 70, registered: false, team: \'blue\' },',
-            '    { name: \'Bob\', age: 26, score: 35, registered: true, team: \'blue\' },',
-            '    { name: \'Charlie\', age: 27, score: 60, registered: false, team: \'red\' },',
-            '    { name: \'David\', age: 18, score: 60, registered: true, team: \'red\' },',
-            '    { name: \'Eve\', age: 29, score: 80, registered: false, team: \'green\' },',
-            '    { name: \'Frank\', age: 30, score: 50, registered: true, team: \'blue\' }',
-            '  ]}',
-            '/>'
+            'function YourFirstGrid() {',
+            '  return (',
+            '    <SpreadGrid',
+            '      data={[',
+            '        { name: \'John\', age: 25, score: 100, registered: true, team: \'red\' },',
+            '        { name: \'Alice\', age: 24, score: 70, registered: false, team: \'blue\' },',
+            '        { name: \'Bob\', age: 26, score: 35, registered: true, team: \'blue\' },',
+            '        { name: \'Charlie\', age: 27, score: 60, registered: false, team: \'red\' },',
+            '        { name: \'David\', age: 18, score: 60, registered: true, team: \'red\' },',
+            '        { name: \'Eve\', age: 29, score: 80, registered: false, team: \'green\' },',
+            '        { name: \'Frank\', age: 30, score: 50, registered: true, team: \'blue\' }',
+            '      ]}',
+            '    />',
+            '  );',
+            '}'
           ]
         },
         {
           framework: 'js',
           code: [
             { collapse: false},
+            'const div = document.getElementById(\'grid\');',
+            '',
             'createGrid(div, {',
             '  data: [',
             '    { name: \'John\', age: 25, score: 100, registered: true, team: \'red\' },',
@@ -50,6 +56,10 @@ export default function YourFirstGrid() {
           framework: 'py',
           code: [
             { collapse: false},
+            'import dash',
+            '',
+            'app = dash.Dash(__name__)',
+            '',
             'app.layout = DashSpreadGrid(',
             '  data=[',
             '    {"name": "John", "age": 25, "score": 100, "registered": True, "team": "red"},',
@@ -61,6 +71,9 @@ export default function YourFirstGrid() {
             '    {"name": "Frank", "age": 30, "score": 50, "registered": True, "team": "blue"}',
             '  ]',
             ')',
+            '',
+            'if __name__ == \'__main__\':',
+            '    app.run_server(debug=True)'
           ]
         }
       ]} />

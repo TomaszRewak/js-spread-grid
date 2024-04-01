@@ -8,6 +8,7 @@ import ErrorOverlay from './pages/error-handling/error-overlay';
 import CellClick from './pages/events/cell-click';
 import Filtering from './pages/data-shaping/filtering';
 import Size from './pages/columns-and-rows/size';
+import Sorting from './pages/data-shaping/sorting';
 
 const routes = [
   {
@@ -27,7 +28,8 @@ const routes = [
   {
     chapter: 'data shaping',
     pages: [
-      { title: 'filtering', page: () => <Filtering/> }
+      { title: 'filtering', page: Filtering },
+      { title: 'sorting', page: Sorting }
     ]
   },
   {

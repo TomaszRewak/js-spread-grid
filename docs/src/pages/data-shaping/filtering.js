@@ -78,6 +78,115 @@ export default function Filtering() {
                     ]}
                 />
             </Example>
+            <Paragraph>
+                TODO
+            </Paragraph>
+            <CodeBlock options={[
+                {
+                    framework: 'jsx',
+                    code: [
+                        { collapse: false },
+                        '<SpreadGrid',
+                        '  data={[',
+                        { collapse: true },
+                        ...defaultDataCode['js'],
+                        { collapse: false },
+                        '  ]}',
+                        '  rows={[',
+                        '    { type: \'HEADER\' },',
+                        '    { type: \'FILTER\' },',
+                        '    { type: \'DATA-BLOCK\' }',
+                        '  ]}',
+                        '  filtering={[',
+                        '    {',
+                        '      column: [{ id: \'age\' }, { id: \'score\' }],',
+                        '      condition: ({ value, expression }) => value >= expression',
+                        '    },',
+                        '    {',
+                        '      column: [{ id: \'name\' }, { id: \'registered\' }, { id: \'team\' }],',
+                        '      condition: ({ text, expression }) => text.includes(expression)',
+                        '    }',
+                        '  ]}',
+                        '/>'
+                    ]
+                },
+                {
+                    framework: 'js',
+                    code: [
+                        { collapse: false },
+                        'createGrid(div, {',
+                        '  data: [',
+                        { collapse: true },
+                        ...defaultDataCode['js'],
+                        { collapse: false },
+                        '  ],',
+                        '  rows: [',
+                        '    { type: \'HEADER\' },',
+                        '    { type: \'FILTER\' },',
+                        '    { type: \'DATA-BLOCK\' }',
+                        '  ],',
+                        '  filtering: [',
+                        '    {',
+                        '      column: [{ id: \'age\' }, { id: \'score\' }],',
+                        '      condition: ({ value, expression }) => value >= expression',
+                        '    },',
+                        '    {',
+                        '      column: [{ id: \'name\' }, { id: \'registered\' }, { id: \'team\' }],',
+                        '      condition: ({ text, expression }) => text.includes(expression)',
+                        '    }',
+                        '  ]',
+                        '});'
+                    ]
+                },
+                {
+                    framework: 'py',
+                    code: [
+                        { collapse: false },
+                        'app.layout = DashSpreadGrid(',
+                        '  data=[',
+                        { collapse: true },
+                        ...defaultDataCode['py'],
+                        { collapse: false },
+                        '  ],',
+                        '  rows=[',
+                        '    {"type": "HEADER"},',
+                        '    {"type": "FILTER"},',
+                        '    {"type": "DATA-BLOCK"}',
+                        '  ],',
+                        '  filtering=[',
+                        '    {',
+                        '      "column": [{"id": "age"}, {"id": "score"}],',
+                        '      "condition": "value >= expression"',
+                        '    },',
+                        '    {',
+                        '      "column": [{"id": "name"}, {"id": "registered"}, {"id": "team"}],',
+                        '      "condition": "text.includes(expression)"',
+                        '    }',
+                        '  ]',
+                        ')',
+                    ]
+                }
+            ]} />
+            <Example>
+                <SpreadGrid
+                    data={defaultData}
+                    rows={[
+                        { type: 'HEADER' },
+                        { type: 'FILTER' },
+                        { type: 'DATA-BLOCK' }
+                    ]}
+                    filtering={[
+                        {
+                            column: [{ id: 'age' }, { id: 'score' }],
+                            condition: ({ value, expression }) => value >= expression
+                        },
+                        {
+                            column: [{ id: 'name' }, { id: 'registered' }, { id: 'team' }],
+                            condition: ({ text, expression }) => text.includes(expression)
+                        }
+                    ]}
+                />
+            </Example>
         </>
     )
 }
