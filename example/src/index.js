@@ -36,7 +36,7 @@ function App() {
             pinnedLeft={2}
             pinnedRight={1}
             rows={[
-                { id: 'a', type: 'HEADER', height: 20 },
+                { id: 'HEADER', type: 'HEADER', height: 20 },
                 ...rows.slice(0, 4),
                 { id: 'b', type: 'HEADER', height: 20 },
                 { id: 'search_row', type: 'FILTER', height: 20 },

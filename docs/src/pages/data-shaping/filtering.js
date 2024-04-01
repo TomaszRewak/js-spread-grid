@@ -101,10 +101,6 @@ export default function Filtering() {
                         '    {',
                         '      column: [{ id: \'age\' }, { id: \'score\' }],',
                         '      condition: ({ value, expression }) => value >= expression',
-                        '    },',
-                        '    {',
-                        '      column: [{ id: \'name\' }, { id: \'registered\' }, { id: \'team\' }],',
-                        '      condition: ({ text, expression }) => text.includes(expression)',
                         '    }',
                         '  ]}',
                         '/>'
@@ -129,10 +125,6 @@ export default function Filtering() {
                         '    {',
                         '      column: [{ id: \'age\' }, { id: \'score\' }],',
                         '      condition: ({ value, expression }) => value >= expression',
-                        '    },',
-                        '    {',
-                        '      column: [{ id: \'name\' }, { id: \'registered\' }, { id: \'team\' }],',
-                        '      condition: ({ text, expression }) => text.includes(expression)',
                         '    }',
                         '  ]',
                         '});'
@@ -157,10 +149,6 @@ export default function Filtering() {
                         '    {',
                         '      "column": [{"id": "age"}, {"id": "score"}],',
                         '      "condition": "value >= expression"',
-                        '    },',
-                        '    {',
-                        '      "column": [{"id": "name"}, {"id": "registered"}, {"id": "team"}],',
-                        '      "condition": "text.includes(expression)"',
                         '    }',
                         '  ]',
                         ')',
@@ -179,10 +167,6 @@ export default function Filtering() {
                         {
                             column: [{ id: 'age' }, { id: 'score' }],
                             condition: ({ value, expression }) => value >= expression
-                        },
-                        {
-                            column: [{ id: 'name' }, { id: 'registered' }, { id: 'team' }],
-                            condition: ({ text, expression }) => text.includes(expression)
                         }
                     ]}
                 />
