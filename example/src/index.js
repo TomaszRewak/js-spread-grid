@@ -32,7 +32,10 @@ function App() {
     return (
         <SpreadGrid
             data={data}
-            columns={columns}
+            columns={[
+                { id: 'HEADER', type: 'HEADER', width: 100 },
+                ...columns
+            ]}
             pinnedLeft={2}
             pinnedRight={1}
             rows={[
@@ -126,15 +129,15 @@ function App() {
                     style: { borderLeft: { width: 3 }, borderRight: { width: 3 }, borderBottom: { width: 3 } }
                 },
                 {
-                    column: { index: 0 },
+                    column: { index: 1 },
                     style: { borderLeft: { width: 1 } }
                 },
                 {
-                    column: { index: 1 },
+                    column: { index: 2 },
                     style: { borderRight: { width: 1, color: 'red' }, background: 'lightgrey' }
                 },
                 {
-                    column: { index: 6 },
+                    column: { index: 7 },
                     style: { borderLeft: { width: 5, dash: [15, 15] }, borderRight: { width: 5, dash: [15, 15] }, background: 'lightgrey' }
                 },
                 {

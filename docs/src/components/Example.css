@@ -3,8 +3,9 @@
     --background-color-2: #292c33;
 
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
     background: #ffffff;
     padding: 15px;
     border: 1px solid #3a3a3a;
