@@ -272,19 +272,17 @@ export default function AppManager() {
     return (
         <>
             <Example>
-                <div style={{ maxHeight: 600, display: 'flex' }}>
-                    <SpreadGrid
-                        data={data}
-                        rows={rows}
-                        columns={columns}
-                        formatting={formatting}
-                        filtering={filtering}
-                        onCellClick={onCellClick}
-                        onCustomCellClick={onCustomCellClick}
-                        pinnedTop={2}
-                        pinnedBottom={1}
-                    />
-                </div>
+                <SpreadGrid
+                    data={data}
+                    rows={rows}
+                    columns={columns}
+                    formatting={formatting}
+                    filtering={filtering}
+                    onCellClick={onCellClick}
+                    onCustomCellClick={onCustomCellClick}
+                    pinnedTop={2}
+                    pinnedBottom={1}
+                />
             </Example>
         </>
     )
