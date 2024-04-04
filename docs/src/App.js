@@ -9,6 +9,7 @@ import CellClick from './pages/events/cell-click';
 import Filtering from './pages/data-shaping/filtering';
 import Size from './pages/columns-and-rows/size';
 import Sorting from './pages/data-shaping/sorting';
+import AppManager from './pages/examples/AppManager';
 
 const routes = [
   {
@@ -42,6 +43,12 @@ const routes = [
     chapter: 'error handling',
     pages: [
       { title: 'error overlay', page: ErrorOverlay }
+    ]
+  },
+  {
+    chapter: 'examples',
+    pages: [
+      { title: 'app manager', page: AppManager }
     ]
   }
 ].map(({ chapter, pages }) => ({
