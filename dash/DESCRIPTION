@@ -1,0 +1,13 @@
+Package: dashSpreadGrid
+Title: Fast grid for Dash applications
+Version: 0.1.10
+Description: Fast grid for Dash applications
+Depends: R (>= 3.0.2)
+Imports: 
+Suggests: 
+License: MIT + file LICENSE
+URL: https://spread-grid.tomasz-rewak.com
+BugReports: https://github.com/TomaszRewak/js-spread-grid/issues
+Encoding: UTF-8
+LazyData: true
+KeepSource: true

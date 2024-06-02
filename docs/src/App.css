@@ -1,0 +1,88 @@
+.App {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "App-navbar App-content";
+    height: 100vh;
+}
+
+.App-navbar {
+    grid-area: App-navbar;
+    background-color: #171717;
+    color: white;
+    padding: 1rem;
+    font-size: 0.9em;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 150px;
+}
+
+.App-navbar>.App-navbar-logo {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+
+.App-navbar>.App-navbar-title {
+    align-self: center;
+    color: #577bae;
+    font-weight: bold;
+}
+
+.App-navbar>.App-navbar-subtitle {
+    margin-bottom: 30px;
+    align-self: center;
+    font-weight: bold;
+    color: #ae5757;
+    font-size: 0.8em;
+}
+
+.App-navbar>.App-navbar-header {
+    margin-top: 10px;
+    color: #4b505d;
+    font-weight: bold;
+    text-wrap: nowrap;
+}
+
+.App-navbar>.App-navbar-item {
+    border-left: 1px solid #4c505c;
+    padding-left: 10px;
+    margin-left: 5px;
+    display: block;
+    text-decoration: none;
+    color: white;
+}
+
+.App-navbar>.App-navbar-item:hover {
+    color: #b3cef3;
+}
+
+.App-navbar>.App-navbar-item.Selected {
+    color: #67a5fc;
+    border-left: 3px solid #67a5fc;
+    padding-left: 9px;
+    margin-left: 4px;
+}
+
+.App-navbar>.App-navbar-item.Wip::after {
+    content: "WIP";
+    color: #ff7d99;
+    font-size: 0.6em;
+    vertical-align: super;
+    margin-left: 5px;
+}
+
+.App-content {
+    grid-area: App-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.App-content-body {
+    width: 100%;
+    max-width: 800px;
+    padding: 1rem;
+    color: white;
+}

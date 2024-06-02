@@ -1,0 +1,71 @@
+.CodeBlock {
+    --border-color: #3a3a3a;
+    --editor-background: #1f2229;
+
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.CodeBlock-header {
+    padding: 5px 5px 0 0;
+}
+
+.CodeBlock-header button {
+    background: transparent;
+    border: solid var(--border-color);
+    border-width: 1px 1px 0 1px;
+    border-radius: 5px 5px 0 0;
+    color: #999999;
+    padding: 3px 10px;
+    margin: 0 5px -1px 0;
+}
+
+.CodeBlock-header button.selected {
+    background: var(--editor-background);
+    color: white;
+}
+
+.CodeBlock-header button>span {
+    color: #ffffff22;
+}
+
+.CodeBlock-body {
+    background: var(--editor-background);
+    border: 1px solid var(--border-color);
+    color: lightpink;
+    padding: 5px;
+    margin: 0;
+}
+
+.CodeBlock-body code {
+    display: block;
+}
+
+.CodeBlock-body code.collapse {
+    max-height: 2.5em;
+    overflow: hidden;
+    opacity: 0.1;
+    cursor: pointer;
+}
+
+.CodeBlock-body code.collapse:hover {
+    opacity: 0.5;
+}
+
+.CodeBlock-body code.collapse:active,
+.CodeBlock-body code.collapse:focus {
+    max-height: none;
+    opacity: 1;
+    cursor: auto;
+}
+
+.CodeBlock-arrows {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    color: #3a5d8d;
+    margin-bottom: 2px;
+    user-select: none;
+    font-family: Calibri;
+}

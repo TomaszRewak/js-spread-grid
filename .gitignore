@@ -1,0 +1,4 @@
+.pytest_cache/
+node_modules/
+example/build/
+*/dist/index.js

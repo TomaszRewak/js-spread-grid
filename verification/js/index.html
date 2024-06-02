@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://unpkg.com/js-spread-grid@latest/dist/index.js"></script>
+</head>
+
+<body>
+    <div id="grid"></div>
+    <script>
+        // Your JavaScript code here
+        SpreadGrid(document.getElementById('grid'), {
+            data: [
+                { name: 'John', age: 25, score: 100, registered: true, team: 'red' },
+                { name: 'Alice', age: 24, score: 70, registered: false, team: 'blue' },
+                { name: 'Bob', age: 26, score: 35, registered: true, team: 'blue' },
+                { name: 'Charlie', age: 27, score: 60, registered: false, team: 'red' },
+                { name: 'David', age: 18, score: 60, registered: true, team: 'red' },
+                { name: 'Eve', age: 29, score: 80, registered: false, team: 'green' },
+                { name: 'Frank', age: 30, score: 50, registered: true, team: 'blue' }
+            ],
+        });
+    </script>
+</body>
+
+</html>

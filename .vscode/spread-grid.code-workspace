@@ -1,0 +1,49 @@
+{
+    "folders": [
+        {
+            "name": "lib",
+            "path": "../lib"
+        },
+        {
+            "name": "tests",
+            "path": "../tests"
+        },
+        {
+            "name": "example",
+            "path": "../example"
+        },
+        {
+            "name": "docs",
+            "path": "../docs"
+        },
+        {
+            "name": "react",
+            "path": "../react"
+        },
+        {
+            "name": "dash",
+            "path": "../dash"
+        },
+        {
+            "name": "verification",
+            "path": "../verification"
+        },
+        {
+            "name": "root",
+            "path": ".."
+        }
+    ],
+    "settings": {
+        "jest.disabledWorkspaceFolders": [
+            "root",
+            "dash",
+            "docs",
+            "react",
+            "example"
+        ],
+        "jest.runMode": "on-demand",
+        "editor.tabSize": 4,
+        "editor.detectIndentation": false,
+        "editor.formatOnSave": true
+    },
+}

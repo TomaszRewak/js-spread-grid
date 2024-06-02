@@ -1,0 +1,20 @@
+.Paragraph code {
+    color: #67a5fc;
+    font-weight: 600;
+    background-color: #ffffff22;
+    padding: 0 0.4em;
+    border-radius: 0.2em;
+}
+
+.Paragraph.CodeBlock code {
+    color: #f92672;
+}
+
+.Paragraph a {
+    color: #94fc67;
+    text-decoration: none;
+}
+
+.Paragraph strong {
+    color: #94c1ff;
+}

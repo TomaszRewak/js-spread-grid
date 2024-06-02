@@ -1,0 +1,70 @@
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.WorkInProgress {
+    display: flex;
+    flex-direction: column;
+}
+
+.WorkInProgress>label:first-child {
+    color: #ff7d99;
+    align-self: center;
+    margin-bottom: 20px;
+    margin-top: 3em;
+}
+
+.WorkInProgress>label:nth-child(2) {
+    color: #8c4756;
+    align-self: center;
+    margin-top: -20px;
+    margin-bottom: 20px;
+}
+
+.WorkInProgress>.Steps {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    background-color: rgb(37, 38, 41);
+    border-radius: 20px;
+}
+
+.WorkInProgress>.Steps>.Step {
+    flex: 1;
+    text-align: center;
+    font-size: 0.8em;
+    margin: 5px;
+}
+
+.WorkInProgress>.Steps>.Step:not(.Current) {
+    opacity: 0.3;
+}
+
+.WorkInProgress>.Steps>.Step::after {
+    display: block;
+    text-align: center;
+    font: 20px Calibri, sans-serif;
+    margin-top: 5px;
+}
+
+.WorkInProgress>.Steps>.Step.Next::after {
+    content: "→";
+    color: #4b505d;
+}
+
+.WorkInProgress>.Steps>.Step.Current::after {
+    content: "↻";
+    color: #67a5fc;
+    animation: spin 2s linear infinite;
+}
+
+.WorkInProgress>.Steps>.Step.Done::after {
+    content: "✓";
+    color: #73fc67;
+}
