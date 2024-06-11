@@ -1,7 +1,7 @@
 
 ## Docs
 
-Documentation and examples can be fuond at [spread-grid.tomasz-rewak.com](https://spread-grid.tomasz-rewak.com/).
+Documentation and examples can be found at [spread-grid.tomasz-rewak.com](https://spread-grid.tomasz-rewak.com/).
 
 ## About
 
