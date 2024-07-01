@@ -34,8 +34,11 @@ tmux send-keys -t "$workspace:7.1" "cd dash" C-m "npm run watch" C-m
 tmux new-window -t "$workspace:8" -n "tests"
 tmux send-keys -t "$workspace:8" "cd tests" C-m "npm test"
 
-tmux new-window -t "$workspace:9" -n "release"
-tmux send-keys -t "$workspace:9" "./release.sh patch"
+tmux new-window -t "$workspace:9" -n "validate"
+tmux send-keys -t "$workspace:9" "cd lib" C-m "tsc -w -p jsconfig.json" C-m
+
+tmux new-window -t "$workspace:10" -n "release"
+tmux send-keys -t "$workspace:10" "./release.sh patch"
 
 tmux select-window -t "$workspace:3"
 tmux attach-session -t "$workspace"
