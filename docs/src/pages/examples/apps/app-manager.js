@@ -328,9 +328,10 @@ export default function AppManager() {
             case 'stop':
                 setData(Object.fromEntries(Object.keys(data).map(key => [
                     key,
-                    !activeRowsSet.has(key) || data[key].startedAt
-                        ? { ...data[key], stoppedAt: Date.now(), startedAt: null }
-                        : data[key]])));
+                    !activeRowsSet.has(key) || !data[key].startedAt
+                        ? data[key] :
+                        { ...data[key], stoppedAt: Date.now(), startedAt: null }
+                ])));
                 break;
             default:
         }
