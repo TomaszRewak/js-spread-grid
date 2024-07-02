@@ -104,6 +104,10 @@ function DashSpreadGrid(props) {
     const onFiltersChange = useCallback((filters) => {
         setProps({ filters });
     }, [setProps]);
+    const sortBy = props.sort_by;
+    const onSortByChange = useCallback((sortBy) => {
+        setProps({ sort_by: sortBy });
+    }, [setProps]);
     const editedCells = props.edited_cells;
     const onEditedCellsChange = useCallback((editedCells) => {
         setProps({ edited_cells: editedCells });
@@ -162,6 +166,8 @@ function DashSpreadGrid(props) {
             onEditedCellsChange,
             filters,
             onFiltersChange,
+            sortBy,
+            onSortByChange,
             columnWidths,
             onColumnWidthsChange,
             rowHeights,

@@ -2,6 +2,7 @@
     "compilerOptions": {
         "checkJs": true,
         "noEmit": true,
+        // "noImplicitAny": true - once all typings are added, this option needs to be enabled
     },
     "exclude": [
         "node_modules",
