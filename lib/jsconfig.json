@@ -2,6 +2,8 @@
     "compilerOptions": {
         "checkJs": true,
         "noEmit": true,
+        "downlevelIteration": true,
+        // "strict": true
         // "noImplicitAny": true - once all typings are added, this option needs to be enabled
     },
     "exclude": [
