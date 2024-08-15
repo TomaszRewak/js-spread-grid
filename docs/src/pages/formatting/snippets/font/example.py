@@ -6,7 +6,7 @@ app.layout = DashSpreadGrid(  # type: ignore
     ],
     formatting=[
         {
-            "font": "bold 14px Comic Sans MS",
+            "font": "'bold 14px Comic Sans MS'",
         }
     ],
 )

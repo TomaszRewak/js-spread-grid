@@ -26,7 +26,7 @@ function useResolvedFormatting(formatting) {
             if ('text' in rule)
                 mappedRule.text = eval(`(${context}) => (${rule.text})`);
             if ('font' in rule)
-                mappedRule.font = isString(rule.font) ? eval(`(${context}) => (${rule.font})`) : rule.font;
+                mappedRule.font = eval(`(${context}) => (${rule.font})`);
             if ('style' in rule)
                 mappedRule.style = isString(rule.style) ? eval(`(${context}) => (${rule.style})`) : rule.style;
             if ('padding' in rule)
