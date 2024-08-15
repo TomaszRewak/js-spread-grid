@@ -72,6 +72,25 @@ function useResolvedFiltering(filtering) {
     }, [filtering]);
 }
 
+function useResolvedSorting(sorting) {
+    return useMemo(() => {
+        return sorting.map(rule => {
+            const mappedRule = {};
+
+            if ('column' in rule)
+                mappedRule.column = rule.column;
+            if ('row' in rule)
+                mappedRule.row = rule.row;
+            if ('comparator' in rule)
+                mappedRule.comparator = eval(`(lhs, rhs) => (${rule.comparator})`);
+            if ('by' in rule)
+                mappedRule.by = rule.by;
+
+            return mappedRule;
+        });
+    }, [sorting]);
+}
+
 function useResolvedDataSelector(dataSelector) {
     return useMemo(() => {
         return eval(`({data, row, column}) => (${dataSelector})`);
@@ -92,6 +111,7 @@ function DashSpreadGrid(props) {
     const formatting = useResolvedFormatting(props.formatting);
     const filtering = useResolvedFiltering(props.filtering);
     const dataSelector = useResolvedDataSelector(props.data_selector);
+    const sorting = useResolvedSorting(props.sorting);
     const pinnedTop = props.pinned_top;
     const pinnedBottom = props.pinned_bottom;
     const pinnedLeft = props.pinned_left;
@@ -154,6 +174,7 @@ function DashSpreadGrid(props) {
             columns,
             rows,
             formatting,
+            sorting,
             filtering,
             pinnedTop,
             pinnedBottom,
