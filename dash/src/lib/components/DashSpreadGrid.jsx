@@ -124,6 +124,14 @@ function DashSpreadGrid(props) {
     const onColumnWidthsChange = useCallback((columnWidths) => {
         setProps({ column_widths: columnWidths });
     }, [setProps]);
+    const contextMenuCell = props.context_menu_cell;
+    const onCellContextMenu = useCallback((cell) => {
+        setProps({ context_menu_cell: { ...cell, n: counter.current++ } });
+    }, [setProps]);
+    const contextMenuCustomCell = props.context_menu_custom_cell;
+    const onCustomCellContextMenu = useCallback((cell) => {
+        setProps({ context_menu_custom_cell: { ...cell, n: counter.current++ } });
+    }, [setProps]);
     const rowHeights = props.row_heights;
     const onRowHeightsChange = useCallback((rowHeights) => {
         setProps({ row_heights: rowHeights });
@@ -180,6 +188,10 @@ function DashSpreadGrid(props) {
             onCellClick,
             clickedCustomCell,
             onCustomCellClick,
+            contextMenuCell,
+            onCellContextMenu,
+            contextMenuCustomCell,
+            onCustomCellContextMenu,
             onActiveColumnsChange,
             onActiveRowsChange,
             onHoveredCellChange,
@@ -244,6 +256,10 @@ DashSpreadGrid.propTypes = {
     // _
     clicked_custom_cell: PropTypes.object,
     // _
+    context_menu_cell: PropTypes.object,
+    // _
+    context_menu_custom_cell: PropTypes.object,
+    // _
     active_columns: PropTypes.array,
     // _
     active_rows: PropTypes.array,
@@ -276,6 +292,8 @@ DashSpreadGrid.defaultProps = {
     rows_order: [],
     clicked_cell: null,
     clicked_custom_cell: null,
+    context_menu_cell: null,
+    context_menu_custom_cell: null,
     active_columns: [],
     active_rows: [],
     hovered_cell: null,
