@@ -76,6 +76,9 @@ function useResolvedFiltering(filtering) {
 
 function useResolvedSorting(sorting) {
     return useMemo(() => {
+        if (isString(sorting))
+            return sorting;
+
         return sorting.map(rule => {
             const mappedRule = {};
 

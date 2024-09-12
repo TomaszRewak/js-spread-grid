@@ -169,6 +169,29 @@ export default function Sorting() {
                     By default, sorting criteria sort <code>by</code> the <code>"HEADER"</code> id. If the header id is renamed without providing custom sorting criteria, sorting will not work.
                 </Paragraph>
             </Section>
+            <SubHeader>Manual sorting</SubHeader>
+            <Section>
+                <Paragraph>
+                    The <code>sorting</code> property can be set to <code>'manual'</code> to disable automatic sorting. In this case, the <strong>row</strong> and <strong>column</strong> order will reflect the initial data order, despite any <code>sortBy</code> criteria.
+                </Paragraph>
+                <CodeBlock options={[
+                    {
+                        framework: 'jsx',
+                        code: require('!!raw-loader!./snippets/sorting/manual.jsx').default
+                    },
+                    {
+                        framework: 'js',
+                        code: require('!!raw-loader!./snippets/sorting/manual.js').default
+                    },
+                    {
+                        framework: 'py',
+                        code: require('!!raw-loader!./snippets/sorting/manual.py').default
+                    }
+                ]} />
+                <Example>
+                    <ManualExample />
+                </Example>
+            </Section>
         </>
     );
 }
@@ -332,6 +355,22 @@ function MultiHeader() {
                     by: "bottom-header",
                 }
             ]}
+        />
+    );
+}
+
+function ManualExample() {
+    const [sortBy, setSortBy] = useState([{ columnId: "age", direction: "ASC" }]);
+
+    return (
+        <SpreadGrid
+            data={[
+                ...defaultData
+            ]}
+            columns={[{ type: 'DATA-BLOCK', width: 70 }]}
+            sortBy={sortBy}
+            onSortByChange={setSortBy}
+            sorting='manual'
         />
     );
 }
