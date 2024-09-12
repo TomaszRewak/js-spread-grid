@@ -170,6 +170,10 @@ function DashSpreadGrid(props) {
     const onHoveredCellChange = useCallback((hoveredCell) => {
         setProps({ hovered_cell: hoveredCell });
     }, [setProps]);
+    const onStateChange = useCallback((stateChange) => {
+        setProps({ state_change: [...stateChange, counter.current++] });
+    }, [setProps]);
+
 
     const [element, setElement] = useState(null);
 
@@ -209,6 +213,7 @@ function DashSpreadGrid(props) {
             onActiveColumnsChange,
             onActiveRowsChange,
             onHoveredCellChange,
+            onStateChange,
         });
 
     return React.createElement("div", { ref: setElement });
@@ -275,6 +280,8 @@ DashSpreadGrid.propTypes = {
     active_rows: PropTypes.array,
     // _
     hovered_cell: PropTypes.object,
+    // _
+    state_change: PropTypes.array,
 };
 
 DashSpreadGrid.defaultProps = {
@@ -305,6 +312,7 @@ DashSpreadGrid.defaultProps = {
     active_columns: [],
     active_rows: [],
     hovered_cell: null,
+    state_change: [],
 };
 
 export default DashSpreadGrid;
