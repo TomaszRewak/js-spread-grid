@@ -8,7 +8,7 @@
             "DOM"
         ],
         // "strict": true
-        // "noImplicitAny": true - once all typings are added, this option needs to be enabled
+        "noImplicitAny": true
     },
     "exclude": [
         "node_modules",
