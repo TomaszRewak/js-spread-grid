@@ -7,24 +7,43 @@ import Example from "../../components/Example";
 export default function Tooltips() {
     return (
         <>
-            <WorkInProgress step="design" />
+            <WorkInProgress step="implementation" details="Firefox not fully supported - waiting for full browser support of popover anchors" />
             <Section>
                 <Example>
-                    <TooltipExample />
+                    <TooltipSimpleExample />
+                </Example>
+            </Section>
+            <Section>
+                <Example>
+                    <TooltipHtmlExample />
                 </Example>
             </Section>
         </>
     );
 }
 
-function TooltipExample() {
+function TooltipSimpleExample() {
     return (
         <SpreadGrid
             data={defaultData}
             formatting={[
                 {
                     column: { id: 'score' },
-                    tooltip: ({ value }) => value > 50 ? 'Good score' : 'Bad score'
+                    tooltip: ({ value }) => value > 50 ? `Good score` : `Bad score`
+                }
+            ]}
+        />
+    );
+}
+
+function TooltipHtmlExample() {
+    return (
+        <SpreadGrid
+            data={defaultData}
+            formatting={[
+                {
+                    column: { id: 'score' },
+                    tooltip: ({ value }) => value > 50 ? `Good score<br><i style="color: green">${value}/100</i>` : `Bad score<br><i style="color: red">${value}/100</i>`
                 }
             ]}
         />
