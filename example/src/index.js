@@ -181,6 +181,10 @@ function App() {
                 {
                     row: { id: 103 },
                     style: { textBaseline: 'bottom' }
+                },
+                {
+                    column: { id: 'column_3' },
+                    tooltip: ({ value }) => `Tooltip: ${value}`
                 }
             ]}
         />
