@@ -33,6 +33,8 @@ function useResolvedFormatting(formatting) {
                 mappedRule.padding = isString(rule.padding) ? eval(`(${context}) => (${rule.padding})`) : rule.padding;
             if ('draw' in rule)
                 mappedRule.draw = eval(`(${context}) => {${rule.draw}}`);
+            if ('tooltip' in rule)
+                mappedRule.tooltip = eval(`(${context}) => (${rule.tooltip})`);
             if ('edit' in rule)
                 if (rule.edit) {
                     const mappedEdit = {};
