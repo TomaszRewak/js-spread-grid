@@ -1,6 +1,6 @@
 Package: dashSpreadGrid
 Title: Fast grid for Dash applications
-Version: 0.2.0
+Version: 0.2.1
 Description: Fast grid for Dash applications
 Depends: R (>= 3.0.2)
 Imports: 
