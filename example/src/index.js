@@ -184,7 +184,10 @@ function App() {
                 },
                 {
                     column: { id: 'column_3' },
-                    tooltip: ({ value }) => `Tooltip: ${value}`
+                    tooltip: ({ value }) => {
+                        console.log('tooltip', value);
+                        return `Tooltip: ${value}`;
+                    }
                 }
             ]}
         />
