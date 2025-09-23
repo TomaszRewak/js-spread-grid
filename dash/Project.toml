@@ -2,7 +2,7 @@
 name = "DashSpreadGrid"
 uuid = "1b08a953-4be3-4667-9a23-fffbb74bec04"
 authors = ["Tomasz Rewak <tomasz.rewak@gmail.com>"]
-version = "0.2.4"
+version = "0.2.5"
 
 [deps]
 Dash = "1b08a953-4be3-4667-9a23-3db579824955"
