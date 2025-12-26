@@ -280,7 +280,7 @@ Manifest.toml
 JuliaManifest.toml
 
 # Auto-generated files
-dash_spread_grid/
+dash_spread_grid/*
 !dash_spread_grid/__init__.py
 deps/
 inst/

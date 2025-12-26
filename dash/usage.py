@@ -5,16 +5,16 @@ from time import time
 _dash_renderer._set_react_version("18.2.0")
 
 
-appData = {
-    'fetcher-eu-001': {'tags': ['fetcher', 'eu', 'core'], 'startedAt': time() - 60_000_000, 'stoppedAt': None, 'isRequired': True},
-    'fetcher-eu-002': {'tags': ['fetcher', 'eu', 'core'], 'startedAt': None, 'stoppedAt': time() - 60_000, 'isRequired': True},
-    'fetcher-apac-001': {'tags': ['fetcher', 'apac', 'core'], 'startedAt': time() - 120_000, 'stoppedAt': None, 'isRequired': True},
-    'fetcher-us-001': {'tags': ['fetcher', 'us', 'core'], 'startedAt': time() - 80_000, 'stoppedAt': None, 'isRequired': True},
-    'logger-eu-001': {'tags': ['logger', 'eu', 'metrics'], 'startedAt': time() - 4_000, 'stoppedAt': None, 'isRequired': False},
-    'logger-apac-001': {'tags': ['logger', 'apac', 'metrics'], 'startedAt': None, 'stoppedAt': time() - 60_000, 'isRequired': False},
-    'logger-us-001': {'tags': ['logger', 'us', 'metrics'], 'startedAt': time() - 80_000, 'stoppedAt': None, 'isRequired': False},
-    'consolidator-comp-001': {'tags': ['consolidator', 'global', 'core'], 'startedAt': time() - 2_000_000, 'stoppedAt': None, 'isRequired': True},
-}    
+appData = [
+    {'name': 'fetcher-eu-001', 'tags': ['fetcher', 'eu', 'core'], 'startedAt': time() - 60_000_000, 'stoppedAt': None, 'isRequired': True},
+    {'name': 'fetcher-eu-002', 'tags': ['fetcher', 'eu', 'core'], 'startedAt': None, 'stoppedAt': time() - 60_000, 'isRequired': True},
+    {'name': 'fetcher-apac-001', 'tags': ['fetcher', 'apac', 'core'], 'startedAt': time() - 120_000, 'stoppedAt': None, 'isRequired': True},
+    {'name': 'fetcher-us-001', 'tags': ['fetcher', 'us', 'core'], 'startedAt': time() - 80_000, 'stoppedAt': None, 'isRequired': True},
+    {'name': 'logger-eu-001', 'tags': ['logger', 'eu', 'metrics'], 'startedAt': time() - 4_000, 'stoppedAt': None, 'isRequired': False},
+    {'name': 'logger-apac-001', 'tags': ['logger', 'apac', 'metrics'], 'startedAt': None, 'stoppedAt': time() - 60_000, 'isRequired': False},
+    {'name': 'logger-us-001', 'tags': ['logger', 'us', 'metrics'], 'startedAt': time() - 80_000, 'stoppedAt': None, 'isRequired': False},
+    {'name': 'consolidator-comp-001', 'tags': ['consolidator', 'global', 'core'], 'startedAt': time() - 2_000_000, 'stoppedAt': None, 'isRequired': True},
+] 
 
 app = Dash(__name__)
 app.layout = html.Div([
@@ -35,19 +35,18 @@ app.layout = html.Div([
         rows=[
             {'type': 'HEADER'},
             {'type': 'FILTER'},
-            {'type': 'DATA-BLOCK'},
+            {
+                'type': 'DATA-BLOCK',
+                'id': 'data[selector].name'
+            },
             {'type': 'CUSTOM', 'id': 'summary'}
         ],
         formatting=[
             {
                 'column': {'id': 'status'},
-                'value': 'data[row.id].stoppedAt ? "stopped" : data[row.id].startedAt ? "running" : "inactive"',
+                'value': 'data[row.selector].stoppedAt ? "stopped" : data[row.selector].startedAt ? "running" : "inactive"',
                 'style': 'value === "running" ? {background: "#3d9943"} : value === "stopped" ? {background: "#ff5454"} : {background: "#ededed"}',
                 'text': '""'
-            },
-            {
-                'column': {'id': 'name'},
-                'value': 'row.id'
             },
             {
                 'row': {'id': 'summary'},
@@ -58,7 +57,7 @@ app.layout = html.Div([
                 'column': {'id': 'start'},
                 'row': [{'type': 'DATA'}, {'id': 'summary'}],
                 'text': '"▷"',
-                'value': '!data[row.id] || !data[row.id].startedAt'
+                'value': '!data[row.selector] || !data[row.selector].startedAt'
             },
             {
                 'column': {'id': 'restart'},
@@ -70,7 +69,7 @@ app.layout = html.Div([
                 'column': {'id': 'stop'},
                 'row': [{'type': 'DATA'}, {'id': 'summary'}],
                 'text': '"▢"',
-                'value': '!data[row.id] || data[row.id].startedAt'
+                'value': '!data[row.selector] || data[row.selector].startedAt'
             },
             {
                 'column': {'label': 'button'},
@@ -123,7 +122,7 @@ app.layout = html.Div([
             },
             {
                 'column': {'id': 'isRequired'},
-                'condition': 'value && !data[row.id].startedAt',
+                'condition': 'value && !data[row.selector].startedAt',
                 'style': '{background: "#ffb3b3"}'
             },
             {
@@ -175,16 +174,16 @@ app.layout = html.Div([
 ])
 
 
-# @callback(Output('output', 'children'), Input('grid', 'clicked_cell'))
-# def display_output(clicked_cell):
-#     print(clicked_cell)
-#     return f'Cell clicked: {clicked_cell}'
+@callback(Output('output', 'children'), Input('grid', 'clicked_cell'))
+def display_output(clicked_cell):
+    print(clicked_cell)
+    return f'Cell clicked: {clicked_cell}'
 
 
-@callback(Output('output', 'children'), Input('grid', 'active_rows'), Input('grid', 'active_columns'))
-def display_active(active_rows, active_columns):
-    print(active_rows, active_columns)
-    return f'Active rows: {active_rows}, Active columns: {active_columns}'
+# @callback(Output('output', 'children'), Input('grid', 'active_rows'), Input('grid', 'active_columns'))
+# def display_active(active_rows, active_columns):
+#     print(active_rows, active_columns)
+#     return f'Active rows: {active_rows}, Active columns: {active_columns}'
 
 
 if __name__ == '__main__':

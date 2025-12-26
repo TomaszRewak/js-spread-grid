@@ -104,8 +104,28 @@ function useResolvedDataSelector(dataSelector) {
     }, [dataSelector]);
 }
 
+function useResolvedDimension(entries) {
+    return useMemo(() => {
+        return entries.map(entry => {
+            const mappedEntry = { ...entry };
+
+            if (entry.type == 'DATA-BLOCK') {
+                if ('selector' in entry)
+                    mappedEntry.selector = eval(`data => (${entry.selector})`);
+                if ('id' in entry)
+                    mappedEntry.id = eval(`({data, selector}) => (${entry.id})`);
+            }
+
+            return mappedEntry;
+        });
+    }, [entries]);
+}
+
 // TODO: Write description
 // TODO: Rename to DashSpreadGrid
+/**
+ * _
+ */
 function DashSpreadGrid(props) {
     // console.count('render DashSpreadGrid');
 
@@ -113,8 +133,8 @@ function DashSpreadGrid(props) {
     const counter = useRef(0);
 
     const data = props.data;
-    const columns = props.columns;
-    const rows = props.rows;
+    const columns = useResolvedDimension(props.columns);
+    const rows = useResolvedDimension(props.rows);
     const formatting = useResolvedFormatting(props.formatting);
     const filtering = useResolvedFiltering(props.filtering);
     const dataSelector = useResolvedDataSelector(props.data_selector);
@@ -219,63 +239,121 @@ function DashSpreadGrid(props) {
 // TODO: add descriptions
 // TODO: Fix types
 DashSpreadGrid.propTypes = {
-    // _
+    /**
+     * _
+     */
     setProps: PropTypes.func,
-    // _
+    /**
+     * _
+     */
     id: PropTypes.string,
-    // _
+    /**
+     * _
+     */
     data: PropTypes.any,
-    // _
+    /**
+     * _
+     */
     columns: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     rows: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     formatting: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     filtering: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     sorting: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     data_selector: PropTypes.string,
-    // _
+    /**
+     * _
+     */
     pinned_top: PropTypes.number,
-    // _
+    /**
+     * _
+     */
     pinned_bottom: PropTypes.number,
-    // _
+    /**
+     * _
+     */
     pinned_left: PropTypes.number,
-    // _
+    /**
+     * _
+     */
     pinned_right: PropTypes.number,
-    // _
+    /**
+     * _
+     */
     borderWidth: PropTypes.number,
-    // _
+    /**
+     * _
+     */
     focusedCell: PropTypes.object,
-    // _
+    /**
+     * _
+     */
     selected_cells: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     highlightedCells: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     edited_cells: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     filters: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     sort_by: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     column_widths: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     row_heights: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     columns_order: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     rows_order: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     clicked_cell: PropTypes.object,
-    // _
+    /**
+     * _
+     */
     clicked_custom_cell: PropTypes.object,
-    // _
+    /**
+     * _
+     */
     active_columns: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     active_rows: PropTypes.array,
-    // _
+    /**
+     * _
+     */
     hovered_cell: PropTypes.object,
 };
 
@@ -286,7 +364,7 @@ DashSpreadGrid.defaultProps = {
     formatting: [],
     filtering: [],
     sorting: [],
-    data_selector: "data[row.id][column.id]",
+    data_selector: "data[row.selector][column.selector]",
     pinned_top: 0,
     pinned_bottom: 0,
     pinned_left: 0,
