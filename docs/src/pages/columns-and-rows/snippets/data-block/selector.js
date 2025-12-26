@@ -16,5 +16,5 @@ SpreadGrid(div, {
             selector: data => Array.from({ length: data.rows }, (_, index) => index + 1)
         },
     ],
-    dataSelector: ({ data, column, row }) => column.id * row.id + data.offset,
+    dataSelector: ({ data, column, row }) => column.selector * row.selector + data.offset,
 });

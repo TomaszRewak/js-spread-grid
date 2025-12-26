@@ -12,7 +12,7 @@ export default function DataSelector() {
             <SubHeader>Data selector</SubHeader>
             <Section>
                 <Paragraph>
-                    In Spread Grid, the <code>dataSelector</code> is a function used to retrieve cell values from the provided <code>data</code> object. The default value of the data selector is: <code>{"({ data, row, column }) => data[row.id][column.id]"}</code>
+                    In Spread Grid, the <code>dataSelector</code> is a function used to retrieve cell values from the provided <code>data</code> object. The default value of the data selector is: <code>{"({ data, row, column }) => data[row.selector][column.selector]"}</code>
                 </Paragraph>
                 <Paragraph>
                     In most cases, you won't have to overwrite this default data selector. It works well for standard grid setups where data is a simple object or array.
@@ -123,7 +123,7 @@ function ComparisonTableExample() {
     }
 
     const dataSelector = ({ data, row, column }) => {
-        return data[row.id[column.id.side]][column.id.property];
+        return data[row.selector[column.selector.side]][column.selector.property];
     };
 
     return (

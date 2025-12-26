@@ -16,5 +16,5 @@ app.layout = DashSpreadGrid(  # type: ignore
             "selector": "Array.from({ length: data.rows }, (_, index) => index + 1)",
         },
     ],
-    dataSelector=lambda data, column, row: column["id"] * row["id"] + data["offset"],
+    dataSelector=lambda data, column, row: column["selector"] * row["selector"] + data["offset"],
 )

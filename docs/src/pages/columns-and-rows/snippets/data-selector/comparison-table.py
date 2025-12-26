@@ -50,5 +50,5 @@ app.layout = DashSpreadGrid(  # type: ignore
         "David": {"name": "David", "age": 18, "score": 60, "registered": True},
         # collapse: false
     },
-    dataSelector="data[row.id[column.id.side]][column.id.property]",
+    dataSelector="data[row.selector[column.selector.side]][column.selector.property]",
 )

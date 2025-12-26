@@ -21,7 +21,7 @@ import DataBlock from './pages/columns-and-rows/data-block';
 import Ids from './pages/columns-and-rows/ids';
 import DataSelector from './pages/columns-and-rows/data-selector';
 import Style from './pages/formatting/style';
-import Selectors from './pages/formatting/selectors';
+import MatchingRules from './pages/formatting/matching-rules';
 import Text from './pages/formatting/text';
 import Value from './pages/formatting/value';
 import Draw from './pages/formatting/draw';
@@ -54,7 +54,7 @@ const routes = [
         chapter: 'formatting',
         pages: [
             { title: 'introduction', page: FormattingIntroduction },
-            { title: 'selectors', page: Selectors },
+            { title: 'matching rules', page: MatchingRules },
             { title: 'style', page: Style },
             { title: 'text', page: Text },
             { title: 'font', page: Font },

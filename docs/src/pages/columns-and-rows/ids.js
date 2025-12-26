@@ -19,7 +19,7 @@ export default function Ids() {
                     Columns and rows also have an (auto-populated) <code>index</code> property that can be accessed in format rules and data selectors. However, it is best used only for things like alternating background colors, as indices will change together with data sorting and filtering.
                 </Paragraph>
                 <Paragraph>
-                    Object-based IDs are especially useful when working with complex data structures, but in most cases using them will require you to define a custom <code>dataSelector</code> function to extract cell values from the <code>data</code> object based on the defined IDs.
+                    By default, if no custom definitions are provided, the Spread Grid will generate ids out of indices found in the provided data.
                 </Paragraph>
             </Section>
 
@@ -68,6 +68,39 @@ export default function Ids() {
                 <Example>
                     <NegativeExample />
                 </Example>
+            </Section>
+
+            <SubHeader>Explicit IDs</SubHeader>
+            <Section>
+                <Paragraph>
+                    You don't need to change the shape of your data in order to specify unique IDs. Even when specifying data as an array of objects, each of those objects can be assigned as explicit unique ID that is independent from the row index.
+                </Paragraph>
+                <Paragraph>
+                    In practice, this is the difference between the <code>id</code> and the <code>selector</code> or a row/column. The <code>id</code> is used to identify the row during interactions and formatting, while <code>selector</code> is being used to extract cell values from the data.
+                </Paragraph>
+                <CodeBlock options={[
+                    {
+                        framework: 'jsx',
+                        code: require('!!raw-loader!./snippets/ids/explicit.jsx').default
+                    },
+                    {
+                        framework: 'js',
+                        code: require('!!raw-loader!./snippets/ids/explicit.js').default
+                    },
+                    {
+                        framework: 'py',
+                        code: require('!!raw-loader!./snippets/ids/explicit.py').default
+                    }
+                ]} />
+                <Example>
+                    <ExplicitExample />
+                </Example>
+                <Paragraph>
+                    It's important to remember this distinction. As whenever the <code>selector</code> is not provided, it will just assume the same value as the <code>id</code>. But it's not always the desired behavior.
+                </Paragraph>
+                <Paragraph>
+                    Using distinct ids and selectors is, in many cases, the only way of maintaining complex ids (which are useful when implementing grid interactions). For example IDs like <code>&#123;name: "Bob", surname: "Smith"&#125;</code> can be used only if explicit selectors are defined. This is because in JS associative arrays cannot be keyed on complex objects and therefor cannot be used as basic selectors. But when splitting them up, the selector can still be the index of a row, while the ID can assume a more complex form.
+                </Paragraph>
             </Section>
 
             <SubHeader>Uses of IDs</SubHeader>
@@ -162,6 +195,44 @@ function NegativeExample() {
             data={data}
             selectedCells={selectedCells}
             onSelectedCellsChange={setSelectedCells}
+        />
+    );
+}
+
+function ExplicitExample() {
+    const [data, setData] = useState(defaultData);
+    const [selectedCells, setSelectedCells] = useState([
+        {
+            rowId: 'Alice',
+            columnId: 'name'
+        }
+    ]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setData((prevData) => {
+                const length = prevData.length;
+                return [prevData[length - 1], ...prevData.slice(0, length - 1)];
+            });
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <SpreadGrid
+            data={data}
+            selectedCells={selectedCells}
+            onSelectedCellsChange={setSelectedCells}
+            rows={[
+                { type: 'HEADER' },
+                { id: data[0].name, selector: 0 },
+                { id: data[1].name, selector: 1 },
+                { id: data[2].name, selector: 2 },
+                { id: data[3].name, selector: 3 },
+                { id: data[4].name, selector: 4 },
+                { id: data[5].name, selector: 5 },
+                { id: data[6].name, selector: 6 },
+            ]}
         />
     );
 }

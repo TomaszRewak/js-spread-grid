@@ -5,6 +5,7 @@ import CodeBlock from "../../components/CodeBlock";
 import SubHeader from "../../components/SubHeader";
 import Section from "../../components/Section";
 import { defaultData } from "../../utils/defaults";
+import { useState, useEffect } from 'react';
 
 export default function DataBlock() {
     return (
@@ -98,10 +99,10 @@ export default function DataBlock() {
                     The <code>DATA-BLOCK</code> type supports a special <code>selector</code> property that allows for customizing the key selection process. This can be useful when you need more control over which keys are used to generate columns or rows.
                 </Paragraph>
                 <Paragraph>
-                    When using a custom <code>DATA-BLOCK</code> selector, you might also need to provide a <code>dataSelector</code> to specify how the data should be retrieved. The <code>data-selector</code> function has access to the <code>data</code>, <code>column</code>, and <code>row</code> properties (were both the column and row are objects with an <code>id</code> property).
+                    When using a custom <code>DATA-BLOCK</code> selector, you might also need to provide a <code>dataSelector</code> to specify how the data should be retrieved. The <code>data-selector</code> function has access to the <code>data</code>, <code>column</code>, and <code>row</code> properties (were both the column and row are objects with an <code>selector</code> property).
                 </Paragraph>
                 <Paragraph>
-                    For example, you can use a <code>dataSelector</code> function like this <code>column.id * row.id + data.offset</code> to calculate cell values (without having to store them in the data object directly).
+                    For example, you can use a <code>dataSelector</code> function like this <code>column.selector * row.selector + data.offset</code> to calculate cell values (without having to store them in the data object directly).
                 </Paragraph>
                 <CodeBlock options={[
                     {
@@ -132,8 +133,35 @@ export default function DataBlock() {
                                 selector: data => Array.from({ length: data.rows }, (_, index) => index + 1),
                             },
                         ]}
-                        dataSelector={({ data, column, row }) => column.id * row.id + data.offset}
+                        dataSelector={({ data, column, row }) => column.selector * row.selector + data.offset}
                     />
+                </Example>
+            </Section>
+
+            <SubHeader>Generating IDs</SubHeader>
+            <Section>
+                <Paragraph>
+                    Independently from the <code>selector</code> you can also specify a custom <code>id</code> function which will assign a unique identifier to each of the rows and/or columns.
+                </Paragraph>
+                <Paragraph>
+                    It should accept an object with two fields (<code>data</code> and <code>selector</code>) as a parameter and produce a unique identifier of any form (a string, int, object, array...). This identifier will be used to maintain cell selection (even when the order of row changes) and to apply formatting rules.
+                </Paragraph>
+                <CodeBlock options={[
+                    {
+                        framework: 'jsx',
+                        code: require('!!raw-loader!./snippets/data-block/ids.jsx').default
+                    },
+                    {
+                        framework: 'js',
+                        code: require('!!raw-loader!./snippets/data-block/ids.js').default
+                    },
+                    {
+                        framework: 'py',
+                        code: require('!!raw-loader!./snippets/data-block/ids.py').default
+                    }
+                ]} />
+                <Example>
+                    <IdsExample />
                 </Example>
             </Section>
 
@@ -172,5 +200,40 @@ export default function DataBlock() {
                 </Example>
             </Section>
         </>
+    );
+}
+
+function IdsExample() {
+    const [data, setData] = useState(defaultData);
+    const [selectedCells, setSelectedCells] = useState([
+        {
+            rowId: 'Alice',
+            columnId: 'name'
+        }
+    ]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setData((prevData) => {
+                const length = prevData.length;
+                return [prevData[length - 1], ...prevData.slice(0, length - 1)];
+            });
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <SpreadGrid
+            data={data}
+            selectedCells={selectedCells}
+            onSelectedCellsChange={setSelectedCells}
+            rows={[
+                { type: 'HEADER' },
+                {
+                    type: 'DATA-BLOCK',
+                    id: ({ data, selector }) => data[selector].name
+                }
+            ]}
+        />
     );
 }

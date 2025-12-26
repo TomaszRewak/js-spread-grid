@@ -141,6 +141,7 @@ export default function Introduction() {
                     Columns/rows support following properties:
                     <ul>
                         <li><code>id</code> - unique identifier of the column/row</li>
+                        <li><code>selector</code> - an identifier used to extract cell value from the data</li>
                         <li><code>type</code> - type of the column/row</li>
                         <li><code>header</code> - header of the column/row</li>
                         <li><code>width</code>/<code>height</code> - width/height of the column/row</li>

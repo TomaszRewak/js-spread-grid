@@ -36,6 +36,7 @@
     color: lightpink;
     padding: 5px;
     margin: 0;
+    overflow-x: auto;
 }
 
 .CodeBlock-body code {

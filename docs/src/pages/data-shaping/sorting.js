@@ -74,7 +74,7 @@ export default function Sorting() {
             <SubHeader>Custom sorting</SubHeader>
             <Section>
                 <Paragraph>
-                    It's possible to define custom sorting comparators through the <code>sorting</code> property. The property accepts an array that is similar in nature to the <code>formatting</code> array. The <code>column</code> and <code>row</code> properties of each element are used to <strong>select</strong> which cells the rule should apply to (see <a href="/formatting/selectors">selectors</a> for more information).
+                    It's possible to define custom sorting comparators through the <code>sorting</code> property. The property accepts an array that is similar in nature to the <code>formatting</code> array. The <code>column</code> and <code>row</code> properties of each element are used to <strong>select</strong> which cells the rule should apply to (see <a href="/formatting/matching-rules">selectors</a> for more information).
                 </Paragraph>
                 <Paragraph>
                     The comparator function should return a boolean value indicating whether the first value is smaller than the second.
