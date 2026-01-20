@@ -144,7 +144,8 @@ function DepthGrid() {
             data={data}
             rows={rows}
             columns={columns}
-            pinnedTop={1}
+            pinnedTop={1} //3
+            //pinnedBottom={3}
             formatting={formatting}
         />
     );
