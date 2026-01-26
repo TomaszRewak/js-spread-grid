@@ -6,7 +6,10 @@ const rows = [
     {
         type: "DYNAMIC-BLOCK",
         height: 15,
-        count: 5
+        count: 5,
+        selector: ({ index }) => index,
+        id: ({ selector }) => selector,
+        header: ({ selector }) => `${selector}`
     },
     { id: 110, height: 15 },
     { id: 107, height: 15 },
