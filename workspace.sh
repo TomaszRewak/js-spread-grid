@@ -32,7 +32,7 @@ tmux send-keys -t "$workspace:7.0" "cd dash" C-m ". venv/bin/activate" C-m "whil
 tmux send-keys -t "$workspace:7.1" "cd dash" C-m "npm run watch" C-m
 
 tmux new-window -t "$workspace:8" -n "tests"
-tmux send-keys -t "$workspace:8" "cd tests" C-m "npm test"
+tmux send-keys -t "$workspace:8" "cd tests" C-m "npm test -- --watchAll=false"
 
 tmux new-window -t "$workspace:9" -n "validate"
 tmux send-keys -t "$workspace:9" "cd lib" C-m "tsc -w -p jsconfig.json" C-m
