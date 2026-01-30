@@ -2,7 +2,7 @@ import SpreadGrid from "react-spread-gird";
 import { useEffect, useState } from "react";
 
 const rows = [
-    { type: "HEADER", height: 30 },
+    { type: "HEADER", height: 15 },
     {
         type: "DYNAMIC-BLOCK",
         height: 15,
@@ -11,58 +11,6 @@ const rows = [
         id: ({ selector }) => selector,
         header: ({ selector }) => `${selector}`
     },
-    {
-        type: "DYNAMIC-BLOCK",
-        height: 15,
-        count: 100000,
-        selector: ({ index }) => index,
-        id: ({ selector }) => selector,
-        header: ({ selector }) => `${selector}`
-    },
-    // { id: 110, height: 15 },
-    // { id: 107, height: 15 },
-    // { id: 106, height: 15 },
-    // { id: 105, height: 15 },
-    // { id: 104, height: 15 },
-    // { id: 103, height: 15 },
-    // { id: 102, height: 15 },
-    // { id: 101, height: 15 },
-    // { id: 100, height: 15 },
-    // { id: 99, height: 15 },
-    // { id: 98, height: 15 },
-    // { id: 97, height: 15 },
-    // { id: 96, height: 15 },
-    // { id: 95, height: 15 },
-    // { id: 94, height: 15 },
-    // { id: 93, height: 15 },
-    // { id: 92, height: 15 },
-    // { id: 91, height: 15 },
-    // { id: 90, height: 15 },
-    // { id: 89, height: 15 },
-    // { id: 88, height: 15 },
-    // { id: 87, height: 15 },
-    // { id: 86, height: 15 },
-    // { id: 85, height: 15 },
-    // { id: 84, height: 15 },
-    // { id: 83, height: 15 },
-    // { id: 82, height: 15 },
-    // { id: 81, height: 15 },
-    // { id: 80, height: 15 },
-    // { id: 79, height: 15 },
-    // { id: 78, height: 15 },
-    // { id: 77, height: 15 },
-    // { id: 76, height: 15 },
-    // { id: 75, height: 15 },
-    // { id: 74, height: 15 },
-    // { id: 73, height: 15 },
-    // { id: 72, height: 15 },
-    // { id: 71, height: 15 },
-    // { id: 70, height: 15 },
-    // { id: 69, height: 15 },
-    // { id: 68, height: 15 },
-    // { id: 67, height: 15 },
-    // { id: 66, height: 15 },
-    // { id: 65, height: 15 },
     { type: "HEADER", height: 30 },
 ];
 const columns = [
@@ -156,10 +104,12 @@ function DepthGrid() {
             data={data}
             rows={rows}
             columns={columns}
-            pinnedTop={5}
-            pinnedBottom={2}
+            pinnedTop={1}
             formatting={formatting}
-            borderWidth={1}
+            verticalScrollTarget={{
+                index: 100,
+                position: 'MIDDLE',
+            }}
         />
     );
 }
