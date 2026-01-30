@@ -159,6 +159,7 @@ function DepthGrid() {
             pinnedTop={5}
             pinnedBottom={2}
             formatting={formatting}
+            borderWidth={1}
         />
     );
 }

@@ -13,6 +13,7 @@
     },
     "homepage": "https://spread-grid.tomasz-rewak.com",
     "main": "src/index.js",
+    "types": "src/index.d.ts",
     "type": "module",
     "scripts": {
         "build": "webpack --mode=production --output-library-type=umd --output-library-export=default --output-library-name=SpreadGrid --entry ./src/index.js --output-filename ./index.js",
