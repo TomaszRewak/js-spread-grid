@@ -107,7 +107,7 @@ function DepthGrid() {
             pinnedTop={1}
             formatting={formatting}
             verticalScrollTarget={{
-                index: 100,
+                index: 1000000,
                 position: 'MIDDLE',
             }}
         />
