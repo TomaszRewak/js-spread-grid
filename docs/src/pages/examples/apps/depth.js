@@ -107,8 +107,15 @@ function DepthGrid() {
             pinnedTop={1}
             formatting={formatting}
             verticalScrollTarget={{
-                index: 1000000,
+                index: 100,
                 position: 'MIDDLE',
+                speed: [
+                    {
+                        pixelsPerSecond: 300,
+                        maxDistance: 500
+                    }
+                ],
+                //disableOnHover: false
             }}
         />
     );
