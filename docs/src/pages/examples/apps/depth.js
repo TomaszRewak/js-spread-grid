@@ -157,11 +157,15 @@ function generateOurOrders(middleIndex) {
     return {
         bids: {
             [getPrice(middleIndex - 2)]: 10,
-            [getPrice(middleIndex - 5)]: 20
+            [getPrice(middleIndex - 5)]: 20,
+            [getPrice(middleIndex - 6)]: 20,
+            [getPrice(middleIndex - 7)]: 20
         },
         asks: {
             [getPrice(middleIndex + 2)]: 10,
-            [getPrice(middleIndex + 5)]: 20
+            [getPrice(middleIndex + 5)]: 20,
+            [getPrice(middleIndex + 6)]: 20,
+            [getPrice(middleIndex + 7)]: 20
         },
         bought: {},
         sold: {}
