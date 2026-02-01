@@ -238,8 +238,8 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
             marketAsks[price] = (marketAsks[price] || 0) + ourOrders.asks[price];
         const maxVolume = Math.max(0, ...Object.values(marketBids), ...Object.values(marketAsks));
         return {
-            bidPrice: Math.max(getPrice(bidIndex), ...Object.keys(ourOrders.bids)),
-            askPrice: Math.min(getPrice(askIndex), ...Object.keys(ourOrders.asks)),
+            bidPrice: Math.max(...Object.keys(marketBids)),
+            askPrice: Math.min(...Object.keys(marketAsks)),
             market: {
                 bids: marketBids,
                 asks: marketAsks
