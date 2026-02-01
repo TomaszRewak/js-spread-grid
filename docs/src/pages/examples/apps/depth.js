@@ -1,18 +1,51 @@
 import SpreadGrid from "react-spread-gird";
 import { useEffect, useState, useMemo, useCallback } from "react";
 
+const tickSizes = [
+    [10, 0.01],
+    [100, 0.1],
+    [null, 1]
+]
+
+function getPrice(index) {
+    let price = 0;
+    for (const [maxPrice, tickSize] of tickSizes) {
+        const steps = (maxPrice - price) / tickSize;
+
+        if (maxPrice === null || index < steps)
+            return price + index * tickSize;
+
+        price += steps * tickSize;
+        index -= steps;
+    }
+}
+
+function drawVolumeBar(ctx, value, maxValue, width, height, color, leftToRight) {
+    if (!value)
+        return;
+
+    const barWidth = value / maxValue * width;
+
+    ctx.fillStyle = color;
+    if (leftToRight)
+        ctx.fillRect(0, 0, barWidth, height);
+    else
+        ctx.fillRect(width - barWidth, 0, barWidth, height);
+}
+
 const rows = [
     { type: "HEADER", height: 15 },
     {
         type: "DYNAMIC-BLOCK",
         height: 15,
         count: 100000,
-        selector: ({ index }) => index,
+        selector: ({ index }) => getPrice(index),
         id: ({ selector }) => selector,
         header: ({ selector }) => `${selector}`
     },
     { type: "HEADER", height: 15 },
 ];
+
 const columns = [
     { id: "our_bid", header: "ob", width: 30, labels: ["bid"] },
     { id: "market_bid", header: "mb", width: 40, labels: ["bid"] },
@@ -20,6 +53,7 @@ const columns = [
     { id: "market_ask", header: "ma", width: 40, labels: ["ask"] },
     { id: "our_ask", header: "oa", width: 30, labels: ["ask"] },
 ];
+
 const formatting = [
     {
         style: { textAlign: "right" }
@@ -34,43 +68,55 @@ const formatting = [
         style: { background: "#1b4398ff" }
     },
     {
+        column: { id: "market_bid" },
+        value: ({ row, data }) => data.market.bids[row.id] || 0,
+    },
+    {
+        column: { id: "market_ask" },
+        value: ({ row, data }) => data.market.asks[row.id] || 0,
+    },
+    {
+        column: { id: "our_bid" },
+        value: ({ row, data }) => data.our.bids[row.id] || 0,
+    },
+    {
+        column: { id: "our_ask" },
+        value: ({ row, data }) => data.our.asks[row.id] || 0,
+    },
+    {
         row: { type: "HEADER" },
         column: { label: "ask" },
         style: { background: "#981b1bff" }
     },
     {
         column: { id: "market_bid" },
-        style: { background: "#f3f7ffff" }
+        style: { background: "#f3f7ffff" },
+        draw: ({ ctx, value, column, row, data }) => drawVolumeBar(ctx, value, data.maxVolume, column.width, row.height, "rgb(210, 222, 247)", false)
     },
     {
         column: { id: "market_ask" },
-        style: { background: "#fff7f7ff" }
+        style: { background: "#fff7f7ff" },
+        draw: ({ ctx, value, column, row, data }) => drawVolumeBar(ctx, value, data.maxVolume, column.width, row.height, "rgb(245, 214, 214)", true)
     },
     {
         column: { id: "price" },
         value: ({ row }) => row.id,
+        text: ({ value }) => value >= 100 ? value.toFixed(0) : value >= 10 ? value.toFixed(1) : value.toFixed(2),
         style: { background: "#414141ff", foreground: "white" }
     },
     {
+        column: [{ id: "market_bid" }, { id: "market_ask" }, { id: "our_bid" }, { id: "our_ask" }],
+        text: ({ value }) => value ? `${value}` : "",
+    },
+    {
         column: { id: "price" },
-        condition: ({ value, data }) => value === data.middleLevel,
+        condition: ({ value, data }) => value === data.bidPrice,
         style: { background: "#58608b" }
     },
     {
-        column: { id: "market_bid" },
-        value: ({ row, data }) => data.market.bids[row.id] || "",
-    },
-    {
-        column: { id: "market_ask" },
-        value: ({ row, data }) => data.market.asks[row.id] || "",
-    },
-    {
-        column: { id: "our_bid" },
-        value: ({ row, data }) => data.our.bids[row.id] || "",
-    },
-    {
-        column: { id: "our_ask" },
-        value: ({ row, data }) => data.our.asks[row.id] || "",
+        column: { id: "price" },
+        condition: ({ value, data }) => value === data.askPrice,
+        style: { background: "#8b585b" }
     },
     {
         column: [{ id: "our_bid" }, { id: "our_ask" }],
@@ -80,64 +126,81 @@ const formatting = [
     }
 ];
 
-function generateMarketOrders(middleLevel, defaultSize, levels) {
+function generateMarketOrders(bidIndex, askIndex, defaultSize, levels, bidAsymmetry) {
     const market = { bids: {}, asks: {} };
     for (let i = 0; i < levels; i++) {
-        market.bids[middleLevel - i] = Math.floor((Math.random() + 1.5) * defaultSize * ((levels - i) / levels) ** 2);
+        market.bids[getPrice(bidIndex - i)] = Math.floor((Math.random() / 5 + 1) * defaultSize * ((levels - i) / levels) ** 2 * bidAsymmetry);
     }
     for (let i = 0; i < levels; i++) {
-        market.asks[middleLevel + i + 1] = Math.floor((Math.random() + 1.5) * defaultSize * ((levels - i) / levels) ** 2);
+        market.asks[getPrice(askIndex + i)] = Math.floor((Math.random() / 5 + 1) * defaultSize * ((levels - i) / levels) ** 2);
     }
     return market;
 }
 
-function uncrossOurOrders(ourOrders, middleLevel) {
+function generateOurOrders(middleIndex) {
+    return {
+        bids: {
+            [getPrice(middleIndex - 2)]: 10
+        },
+        asks: {
+            [getPrice(middleIndex + 2)]: 10
+        }
+    };
+}
+
+function uncrossOurOrders(ourOrders, bidIndex, askIndex) {
+    const bidPrice = Math.max(getPrice(bidIndex), ...Object.keys(ourOrders.bids));
+    const askPrice = Math.min(getPrice(askIndex), ...Object.keys(ourOrders.asks));
     return {
         bids: Object.fromEntries(
-            Object.entries(ourOrders.bids).filter(([price]) => Number(price) <= middleLevel)
+            Object.entries(ourOrders.bids).filter(([price]) => price < askPrice)
         ),
         asks: Object.fromEntries(
-            Object.entries(ourOrders.asks).filter(([price]) => Number(price) > middleLevel)
+            Object.entries(ourOrders.asks).filter(([price]) => price > bidPrice)
         )
     };
 }
 
-function DepthGrid({ initialMiddleLevel, defaultSize, levels }) {
-    const [middleLevel, setMiddleLevel] = useState(initialMiddleLevel);
+function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, gap = 0 }) {
+    const [middleIndex, setMiddleIndex] = useState(initialMiddleIndex);
     const [marketOrders, setMarketOrders] = useState({ bids: {}, asks: {} });
-    const [ourOrders, setOurOrders] = useState({ bids: { [initialMiddleLevel - 3]: 100 }, asks: { [initialMiddleLevel + 3]: 100 } });
+    const [ourOrders, setOurOrders] = useState(generateOurOrders(initialMiddleIndex));
+    const [focusedCell, setFocusedCell] = useState(null);
+    const [selectedCells, setSelectedCells] = useState([]);
+    const bidIndex = middleIndex - gap;
+    const askIndex = middleIndex + gap + 1;
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setMiddleLevel(prev => prev + Math.round((Math.random() - 0.5) * 2));
+            setMiddleIndex(prev => prev + Math.round((Math.random() - 0.5) * 2));
         }, 500);
         return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setMarketOrders(generateMarketOrders(middleLevel, defaultSize, levels));
+            setMarketOrders(generateMarketOrders(bidIndex, askIndex, defaultSize, levels, bidAsymmetry));
         }, 100);
         return () => clearInterval(interval);
-    }, [middleLevel, defaultSize, levels]);
+    }, [bidIndex, askIndex, defaultSize, levels, bidAsymmetry]);
 
     useEffect(() => {
-        setOurOrders(prev => uncrossOurOrders(prev, middleLevel));
-    }, [middleLevel]);
+        setOurOrders(prev => uncrossOurOrders(prev, bidIndex, askIndex));
+    }, [bidIndex, askIndex]);
 
     const addBid = useCallback((level) => {
         setOurOrders(prev => uncrossOurOrders({
             bids: { ...prev.bids, [level]: (prev.bids[level] || 0) + 10 },
             asks: prev.asks
-        }, middleLevel));
-    }, [middleLevel]);
+        }, bidIndex, askIndex));
+    }, [bidIndex, askIndex]);
 
     const addAsk = useCallback((level) => {
         setOurOrders(prev => uncrossOurOrders({
             bids: prev.bids,
             asks: { ...prev.asks, [level]: (prev.asks[level] || 0) + 10 }
-        }, middleLevel));
-    }, [middleLevel]);
+        }, bidIndex, askIndex));
+    }, [bidIndex, askIndex]);
 
     const removeBid = useCallback((level) => {
         setOurOrders(prev => {
@@ -156,7 +219,6 @@ function DepthGrid({ initialMiddleLevel, defaultSize, levels }) {
     }, []);
 
     const onCellClick = useCallback((event) => {
-        console.log(event);
         if (event.columnId === 'market_bid')
             addBid(event.rowId);
         if (event.columnId === 'market_ask')
@@ -165,6 +227,8 @@ function DepthGrid({ initialMiddleLevel, defaultSize, levels }) {
             removeBid(event.rowId);
         if (event.columnId === 'our_ask')
             removeAsk(event.rowId);
+        setFocusedCell(null);
+        setSelectedCells([]);
     }, [addBid, addAsk, removeBid, removeAsk]);
 
     const data = useMemo(() => {
@@ -174,16 +238,33 @@ function DepthGrid({ initialMiddleLevel, defaultSize, levels }) {
             marketBids[price] = (marketBids[price] || 0) + ourOrders.bids[price];
         for (const price in ourOrders.asks)
             marketAsks[price] = (marketAsks[price] || 0) + ourOrders.asks[price];
+        const maxVolume = Math.max(0, ...Object.values(marketBids), ...Object.values(marketAsks));
         return {
-            middleLevel,
+            bidPrice: Math.max(getPrice(bidIndex), ...Object.keys(ourOrders.bids)),
+            askPrice: Math.min(getPrice(askIndex), ...Object.keys(ourOrders.asks)),
             market: {
                 bids: marketBids,
                 asks: marketAsks
             },
-            our: ourOrders
+            our: ourOrders,
+            maxVolume
         };
+    }, [marketOrders, ourOrders, bidIndex, askIndex]);
 
-    }, [marketOrders, ourOrders, middleLevel]);
+    const verticalScrollTarget = useMemo(() => ({
+        index: middleIndex,
+        position: 'MIDDLE',
+        speed: [
+            {
+                pixelsPerSecond: 20,
+                maxDistance: 50
+            },
+            {
+                pixelsPerSecond: 100,
+                maxDistance: 300
+            }
+        ],
+    }), [middleIndex]);
 
     return (
         <div style={{ display: 'flex', overflow: "hidden", background: "white" }}>
@@ -196,17 +277,11 @@ function DepthGrid({ initialMiddleLevel, defaultSize, levels }) {
                 height={600}
                 formatting={formatting}
                 onCellClick={onCellClick}
-                verticalScrollTarget={{
-                    index: middleLevel,
-                    position: 'MIDDLE',
-                    speed: [
-                        {
-                            pixelsPerSecond: 100,
-                            maxDistance: 200
-                        }
-                    ],
-                    //disableOnHover: false
-                }}
+                focusedCell={focusedCell}
+                onFocusedCellChange={setFocusedCell}
+                selectedCells={selectedCells}
+                onSelectedCellsChange={setSelectedCells}
+                verticalScrollTarget={verticalScrollTarget}
             />
         </div>
     );
@@ -215,9 +290,9 @@ function DepthGrid({ initialMiddleLevel, defaultSize, levels }) {
 export default function Depth() {
     return (
         <div style={{ maxHeight: '400px', display: 'flex', flexDirection: 'row', gap: '20px', background: '#222222' }}>
-            <DepthGrid initialMiddleLevel={100} defaultSize={10} levels={4} />
-            <DepthGrid initialMiddleLevel={1000} defaultSize={1000} levels={10} />
-            <DepthGrid initialMiddleLevel={750} defaultSize={100} levels={30} />
+            <DepthGrid initialMiddleIndex={100} defaultSize={10} levels={4} gap={2} />
+            <DepthGrid initialMiddleIndex={1200} defaultSize={1000} levels={10} />
+            <DepthGrid initialMiddleIndex={10000} defaultSize={100} levels={30} bidAsymmetry={0.5} />
         </div>
     );
 }
