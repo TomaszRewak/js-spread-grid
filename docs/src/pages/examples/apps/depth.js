@@ -39,7 +39,7 @@ const rows = [
         type: "DYNAMIC-BLOCK",
         height: 15,
         count: 100000,
-        selector: ({ index }) => getPrice(index),
+        id: ({ selector }) => getPrice(selector),
     },
     { type: "HEADER", height: 15 },
 ];
@@ -108,13 +108,23 @@ const formatting = [
     },
     {
         column: { id: "price" },
-        condition: ({ value, data }) => value === data.bidPrice,
+        condition: ({ value, data }) => value <= data.bidPrice,
         style: { background: "#58608b" }
     },
     {
         column: { id: "price" },
-        condition: ({ value, data }) => value === data.askPrice,
+        condition: ({ value, data }) => value >= data.askPrice,
         style: { background: "#8b585b" }
+    },
+    {
+        column: { id: "price" },
+        condition: ({ value, data }) => value === data.initPrice,
+        style: { background: "#888b58" }
+    },
+    {
+        column: [{ id: "our_bid" }, { id: "our_ask" }],
+        condition: ({ row }) => row.selector % 10 === 0,
+        style: { background: "#f7f7f7" }
     },
     {
         column: [{ id: "our_bid" }, { id: "our_ask" }],
@@ -138,10 +148,12 @@ function generateMarketOrders(bidIndex, askIndex, defaultSize, levels, bidAsymme
 function generateOurOrders(middleIndex) {
     return {
         bids: {
-            [getPrice(middleIndex - 2)]: 10
+            [getPrice(middleIndex - 2)]: 10,
+            [getPrice(middleIndex - 5)]: 20
         },
         asks: {
-            [getPrice(middleIndex + 2)]: 10
+            [getPrice(middleIndex + 2)]: 10,
+            [getPrice(middleIndex + 5)]: 20
         }
     };
 }
@@ -240,6 +252,7 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
         return {
             bidPrice: Math.max(...Object.keys(marketBids)),
             askPrice: Math.min(...Object.keys(marketAsks)),
+            initPrice: getPrice(initialMiddleIndex),
             market: {
                 bids: marketBids,
                 asks: marketAsks
