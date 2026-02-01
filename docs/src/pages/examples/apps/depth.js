@@ -40,8 +40,6 @@ const rows = [
         height: 15,
         count: 100000,
         selector: ({ index }) => getPrice(index),
-        id: ({ selector }) => selector,
-        header: ({ selector }) => `${selector}`
     },
     { type: "HEADER", height: 15 },
 ];
