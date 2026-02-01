@@ -38,7 +38,7 @@ const rows = [
     {
         type: "DYNAMIC-BLOCK",
         height: 15,
-        count: 1000000,
+        count: 100000,
         selector: ({ index }) => getPrice(index),
     },
     { type: "HEADER", height: 15 },
@@ -161,12 +161,12 @@ function uncrossOurOrders(ourOrders, bidIndex, askIndex) {
 
 function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, gap = 0 }) {
     const [middleIndex, setMiddleIndex] = useState(initialMiddleIndex);
-    const [marketOrders, setMarketOrders] = useState({ bids: {}, asks: {} });
+    const bidIndex = middleIndex - gap;
+    const askIndex = middleIndex + gap + 1;
+    const [marketOrders, setMarketOrders] = useState(generateMarketOrders(bidIndex, askIndex, defaultSize, levels, bidAsymmetry));
     const [ourOrders, setOurOrders] = useState(generateOurOrders(initialMiddleIndex));
     const [focusedCell, setFocusedCell] = useState(null);
     const [selectedCells, setSelectedCells] = useState([]);
-    const bidIndex = middleIndex - gap;
-    const askIndex = middleIndex + gap + 1;
 
     useEffect(() => {
         const interval = setInterval(() => {
