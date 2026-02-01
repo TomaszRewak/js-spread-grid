@@ -223,27 +223,23 @@ function tickDownOurTrades(ourOrders) {
 }
 
 function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, gap = 0 }) {
+    const [tick, setTick] = useState(0);
     const [middleIndex, setMiddleIndex] = useState(initialMiddleIndex);
     const bidIndex = middleIndex - gap;
     const askIndex = middleIndex + gap + 1;
-    const [marketOrders, setMarketOrders] = useState(generateMarketOrders(bidIndex, askIndex, defaultSize, levels, bidAsymmetry));
     const [ourOrders, setOurOrders] = useState(generateOurOrders(initialMiddleIndex));
     const [focusedCell, setFocusedCell] = useState(null);
     const [selectedCells, setSelectedCells] = useState([]);
+    const marketOrders = useMemo(
+        () => generateMarketOrders(bidIndex, askIndex, defaultSize, levels, bidAsymmetry),
+        [tick, bidIndex, askIndex, defaultSize, levels, bidAsymmetry]);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setMiddleIndex(prev => prev + Math.round((Math.random() - 0.5) * 2));
-        }, 500);
-        return () => clearInterval(interval);
-    }, []);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setMarketOrders(generateMarketOrders(bidIndex, askIndex, defaultSize, levels, bidAsymmetry));
+            setTick(prev => prev + 1);
         }, 100);
         return () => clearInterval(interval);
-    }, [bidIndex, askIndex, defaultSize, levels, bidAsymmetry]);
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -251,6 +247,13 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
         }, 1000);
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        if (Math.random() < 0.8)
+            return;
+
+        setMiddleIndex(prev => prev + Math.round((Math.random() - 0.5) * 2));
+    }, [tick]);
 
     useEffect(() => {
         setOurOrders(prev => uncrossOurOrders(prev, bidIndex, askIndex));
