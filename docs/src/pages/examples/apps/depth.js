@@ -250,7 +250,7 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
     }, [marketOrders, ourOrders, bidIndex, askIndex]);
 
     const verticalScrollTarget = useMemo(() => ({
-        index: middleIndex,
+        index: middleIndex + 0.5,
         position: 'MIDDLE',
         speed: [
             {
