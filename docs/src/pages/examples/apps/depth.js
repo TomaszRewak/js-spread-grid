@@ -38,7 +38,7 @@ const rows = [
     {
         type: "DYNAMIC-BLOCK",
         height: 15,
-        count: 100000,
+        count: 1000000,
         selector: ({ index }) => getPrice(index),
     },
     { type: "HEADER", height: 15 },

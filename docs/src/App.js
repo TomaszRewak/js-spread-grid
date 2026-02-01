@@ -117,7 +117,7 @@ function Navbar() {
         <div className="App-navbar">
             <img src="/logo-small.png" alt="logo" className="App-navbar-logo" />
             <div className="App-navbar-title">Spread Grid</div>
-            <div className="App-navbar-subtitle">beta</div>
+            <div className="App-navbar-subtitle">v1.0.0</div>
             {routes.map(({ chapter, pages }) => (
                 <Fragment key={chapter}>
                     <div className="App-navbar-header">{chapter}</div>
