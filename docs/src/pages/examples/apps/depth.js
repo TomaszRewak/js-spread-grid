@@ -45,11 +45,13 @@ const rows = [
 ];
 
 const columns = [
+    { id: "bought", header: "", width: 5, labels: ["bid"] },
     { id: "our_bid", header: "ob", width: 30, labels: ["bid"] },
     { id: "market_bid", header: "mb", width: 40, labels: ["bid"] },
     { id: "price", header: "p", width: 50 },
     { id: "market_ask", header: "ma", width: 40, labels: ["ask"] },
     { id: "our_ask", header: "oa", width: 30, labels: ["ask"] },
+    { id: "sold", header: "", width: 5, labels: ["ask"] },
 ];
 
 const formatting = [
@@ -100,7 +102,7 @@ const formatting = [
         column: { id: "price" },
         value: ({ row }) => row.id,
         text: ({ value }) => value >= 100 ? value.toFixed(0) : value >= 10 ? value.toFixed(1) : value.toFixed(2),
-        style: { background: "#414141ff", foreground: "white" }
+        style: { background: "#414141ff", foreground: "white", border: { width: 1, color: "#9b9b9b" } }
     },
     {
         column: [{ id: "market_bid" }, { id: "market_ask" }, { id: "our_bid" }, { id: "our_ask" }],
@@ -131,6 +133,12 @@ const formatting = [
         condition: ({ value }) => value,
         font: "bold 12px Calibri",
         style: { foreground: "rgb(49, 114, 36)", background: "rgb(231, 255, 236)" }
+    },
+    {
+        column: [{ id: "bought" }, { id: "sold" }],
+        value: ({ row, data, column }) => data.our[column.id][row.id] || 0,
+        text: '',
+        style: ({ value }) => value ? { background: `rgb(49, 114, 36, ${value * 10}%)` } : {}
     }
 ];
 
@@ -154,20 +162,59 @@ function generateOurOrders(middleIndex) {
         asks: {
             [getPrice(middleIndex + 2)]: 10,
             [getPrice(middleIndex + 5)]: 20
-        }
+        },
+        bought: {},
+        sold: {}
     };
 }
 
 function uncrossOurOrders(ourOrders, bidIndex, askIndex) {
     const bidPrice = Math.max(getPrice(bidIndex), ...Object.keys(ourOrders.bids));
     const askPrice = Math.min(getPrice(askIndex), ...Object.keys(ourOrders.asks));
+    const bids = { ...ourOrders.bids };
+    const asks = { ...ourOrders.asks };
+    const bought = { ...ourOrders.bought };
+    const sold = { ...ourOrders.sold };
+
+    for (const price in bids) {
+        if (price >= askPrice) {
+            delete bids[price];
+            bought[price] = 10;
+        }
+    }
+
+    for (const price in asks) {
+        if (price <= bidPrice) {
+            delete asks[price];
+            sold[price] = 10;
+        }
+    }
+
     return {
-        bids: Object.fromEntries(
-            Object.entries(ourOrders.bids).filter(([price]) => price < askPrice)
-        ),
-        asks: Object.fromEntries(
-            Object.entries(ourOrders.asks).filter(([price]) => price > bidPrice)
-        )
+        bids,
+        asks,
+        bought,
+        sold
+    };
+}
+
+function tickDownOurTrades(ourOrders) {
+    const bought = {};
+    for (const price in ourOrders.bought) {
+        const value = ourOrders.bought[price] - 1;
+        if (value > 0)
+            bought[price] = value;
+    }
+    const sold = {};
+    for (const price in ourOrders.sold) {
+        const value = ourOrders.sold[price] - 1;
+        if (value > 0)
+            sold[price] = value;
+    }
+    return {
+        ...ourOrders,
+        bought,
+        sold
     };
 }
 
@@ -195,19 +242,26 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
     }, [bidIndex, askIndex, defaultSize, levels, bidAsymmetry]);
 
     useEffect(() => {
+        const interval = setInterval(() => {
+            setOurOrders(prev => tickDownOurTrades(prev));
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
         setOurOrders(prev => uncrossOurOrders(prev, bidIndex, askIndex));
     }, [bidIndex, askIndex]);
 
     const addBid = useCallback((level) => {
         setOurOrders(prev => uncrossOurOrders({
+            ...prev,
             bids: { ...prev.bids, [level]: (prev.bids[level] || 0) + 10 },
-            asks: prev.asks
         }, bidIndex, askIndex));
     }, [bidIndex, askIndex]);
 
     const addAsk = useCallback((level) => {
         setOurOrders(prev => uncrossOurOrders({
-            bids: prev.bids,
+            ...prev,
             asks: { ...prev.asks, [level]: (prev.asks[level] || 0) + 10 }
         }, bidIndex, askIndex));
     }, [bidIndex, askIndex]);
@@ -216,7 +270,7 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
         setOurOrders(prev => {
             const newBids = { ...prev.bids };
             delete newBids[level];
-            return { bids: newBids, asks: prev.asks };
+            return { ...prev, bids: newBids };
         });
     }, []);
 
@@ -224,7 +278,7 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
         setOurOrders(prev => {
             const newAsks = { ...prev.asks };
             delete newAsks[level];
-            return { bids: prev.bids, asks: newAsks };
+            return { ...prev, asks: newAsks };
         });
     }, []);
 
