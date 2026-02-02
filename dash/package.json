@@ -1,6 +1,6 @@
 {
     "name": "dash_spread_grid",
-    "version": "0.2.7",
+    "version": "1.0.0",
     "description": "Fast grid for Dash applications",
     "author": "Tomasz Rewak <tomasz.rewak@gmail.com>",
     "license": "MIT",
