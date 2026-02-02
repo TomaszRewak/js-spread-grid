@@ -111,7 +111,7 @@ function useResolvedDimension(entries) {
 
             if (entry.type == 'DATA-BLOCK') {
                 if ('selector' in entry)
-                    mappedEntry.selector = eval(`data => (${entry.selector})`);
+                    mappedEntry.selector = eval(`({data}) => (${entry.selector})`);
                 if ('id' in entry)
                     mappedEntry.id = eval(`({data, selector}) => (${entry.id})`);
             }
