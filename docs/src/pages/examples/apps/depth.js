@@ -336,6 +336,7 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
                 maxDistance: 300
             }
         ],
+        // disableOnHover: false
     }), [middleIndex]);
 
     return (

@@ -44,6 +44,9 @@
         "jest.runMode": "on-demand",
         "editor.tabSize": 4,
         "editor.detectIndentation": false,
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "chat.tools.terminal.autoApprove": {
+            "tsc": true
+        }
     },
 }
