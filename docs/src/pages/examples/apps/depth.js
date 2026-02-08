@@ -326,18 +326,23 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
     const verticalScrollTarget = useMemo(() => ({
         index: middleIndex + 0.5,
         position: 'MIDDLE',
-        speed: [
-            {
-                pixelsPerSecond: 20,
-                maxDistance: 50
-            },
-            {
-                pixelsPerSecond: 100,
-                maxDistance: 300
-            }
-        ],
         // disableOnHover: false
     }), [middleIndex]);
+
+    const verticalScrollSpeed = useMemo(() => [
+        {
+            maxDistance: 50,
+            scrollSpeed: 20
+        },
+        {
+            maxDistance: 300,
+            scrollSpeed: 100
+        },
+        {
+            maxDistance: Infinity,
+            scrollSpeed: 'smooth'
+        }
+    ], []);
 
     return (
         <div style={{ display: 'flex', overflow: "hidden", background: "white" }}>
@@ -355,6 +360,7 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
                 selectedCells={selectedCells}
                 onSelectedCellsChange={setSelectedCells}
                 verticalScrollTarget={verticalScrollTarget}
+                verticalScrollSpeed={verticalScrollSpeed}
             />
         </div>
     );
