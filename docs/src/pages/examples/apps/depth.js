@@ -1,6 +1,10 @@
 import SpreadGrid from "react-spread-gird";
 import { useEffect, useState, useMemo, useCallback } from "react";
 
+///////////////////////////////////////////////////////////
+////////////////////////// UTILS //////////////////////////
+///////////////////////////////////////////////////////////
+
 const tickSizes = [
     [10, 0.01],
     [100, 0.1],
@@ -21,17 +25,81 @@ function getPrice(index) {
 }
 
 function drawVolumeBar(ctx, value, maxValue, width, height, color, leftToRight) {
-    if (!value)
-        return;
-
+    if (!value) return;
     const barWidth = value / maxValue * width;
-
+    const x = leftToRight ? 0 : width - barWidth;
     ctx.fillStyle = color;
-    if (leftToRight)
-        ctx.fillRect(0, 0, barWidth, height);
-    else
-        ctx.fillRect(width - barWidth, 0, barWidth, height);
+    ctx.fillRect(x, 0, barWidth, height);
 }
+
+function generateSide(startIndex, direction, defaultSize, levels, scale = 1) {
+    const orders = {};
+    for (let i = 0; i < levels; i++)
+        orders[getPrice(startIndex + direction * i)] = Math.floor((Math.random() / 5 + 1) * defaultSize * ((levels - i) / levels) ** 2 * scale);
+    return orders;
+}
+
+function generateMarketOrders(bidIndex, askIndex, defaultSize, levels, bidAsymmetry) {
+    return {
+        bids: generateSide(bidIndex, -1, defaultSize, levels, bidAsymmetry),
+        asks: generateSide(askIndex, 1, defaultSize, levels),
+    };
+}
+
+function generateOurOrders(middleIndex) {
+    return {
+        bids: {
+            [getPrice(middleIndex - 2)]: 10,
+            [getPrice(middleIndex - 5)]: 20,
+            [getPrice(middleIndex - 6)]: 20,
+            [getPrice(middleIndex - 7)]: 20
+        },
+        asks: {
+            [getPrice(middleIndex + 2)]: 10,
+            [getPrice(middleIndex + 5)]: 20,
+            [getPrice(middleIndex + 6)]: 20,
+            [getPrice(middleIndex + 7)]: 20
+        },
+        bought: {},
+        sold: {}
+    };
+}
+
+function uncrossOurOrders(ourOrders, bidIndex, askIndex) {
+    const bidPrice = Math.max(getPrice(bidIndex), ...Object.keys(ourOrders.bids));
+    const askPrice = Math.min(getPrice(askIndex), ...Object.keys(ourOrders.asks));
+    const bids = { ...ourOrders.bids }, asks = { ...ourOrders.asks };
+    const bought = { ...ourOrders.bought }, sold = { ...ourOrders.sold };
+
+    for (const price in bids)
+        if (price >= askPrice) { delete bids[price]; bought[price] = 10; }
+
+    for (const price in asks)
+        if (price <= bidPrice) { delete asks[price]; sold[price] = 10; }
+
+    return { bids, asks, bought, sold };
+}
+
+function fadeCounters(obj) {
+    const result = {};
+    for (const key in obj)
+        if (obj[key] > 1) result[key] = obj[key] - 1;
+    return result;
+}
+
+function tickDownOurTrades(ourOrders) {
+    return { ...ourOrders, bought: fadeCounters(ourOrders.bought), sold: fadeCounters(ourOrders.sold) };
+}
+
+function mergeVolumes(market, ours) {
+    const merged = { ...market };
+    for (const price in ours) merged[price] = (merged[price] || 0) + ours[price];
+    return merged;
+}
+
+////////////////////////////////////////////////////////////
+////////////////////////// LAYOUT //////////////////////////
+////////////////////////////////////////////////////////////
 
 const rows = [
     { type: "HEADER", height: 15 },
@@ -142,85 +210,24 @@ const formatting = [
     }
 ];
 
-function generateMarketOrders(bidIndex, askIndex, defaultSize, levels, bidAsymmetry) {
-    const market = { bids: {}, asks: {} };
-    for (let i = 0; i < levels; i++) {
-        market.bids[getPrice(bidIndex - i)] = Math.floor((Math.random() / 5 + 1) * defaultSize * ((levels - i) / levels) ** 2 * bidAsymmetry);
+const verticalScrollSpeed = [
+    {
+        maxDistance: 50,
+        scrollSpeed: 20
+    },
+    {
+        maxDistance: 300,
+        scrollSpeed: 100
+    },
+    {
+        maxDistance: Infinity,
+        scrollSpeed: 'smooth'
     }
-    for (let i = 0; i < levels; i++) {
-        market.asks[getPrice(askIndex + i)] = Math.floor((Math.random() / 5 + 1) * defaultSize * ((levels - i) / levels) ** 2);
-    }
-    return market;
-}
+];
 
-function generateOurOrders(middleIndex) {
-    return {
-        bids: {
-            [getPrice(middleIndex - 2)]: 10,
-            [getPrice(middleIndex - 5)]: 20,
-            [getPrice(middleIndex - 6)]: 20,
-            [getPrice(middleIndex - 7)]: 20
-        },
-        asks: {
-            [getPrice(middleIndex + 2)]: 10,
-            [getPrice(middleIndex + 5)]: 20,
-            [getPrice(middleIndex + 6)]: 20,
-            [getPrice(middleIndex + 7)]: 20
-        },
-        bought: {},
-        sold: {}
-    };
-}
-
-function uncrossOurOrders(ourOrders, bidIndex, askIndex) {
-    const bidPrice = Math.max(getPrice(bidIndex), ...Object.keys(ourOrders.bids));
-    const askPrice = Math.min(getPrice(askIndex), ...Object.keys(ourOrders.asks));
-    const bids = { ...ourOrders.bids };
-    const asks = { ...ourOrders.asks };
-    const bought = { ...ourOrders.bought };
-    const sold = { ...ourOrders.sold };
-
-    for (const price in bids) {
-        if (price >= askPrice) {
-            delete bids[price];
-            bought[price] = 10;
-        }
-    }
-
-    for (const price in asks) {
-        if (price <= bidPrice) {
-            delete asks[price];
-            sold[price] = 10;
-        }
-    }
-
-    return {
-        bids,
-        asks,
-        bought,
-        sold
-    };
-}
-
-function tickDownOurTrades(ourOrders) {
-    const bought = {};
-    for (const price in ourOrders.bought) {
-        const value = ourOrders.bought[price] - 1;
-        if (value > 0)
-            bought[price] = value;
-    }
-    const sold = {};
-    for (const price in ourOrders.sold) {
-        const value = ourOrders.sold[price] - 1;
-        if (value > 0)
-            sold[price] = value;
-    }
-    return {
-        ...ourOrders,
-        bought,
-        sold
-    };
-}
+/////////////////////////////////////////////////////////
+////////////////////////// APP //////////////////////////
+/////////////////////////////////////////////////////////
 
 function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, gap = 0 }) {
     const [tick, setTick] = useState(0);
@@ -235,16 +242,12 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
         [tick, bidIndex, askIndex, defaultSize, levels, bidAsymmetry]);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setTick(prev => prev + 1);
-        }, 100);
+        const interval = setInterval(() => setTick(t => t + 1), 100);
         return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setOurOrders(prev => tickDownOurTrades(prev));
-        }, 1000);
+        const interval = setInterval(() => setOurOrders(tickDownOurTrades), 1000);
         return () => clearInterval(interval);
     }, []);
 
@@ -259,89 +262,48 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
         setOurOrders(prev => uncrossOurOrders(prev, bidIndex, askIndex));
     }, [bidIndex, askIndex]);
 
-    const addBid = useCallback((level) => {
+    const addOrder = useCallback((side, level) => {
         setOurOrders(prev => uncrossOurOrders({
             ...prev,
-            bids: { ...prev.bids, [level]: (prev.bids[level] || 0) + 10 },
+            [side]: { ...prev[side], [level]: (prev[side][level] || 0) + 10 },
         }, bidIndex, askIndex));
     }, [bidIndex, askIndex]);
 
-    const addAsk = useCallback((level) => {
-        setOurOrders(prev => uncrossOurOrders({
-            ...prev,
-            asks: { ...prev.asks, [level]: (prev.asks[level] || 0) + 10 }
-        }, bidIndex, askIndex));
-    }, [bidIndex, askIndex]);
-
-    const removeBid = useCallback((level) => {
+    const removeOrder = useCallback((side, level) => {
         setOurOrders(prev => {
-            const newBids = { ...prev.bids };
-            delete newBids[level];
-            return { ...prev, bids: newBids };
+            const updated = { ...prev[side] };
+            delete updated[level];
+            return { ...prev, [side]: updated };
         });
     }, []);
 
-    const removeAsk = useCallback((level) => {
-        setOurOrders(prev => {
-            const newAsks = { ...prev.asks };
-            delete newAsks[level];
-            return { ...prev, asks: newAsks };
-        });
-    }, []);
-
-    const onCellClick = useCallback((event) => {
-        if (event.columnId === 'market_bid')
-            addBid(event.rowId);
-        if (event.columnId === 'market_ask')
-            addAsk(event.rowId);
-        if (event.columnId === 'our_bid')
-            removeBid(event.rowId);
-        if (event.columnId === 'our_ask')
-            removeAsk(event.rowId);
+    const onCellClick = useCallback(({ columnId, rowId }) => {
+        if (columnId === 'market_bid') addOrder('bids', rowId);
+        else if (columnId === 'market_ask') addOrder('asks', rowId);
+        else if (columnId === 'our_bid') removeOrder('bids', rowId);
+        else if (columnId === 'our_ask') removeOrder('asks', rowId);
         setFocusedCell(null);
         setSelectedCells([]);
-    }, [addBid, addAsk, removeBid, removeAsk]);
+    }, [addOrder, removeOrder]);
 
     const data = useMemo(() => {
-        const marketBids = { ...marketOrders.bids };
-        const marketAsks = { ...marketOrders.asks };
-        for (const price in ourOrders.bids)
-            marketBids[price] = (marketBids[price] || 0) + ourOrders.bids[price];
-        for (const price in ourOrders.asks)
-            marketAsks[price] = (marketAsks[price] || 0) + ourOrders.asks[price];
-        const maxVolume = Math.max(0, ...Object.values(marketBids), ...Object.values(marketAsks));
+        const bids = mergeVolumes(marketOrders.bids, ourOrders.bids);
+        const asks = mergeVolumes(marketOrders.asks, ourOrders.asks);
+        const maxVolume = Math.max(0, ...Object.values(bids), ...Object.values(asks));
         return {
-            bidPrice: Math.max(...Object.keys(marketBids)),
-            askPrice: Math.min(...Object.keys(marketAsks)),
+            bidPrice: Math.max(...Object.keys(bids)),
+            askPrice: Math.min(...Object.keys(asks)),
             initPrice: getPrice(initialMiddleIndex),
-            market: {
-                bids: marketBids,
-                asks: marketAsks
-            },
+            market: { bids, asks },
             our: ourOrders,
             maxVolume
         };
-    }, [marketOrders, ourOrders, bidIndex, askIndex]);
+    }, [marketOrders, ourOrders]);
 
     const verticalScrollTarget = useMemo(() => ({
         index: middleIndex + 0.5,
         position: 'MIDDLE',
     }), [middleIndex]);
-
-    const verticalScrollSpeed = useMemo(() => [
-        {
-            maxDistance: 50,
-            scrollSpeed: 20
-        },
-        {
-            maxDistance: 300,
-            scrollSpeed: 100
-        },
-        {
-            maxDistance: Infinity,
-            scrollSpeed: 'smooth'
-        }
-    ], []);
 
     return (
         <div style={{ display: 'flex', overflow: "hidden", background: "white" }}>
