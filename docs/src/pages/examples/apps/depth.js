@@ -65,7 +65,7 @@ const formatting = [
     {
         row: { type: "HEADER" },
         column: { label: "bid" },
-        style: { background: "#1b4398ff" }
+        style: { background: "rgb(41, 76, 151)" }
     },
     {
         column: { id: "market_bid" },
@@ -86,7 +86,7 @@ const formatting = [
     {
         row: { type: "HEADER" },
         column: { label: "ask" },
-        style: { background: "#981b1bff" }
+        style: { background: "rgb(148, 49, 49)" }
     },
     {
         column: { id: "market_bid" },
@@ -361,6 +361,9 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
                 verticalScrollTarget={verticalScrollTarget}
                 verticalScrollSpeed={verticalScrollSpeed}
                 disableScrollOnHover={true}
+                style={{
+                    scrollbarWidth: "none"
+                }}
             />
         </div>
     );
