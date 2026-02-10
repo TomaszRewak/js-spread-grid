@@ -68,6 +68,14 @@ function App() {
                     condition: ({ value, expression }) => `${value}`.includes(expression)
                 }
             ]}
+            verticalScrollTarget={{
+                index: 50,
+                position: 'MIDDLE'
+            }}
+            horizontalScrollTarget={{
+                index: 22,
+                position: 'MIDDLE'
+            }}
             formatting={[
                 {
                     row: { id: 'search_row' },

@@ -326,7 +326,6 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
     const verticalScrollTarget = useMemo(() => ({
         index: middleIndex + 0.5,
         position: 'MIDDLE',
-        // disableOnHover: false
     }), [middleIndex]);
 
     const verticalScrollSpeed = useMemo(() => [
@@ -361,6 +360,7 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
                 onSelectedCellsChange={setSelectedCells}
                 verticalScrollTarget={verticalScrollTarget}
                 verticalScrollSpeed={verticalScrollSpeed}
+                disableScrollOnHover={true}
             />
         </div>
     );
