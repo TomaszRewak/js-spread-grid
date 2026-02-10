@@ -309,6 +309,7 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
         <div style={{ display: 'flex', overflow: "hidden", background: "white" }}>
             <SpreadGrid
                 data={data}
+                dataSelector={() => null}
                 rows={rows}
                 columns={columns}
                 pinnedTop={1}
