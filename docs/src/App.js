@@ -29,6 +29,9 @@ import Draw from './pages/formatting/draw';
 import Font from './pages/formatting/font';
 import Tooltips from './pages/events/tooltips';
 import Active from './pages/data-shaping/active';
+import ScrollTarget from './pages/scrolling/scroll-target';
+import ScrollSpeed from './pages/scrolling/scroll-speed';
+import ScrollOnHover from './pages/scrolling/scroll-on-hover';
 
 const routes = [
     {
@@ -69,6 +72,14 @@ const routes = [
             { title: 'sorting', page: Sorting },
             { title: 'filtering', page: Filtering, wip: true },
             { title: 'active', page: Active, wip: true }
+        ]
+    },
+    {
+        chapter: 'scrolling',
+        pages: [
+            { title: 'target', page: ScrollTarget },
+            { title: 'speed', page: ScrollSpeed },
+            { title: 'on hover', page: ScrollOnHover }
         ]
     },
     {
