@@ -18,7 +18,7 @@ The core follows a state → render pipeline:
 3. **`core/render.js`** - Canvas rendering. Draws cells section-by-section for pinning support.
 4. **`state-utils/`** - Pure functions computing derived state (e.g., `getFiltered.js`, `getSorted.js`, `getPlaced.js`).
 5. **`types/`** - Classes like `FormatResolver`, `FormattingRules`, `Selection` for complex state logic.
-6. **`typings.js`** - JSDoc type definitions. Use `/** @import * as Types from "../typings.js"; */` pattern.
+6. **`typings.js`** - JSDoc type definitions. Use `/** @import * as Types from "../typings.js"; */` pattern at the top of each file to import types.
 
 ## Key Conventions
 ### TypeScript via JSDoc

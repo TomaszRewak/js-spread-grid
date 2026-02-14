@@ -44,6 +44,15 @@ const routes = [
         ]
     },
     {
+        chapter: 'examples',
+        pages: [
+            { title: 'app manager', page: AppManager },
+            { title: 'heatmap', page: Heatmap },
+            { title: 'plotter', page: Plotter },
+            { title: 'depth', page: Depth }
+        ]
+    },
+    {
         chapter: 'columns and rows',
         pages: [
             { title: 'introduction', page: ColumnsAndRowsIntroduction },
@@ -99,15 +108,6 @@ const routes = [
         chapter: 'error handling',
         pages: [
             { title: 'error overlay', page: ErrorOverlay }
-        ]
-    },
-    {
-        chapter: 'examples',
-        pages: [
-            { title: 'app manager', page: AppManager },
-            { title: 'heatmap', page: Heatmap },
-            { title: 'plotter', page: Plotter },
-            { title: 'depth', page: Depth }
         ]
     }
 ].map(({ chapter, pages }) => ({
