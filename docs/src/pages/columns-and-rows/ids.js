@@ -10,120 +10,88 @@ import { useState, useEffect, useMemo } from 'react';
 export default function Ids() {
     return (
         <>
-            <SubHeader>Column and row IDs</SubHeader>
+            <SubHeader>IDs and selectors</SubHeader>
             <Section>
                 <Paragraph>
-                    In Spread Grid, each column and row needs to be assigned a unique identifier, or ID. These IDs are crucial for managing the grid's structure and behavior. IDs are typically numerical or text values, but they can take any form, including objects. Regardless of the type, IDs must be unique within the scope of columns or rows to ensure proper identification and manipulation.
+                    Every column and row in Spread Grid has two important properties: an <code>id</code> and a <code>selector</code>.
                 </Paragraph>
                 <Paragraph>
-                    Columns and rows also have an (auto-populated) <code>index</code> property that can be accessed in format rules and data selectors. However, it is best used only for things like alternating background colors, as indices will change together with data sorting and filtering.
+                    The <code>id</code> is a unique identifier used for <strong>referencing</strong> a column or row. It appears in formatting rules, cell selection, click events, and other interactions. IDs can be numbers, strings, or even complex objects - as long as (after stringifying) they are unique within the scope of their dimension.
                 </Paragraph>
                 <Paragraph>
-                    By default, if no custom definitions are provided, the Spread Grid will generate ids out of indices found in the provided data.
+                    The <code>selector</code> is used for <strong>data access</strong>. It is the value passed to the data selector function when extracting cell values. The default data selector resolves values as <code>{"data[row.selector][column.selector]"}</code>.
+                </Paragraph>
+                <Paragraph>
+                    When only an <code>id</code> is provided, the <code>selector</code> defaults to the same value - and vice versa. This means <code>{"{ id: 'name' }"}</code> is equivalent to <code>{"{ id: 'name', selector: 'name' }"}</code>. In many cases this default is all you need. Splitting them apart becomes useful when the value used to access data should differ from the identifier used in interactions.
                 </Paragraph>
             </Section>
 
-            <SubHeader>Best practices for IDs</SubHeader>
+            <SubHeader>Indices</SubHeader>
             <Section>
                 <Paragraph>
-                    It's best to use IDs that relate to the underlying data so that if rows are added or removed, the selection in the grid follows appropriately. This practice ensures the grid remains consistent and selections remain valid as the data changes. For example, if the IDs are based on unique data points like a primary key from a database, selections (and ongoing edition) will naturally follow the data even as rows change their position.
+                    Columns and rows also have an auto-populated <code>index</code> property that can be accessed in formatting rules. However, the index reflects the current visual position and will change with sorting and filtering - so it is best used only for things like alternating row colors.
+                </Paragraph>
+            </Section>
+
+            <SubHeader>Data-driven IDs</SubHeader>
+            <Section>
+                <Paragraph>
+                    It is best practice to use IDs that represent the identity of the data rather than its position. When IDs are meaningful and stable, features like cell selection and editing naturally follow the data even when rows are reordered, added, or removed.
                 </Paragraph>
                 <Paragraph>
-                    Consider the following example where the IDs are based on unique data points. As the rows are shifted, the selection remains consistent.
+                    If data is provided as an <strong>object</strong> (dictionary), the object properties become both the IDs and selectors for rows. Because these are meaningful and stable, cell selection naturally follows when data is reordered.
                 </Paragraph>
                 <CodeBlock options={[
-                    {
-                        framework: 'jsx',
-                        code: require('!!raw-loader!./snippets/ids/positive.jsx').default
-                    },
-                    {
-                        framework: 'js',
-                        code: require('!!raw-loader!./snippets/ids/positive.js').default
-                    },
-                    {
-                        framework: 'py',
-                        code: require('!!raw-loader!./snippets/ids/positive.py').default
-                    }
+                    { framework: 'jsx', code: require('!!raw-loader!./snippets/ids/positive.jsx').default },
+                    { framework: 'js', code: require('!!raw-loader!./snippets/ids/positive.js').default },
+                    { framework: 'py', code: require('!!raw-loader!./snippets/ids/positive.py').default }
                 ]} />
                 <Example>
                     <PositiveExample />
                 </Example>
                 <Paragraph>
-                    In contrast, if the IDs are not based on unique data points, the selection will not follow the data as it changes. In the following example, the selection will not remain consistent as the rows are shifted.
+                    If data is an <strong>array</strong>, row IDs default to numeric indices (<code>0</code>, <code>1</code>, <code>2</code>…). These indices describe position rather than identity - so when rows are reordered, the selection stays at the same index instead of following the data.
                 </Paragraph>
                 <CodeBlock options={[
-                    {
-                        framework: 'jsx',
-                        code: require('!!raw-loader!./snippets/ids/negative.jsx').default
-                    },
-                    {
-                        framework: 'js',
-                        code: require('!!raw-loader!./snippets/ids/negative.js').default
-                    },
-                    {
-                        framework: 'py',
-                        code: require('!!raw-loader!./snippets/ids/negative.py').default
-                    }
+                    { framework: 'jsx', code: require('!!raw-loader!./snippets/ids/negative.jsx').default },
+                    { framework: 'js', code: require('!!raw-loader!./snippets/ids/negative.js').default },
+                    { framework: 'py', code: require('!!raw-loader!./snippets/ids/negative.py').default }
                 ]} />
                 <Example>
                     <NegativeExample />
                 </Example>
             </Section>
 
-            <SubHeader>Explicit IDs</SubHeader>
+            <SubHeader>Splitting id from selector</SubHeader>
             <Section>
                 <Paragraph>
-                    You don't need to change the shape of your data in order to specify unique IDs. Even when specifying data as an array of objects, each of those objects can be assigned as explicit unique ID that is independent from the row index.
+                    When data is stored as an array, selectors must be numeric indices - but numeric indices make poor IDs because they describe position, not identity. To get the best of both worlds, you can set the <code>id</code> and <code>selector</code> independently.
                 </Paragraph>
                 <Paragraph>
-                    In practice, this is the difference between the <code>id</code> and the <code>selector</code> or a row/column. The <code>id</code> is used to identify the row during interactions and formatting, while <code>selector</code> is being used to extract cell values from the data.
+                    In the following example, each row's selector remains a numeric index (so data access works), while its ID is set to the person's name (so selection follows the data when rows move).
                 </Paragraph>
                 <CodeBlock options={[
-                    {
-                        framework: 'jsx',
-                        code: require('!!raw-loader!./snippets/ids/explicit.jsx').default
-                    },
-                    {
-                        framework: 'js',
-                        code: require('!!raw-loader!./snippets/ids/explicit.js').default
-                    },
-                    {
-                        framework: 'py',
-                        code: require('!!raw-loader!./snippets/ids/explicit.py').default
-                    }
+                    { framework: 'jsx', code: require('!!raw-loader!./snippets/ids/explicit.jsx').default },
+                    { framework: 'js', code: require('!!raw-loader!./snippets/ids/explicit.js').default },
+                    { framework: 'py', code: require('!!raw-loader!./snippets/ids/explicit.py').default }
                 ]} />
                 <Example>
                     <ExplicitExample />
                 </Example>
                 <Paragraph>
-                    It's important to remember this distinction. As whenever the <code>selector</code> is not provided, it will just assume the same value as the <code>id</code>. But it's not always the desired behavior.
-                </Paragraph>
-                <Paragraph>
-                    Using distinct ids and selectors is, in many cases, the only way of maintaining complex ids (which are useful when implementing grid interactions). For example IDs like <code>&#123;name: "Bob", surname: "Smith"&#125;</code> can be used only if explicit selectors are defined. This is because in JS associative arrays cannot be keyed on complex objects and therefor cannot be used as basic selectors. But when splitting them up, the selector can still be the index of a row, while the ID can assume a more complex form.
+                    IDs can also be complex objects (e.g. <code>{"{ name: 'Bob', surname: 'Smith' }"}</code>). Complex IDs require explicit selectors, since objects cannot be used as associative array indices in JavaScript.
                 </Paragraph>
             </Section>
 
             <SubHeader>Uses of IDs</SubHeader>
             <Section>
                 <Paragraph>
-                    IDs are not only useful for maintaining grid selection but also play a crucial role in other functionalities like data formatting and editing.
-                </Paragraph>
-                <Paragraph>
-                    Here is an example where IDs are used for formatting a specific cell within a grid.
+                    IDs appear throughout the library - in formatting rules, cell selection, click events, and editing. The following example uses a formatting rule that targets a specific cell by matching both a column ID and a row ID.
                 </Paragraph>
                 <CodeBlock options={[
-                    {
-                        framework: 'jsx',
-                        code: require('!!raw-loader!./snippets/ids/formatting.jsx').default
-                    },
-                    {
-                        framework: 'js',
-                        code: require('!!raw-loader!./snippets/ids/formatting.js').default
-                    },
-                    {
-                        framework: 'py',
-                        code: require('!!raw-loader!./snippets/ids/formatting.py').default
-                    }
+                    { framework: 'jsx', code: require('!!raw-loader!./snippets/ids/formatting.jsx').default },
+                    { framework: 'js', code: require('!!raw-loader!./snippets/ids/formatting.js').default },
+                    { framework: 'py', code: require('!!raw-loader!./snippets/ids/formatting.py').default }
                 ]} />
                 <Example>
                     <FormattingExample />

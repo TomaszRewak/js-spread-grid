@@ -13,7 +13,7 @@ export default function DataBlock() {
             <SubHeader>Auto-generating rows and columns</SubHeader>
             <Section>
                 <Paragraph>
-                    The <code>DATA-BLOCK</code> type is used to dynamically generate columns or rows based on the provided data. This type simplifies the creation of grids by automatically deriving column or row definitions from the data set.
+                    The <code>DATA-BLOCK</code> type dynamically generates columns or rows based on the provided data. It derives definitions by examining the data structure, simplifying grid creation when the columns or rows directly reflect the data.
                 </Paragraph>
                 <Paragraph>
                     The following examples demonstrate how to use the <code>DATA-BLOCK</code> type for columns and rows.
@@ -89,20 +89,20 @@ export default function DataBlock() {
                     <li>For columns, it iterates over all objects discovered as rows and gets all of their unique properties.</li>
                 </ul>
                 <Paragraph>
-                    This means that when an array is encountered, each index is treated as a separate column/row. When an object is encountered, each key is treated as a separate column/row.
+                    This means that when an array is encountered, each index is treated as a separate column/row. When an object is encountered, each property is treated as a separate column/row.
                 </Paragraph>
             </Section>
 
             <SubHeader>Selectors</SubHeader>
             <Section>
                 <Paragraph>
-                    The <code>DATA-BLOCK</code> type supports a special <code>selector</code> property that allows for customizing the key selection process. This can be useful when you need more control over which keys are used to generate columns or rows.
+                    By default, <code>DATA-BLOCK</code> discovers selectors automatically - iterating over array indices or object properties. You can override this by providing a <code>selector</code> function on the <code>DATA-BLOCK</code> definition. This function receives the data and returns an array of selectors that will be used to generate the individual columns or rows.
                 </Paragraph>
                 <Paragraph>
-                    When using a custom <code>DATA-BLOCK</code> selector, you might also need to provide a <code>dataSelector</code> to specify how the data should be retrieved. The <code>data-selector</code> function has access to the <code>data</code>, <code>column</code>, and <code>row</code> properties (were both the column and row are objects with an <code>selector</code> property).
+                    Note that the <code>selector</code> here means something different than the <code>selector</code> property on a static column or row. On an individual dimension, <code>selector</code> is a single value used for data access. On a <code>DATA-BLOCK</code>, it is a function that returns the <em>list</em> of values used to create the dimensions.
                 </Paragraph>
                 <Paragraph>
-                    For example, you can use a <code>dataSelector</code> function like this <code>column.selector * row.selector + data.offset</code> to calculate cell values (without having to store them in the data object directly).
+                    When using custom selector generation, you will typically also need a custom <code>dataSelector</code> to define how cell values are extracted from your data structure.
                 </Paragraph>
                 <CodeBlock options={[
                     {
@@ -141,10 +141,10 @@ export default function DataBlock() {
             <SubHeader>Generating IDs</SubHeader>
             <Section>
                 <Paragraph>
-                    Independently from the <code>selector</code> you can also specify a custom <code>id</code> function which will assign a unique identifier to each of the rows and/or columns.
+                    By default, <code>DATA-BLOCK</code> uses each selector value as both the ID and selector for the generated dimensions. You can override this by providing a custom <code>id</code> function that assigns a unique identifier to each generated column or row.
                 </Paragraph>
                 <Paragraph>
-                    It should accept an object with two fields (<code>data</code> and <code>selector</code>) as a parameter and produce a unique identifier of any form (a string, int, object, array...). This identifier will be used to maintain cell selection (even when the order of row changes) and to apply formatting rules.
+                    The function receives an object with <code>data</code> and <code>selector</code> fields and should return a unique identifier (a string, number, object, or array). This identifier will be used for cell selection, formatting rules, and other interactions - just as described in the IDs and selectors page.
                 </Paragraph>
                 <CodeBlock options={[
                     {

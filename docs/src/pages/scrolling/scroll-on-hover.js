@@ -73,7 +73,7 @@ export default function ScrollOnHover() {
                     The <code>disableScrollOnHover</code> property controls whether programmatic scrolling is paused while the user's mouse hovers over the grid's scrollable area. This is enabled (<code>true</code>) by default.
                 </Paragraph>
                 <Paragraph>
-                    When enabled, hovering over the grid body prevents the scroll target from taking effect — allowing the user to freely browse the data without being interrupted by automatic scrolling. Scrolling resumes once the mouse leaves the grid. The mouse hovering over pinned rows or columns does not disable scrolling.
+                    When enabled, hovering over the grid body prevents the scroll target from taking effect - allowing the user to freely browse the data without being interrupted by automatic scrolling. Scrolling resumes once the mouse leaves the grid. The mouse hovering over pinned rows or columns does not disable scrolling.
                 </Paragraph>
             </Section>
 

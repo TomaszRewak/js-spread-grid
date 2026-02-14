@@ -9,13 +9,13 @@ import { defaultData } from "../../utils/defaults";
 export default function Introduction() {
     return (
         <>
-            <SubHeader>Definition-drive approach</SubHeader>
+            <SubHeader>Definition-driven approach</SubHeader>
             <Section>
                 <Paragraph>
-                    Columns and row are the building blocks of any table layout. They define the vertical and horizontal divisions of the grid.
+                    Columns and rows are the building blocks of any table layout. They define the vertical and horizontal divisions of the grid.
                 </Paragraph>
                 <Paragraph>
-                    They are especially important in case of the Spread Grid. Columns and rows are the first class concepts within this library. One can create a grid without any data, or that data can assume any form (including sparse representations or dynamic generators) - but not without column and row definitions. And even though the columns and rows can be derived from the data (in selected scenarios), they always form the backbone of how the grid is constructed. The difference between the two approached (the described <strong>definition-driven approach</strong> and an alternative data-driven approach) might be subtle, but it is good to keep it in mind when reading the remaining chapters of this documentation. It will help you understand topics like cell formatting and selectors.
+                    They are especially important in case of the Spread Grid. Columns and rows are the first class concepts within this library. One can create a grid without any data, or that data can assume any form (including sparse representations or dynamic generators) - but not without column and row definitions. And even though the columns and rows can be derived from the data (in selected scenarios), they always form the backbone of how the grid is constructed. The difference between the two approaches (the described <strong>definition-driven approach</strong> and an alternative data-driven approach) might be subtle, but it is good to keep it in mind when reading the remaining chapters of this documentation. It will help you understand topics like cell formatting and selectors.
                 </Paragraph>
                 <Paragraph>
                     Columns and rows are conceptually almost identical in case of the Spread Grid library. Most properties and behaviors of one of them is equally applicable to the other. One can pin both columns and rows, filter/sort them, annotate them with headers and more. This allows for creating more complex layouts, like pivot tables. The two most notable differences between columns and rows are: the way in which they are referred to in formatting selectors/callbacks and how one defines their sizes.
@@ -140,8 +140,8 @@ export default function Introduction() {
                 <Paragraph>
                     Columns/rows support following properties:
                     <ul>
-                        <li><code>id</code> - unique identifier of the column/row</li>
-                        <li><code>selector</code> - an identifier used to extract cell value from the data</li>
+                        <li><code>id</code> - unique identifier used for referencing the column/row in formatting, selection, and events</li>
+                        <li><code>selector</code> - used to locate cell values within the data (defaults to the same value as <code>id</code>)</li>
                         <li><code>type</code> - type of the column/row</li>
                         <li><code>header</code> - header of the column/row</li>
                         <li><code>width</code>/<code>height</code> - width/height of the column/row</li>

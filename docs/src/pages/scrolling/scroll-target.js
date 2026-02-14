@@ -153,9 +153,9 @@ export default function ScrollTarget() {
                     An optional <code>position</code> property determines where within the viewport the target row or column should appear. The supported values are:
                 </Paragraph>
                 <ul>
-                    <li><code>BEGIN</code> — aligns the target row to the top of the scrollable area (the default).</li>
-                    <li><code>MIDDLE</code> — centers the target row within the viewport.</li>
-                    <li><code>END</code> — aligns the target row to the bottom of the scrollable area.</li>
+                    <li><code>BEGIN</code> - aligns the target row to the top of the scrollable area (the default).</li>
+                    <li><code>MIDDLE</code> - centers the target row within the viewport.</li>
+                    <li><code>END</code> - aligns the target row to the bottom of the scrollable area.</li>
                 </ul>
                 <CodeBlock options={[
                     { framework: 'jsx', code: require('!!raw-loader!./snippets/scroll-target/position.jsx').default },

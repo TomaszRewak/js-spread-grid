@@ -136,7 +136,7 @@ export default function ScrollSpeed() {
             <SubHeader>Numerical value</SubHeader>
             <Section>
                 <Paragraph>
-                    A numerical value specifies the scroll speed in pixels per second. This gives you precise control over how fast the grid scrolls to the target. Lower values produce slower, more gradual animations — for example, <code>500</code> scrolls at 500 pixels per second.
+                    A numerical value specifies the scroll speed in pixels per second. This gives you precise control over how fast the grid scrolls to the target. Lower values produce slower, more gradual animations - for example, <code>500</code> scrolls at 500 pixels per second.
                 </Paragraph>
                 <CodeBlock options={[
                     { framework: 'jsx', code: require('!!raw-loader!./snippets/scroll-speed/numerical.jsx').default },
@@ -166,7 +166,7 @@ export default function ScrollSpeed() {
             <SubHeader>Speed steps</SubHeader>
             <Section>
                 <Paragraph>
-                    For more advanced control, you can provide an array of speed steps. Each step defines a <code>scrollSpeed</code> and a <code>maxDistance</code> threshold. The grid selects the speed based on the current distance to the target — the first step whose <code>maxDistance</code> is greater than or equal to the remaining distance is used.
+                    For more advanced control, you can provide an array of speed steps. Each step defines a <code>scrollSpeed</code> and a <code>maxDistance</code> threshold. The grid selects the speed based on the current distance to the target - the first step whose <code>maxDistance</code> is greater than or equal to the remaining distance is used.
                 </Paragraph>
                 <Paragraph>
                     This allows for adaptive scrolling: slow for short distances (precise), fast for medium distances, and instant for very large jumps.

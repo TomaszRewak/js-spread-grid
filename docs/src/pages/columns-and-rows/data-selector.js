@@ -12,13 +12,10 @@ export default function DataSelector() {
             <SubHeader>Data selector</SubHeader>
             <Section>
                 <Paragraph>
-                    In Spread Grid, the <code>dataSelector</code> is a function used to retrieve cell values from the provided <code>data</code> object. The default value of the data selector is: <code>{"({ data, row, column }) => data[row.selector][column.selector]"}</code>
+                    The <code>dataSelector</code> is a grid-level function that extracts cell values from the provided data. It uses the <code>selector</code> property of each column and row to locate the value. Its default implementation is: <code>{"({ data, row, column }) => data?.[row.selector]?.[column.selector]"}</code>
                 </Paragraph>
                 <Paragraph>
-                    In most cases, you won't have to overwrite this default data selector. It works well for standard grid setups where data is a simple object or array.
-                </Paragraph>
-                <Paragraph>
-                    However, the <code>dataSelector</code> can be customized to handle more complex scenarios, such as processing sparse data representations or even fully generative data.
+                    In most cases the default is sufficient - it works well when data is a simple object or array. But the <code>dataSelector</code> can be customized for more complex scenarios, such as sparse data representations or fully generative data.
                 </Paragraph>
             </Section>
             <SubHeader>Generative data</SubHeader>

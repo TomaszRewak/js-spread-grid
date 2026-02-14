@@ -56,10 +56,10 @@ const routes = [
         chapter: 'columns and rows',
         pages: [
             { title: 'introduction', page: ColumnsAndRowsIntroduction },
-            { title: 'ids', page: Ids },
-            { title: 'headers', page: Headers, wip: true },
-            { title: 'data block', page: DataBlock },
+            { title: 'ids and selectors', page: Ids },
             { title: 'data selector', page: DataSelector },
+            { title: 'data block', page: DataBlock },
+            { title: 'headers', page: Headers, wip: true },
             { title: 'size', page: Size }
         ]
     },
