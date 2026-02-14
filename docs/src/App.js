@@ -19,6 +19,7 @@ import { default as FormattingIntroduction } from './pages/formatting/introducti
 import { default as ColumnsAndRowsIntroduction } from './pages/columns-and-rows/introduction';
 import { default as EditingIntroduction } from './pages/editing/introduction';
 import DataBlock from './pages/columns-and-rows/data-block';
+import DynamicBlock from './pages/columns-and-rows/dynamic-block';
 import Ids from './pages/columns-and-rows/ids';
 import DataSelector from './pages/columns-and-rows/data-selector';
 import Style from './pages/formatting/style';
@@ -59,6 +60,7 @@ const routes = [
             { title: 'ids and selectors', page: Ids },
             { title: 'data selector', page: DataSelector },
             { title: 'data block', page: DataBlock },
+            { title: 'dynamic block', page: DynamicBlock },
             { title: 'headers', page: Headers, wip: true },
             { title: 'size', page: Size }
         ]

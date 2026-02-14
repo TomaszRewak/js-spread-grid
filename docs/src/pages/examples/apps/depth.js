@@ -327,6 +327,9 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
                 style={{
                     scrollbarWidth: "none"
                 }}
+            // onActiveRowsChange={
+            //     (rows) => console.log(rows)
+            // }
             />
         </div>
     );
