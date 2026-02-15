@@ -13,6 +13,14 @@ function update_package_json() {
     cd ..
 }
 
+function update_docs_version() {
+    local version=$(node -p "require('./lib/package.json').version")
+
+    echo "-----> Updating docs version display to $version"
+
+    sed -i "s/v[0-9]\+\.[0-9]\+\.[0-9]\+/v$version/" docs/src/App.js
+}
+
 function release_dash_package() {
     local package=$1
 
@@ -75,14 +83,16 @@ for package in ${packages[@]}; do
     update_package_json $package $version
 done
 
-for package in ${js_packages[@]}; do
-    release_js_package $package
-done
+update_docs_version
 
-for package in ${dash_packages[@]}; do
-    release_dash_package $package
-done
+# for package in ${js_packages[@]}; do
+#     release_js_package $package
+# done
 
-for application in ${applications[@]}; do
-    publish_application $application
-done
+# for package in ${dash_packages[@]}; do
+#     release_dash_package $package
+# done
+
+# for application in ${applications[@]}; do
+#     publish_application $application
+# done

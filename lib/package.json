@@ -1,6 +1,6 @@
 {
     "name": "js-spread-grid",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "Fast grid for js applications",
     "author": "Tomasz Rewak <tomasz.rewak@gmail.com>",
     "license": "MIT",
