@@ -3,7 +3,6 @@ import CodeBlock from "../../components/CodeBlock";
 import Example from "../../components/Example";
 import Paragraph from "../../components/Paragraph";
 import { defaultData, defaultDataCode } from "../../utils/defaults";
-import WorkInProgress from "../../components/WorkInProgress";
 import Section from "../../components/Section";
 import SubHeader from "../../components/SubHeader";
 import { useState } from "react";
@@ -11,9 +10,17 @@ import { useState } from "react";
 export default function Filtering() {
     return (
         <>
-            <WorkInProgress step="documentation" />
             <SubHeader>Filtering</SubHeader>
             <Section>
+                <Paragraph>
+                    To enable filtering, add a <code>{'{ type: "FILTER" }'}</code> row to your row definitions. This creates an editable row where users can type filter expressions to narrow down visible data.
+                </Paragraph>
+                <Paragraph>
+                    By default, a row is shown if the cell's text contains the typed expression.
+                </Paragraph>
+                <Paragraph>
+                    The filter state can be controlled externally via <code>filters</code> and <code>onFiltersChange</code> properties.
+                </Paragraph>
                 <CodeBlock separator={'or'} options={[
                     {
                         framework: 'jsx',
@@ -37,6 +44,15 @@ export default function Filtering() {
             </Section>
             <SubHeader>Custom filtering</SubHeader>
             <Section>
+                <Paragraph>
+                    The <code>filtering</code> property lets you override the default condition. It accepts an array of rules, similar to <code>formatting</code>. Each rule uses <code>column</code> and <code>row</code> selectors to choose which cells it applies to, and a <code>condition</code> callback that decides whether a row should be visible.
+                </Paragraph>
+                <Paragraph>
+                    The callback receives a context object containing the cell <code>value</code>, <code>text</code>, and the filter <code>expression</code>. It also includes <code>row</code>, <code>column</code>, <code>rows</code>, <code>columns</code>, and <code>data</code> for more advanced logic.
+                </Paragraph>
+                <Paragraph>
+                    In this example, the name column uses a starts-with condition instead of the default includes check.
+                </Paragraph>
                 <CodeBlock options={[
                     {
                         framework: 'jsx',
@@ -55,6 +71,7 @@ export default function Filtering() {
                     <CustomFilteringExample />
                 </Example>
                 <Paragraph>
+                    Filter expressions are strings by default. To filter against non-string data like numbers, use <code>formatting</code> rules on the FILTER row with custom <code>edit</code> behavior. The <code>parse</code> callback converts the string input into a typed value, and <code>validate</code> prevents invalid input from being committed.
                 </Paragraph>
                 <CodeBlock options={[
                     {
@@ -76,6 +93,9 @@ export default function Filtering() {
             </Section>
             <SubHeader>Disabling filtering</SubHeader>
             <Section>
+                <Paragraph>
+                    To disable filtering for specific columns, use <code>formatting</code> rules that set <code>edit: false</code> and <code>text: ''</code> on the FILTER row.
+                </Paragraph>
                 <CodeBlock options={[
                     {
                         framework: 'jsx',
@@ -96,6 +116,9 @@ export default function Filtering() {
             </Section>
             <SubHeader>Custom hint</SubHeader>
             <Section>
+                <Paragraph>
+                    Empty filter cells show no placeholder by default. Use the <code>text</code> formatting property on the FILTER row to display a custom hint when the cell has no value.
+                </Paragraph>
                 <CodeBlock options={[
                     {
                         framework: 'jsx',
