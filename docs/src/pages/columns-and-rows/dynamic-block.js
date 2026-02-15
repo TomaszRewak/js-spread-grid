@@ -28,7 +28,7 @@ export default function DynamicBlock() {
                     A <code>DYNAMIC-BLOCK</code> requires two properties: <code>type</code> and <code>count</code> (the total number of items). Optionally, you can specify a uniform <code>height</code> (for rows) or <code>width</code> (for columns) - individual sizing is not supported.
                 </Paragraph>
                 <Paragraph>
-                    In the following example, 100,000 rows are created. A <code>selector</code> function maps each item's index to a value, and a <code>dataSelector</code> generates cell contents on the fly. Only the rows within the scroll view are actually processed.
+                    In the following example, 100,001 rows are created. A <code>selector</code> function maps each item's index to a value, and a <code>dataSelector</code> generates cell contents on the fly. Only the rows within the scroll view are actually processed.
                 </Paragraph>
                 <CodeBlock options={[
                     { framework: 'jsx', code: require('!!raw-loader!./snippets/dynamic-block/basic.jsx').default },
@@ -107,14 +107,13 @@ function BasicExample() {
     return (
         <SpreadGrid
             columns={[
-                { type: 'HEADER' },
                 { id: 'value', width: 80 },
                 { id: 'square', width: 80 },
                 { id: 'cube', width: 80 },
             ]}
             rows={[
                 { type: 'HEADER' },
-                { type: 'DYNAMIC-BLOCK', count: 100000 },
+                { type: 'DYNAMIC-BLOCK', count: 100001 },
             ]}
             dataSelector={({ row, column }) => {
                 const n = row.selector;

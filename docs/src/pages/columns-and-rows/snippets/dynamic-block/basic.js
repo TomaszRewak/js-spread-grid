@@ -8,7 +8,7 @@ SpreadGrid(div, {
     ],
     rows: [
         { type: 'HEADER' },
-        { type: 'DYNAMIC-BLOCK', count: 100000 },
+        { type: 'DYNAMIC-BLOCK', count: 100001 },
     ],
     dataSelector: ({ row, column }) => {
         const n = row.selector;

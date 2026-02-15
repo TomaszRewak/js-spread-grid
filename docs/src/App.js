@@ -81,7 +81,7 @@ const routes = [
         chapter: 'data shaping',
         pages: [
             { title: 'sorting', page: Sorting },
-            { title: 'filtering', page: Filtering, wip: true },
+            { title: 'filtering', page: Filtering },
             { title: 'active', page: Active, wip: true }
         ]
     },

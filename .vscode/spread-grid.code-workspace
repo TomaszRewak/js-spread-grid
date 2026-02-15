@@ -46,7 +46,8 @@
         "editor.detectIndentation": false,
         "editor.formatOnSave": true,
         "chat.tools.terminal.autoApprove": {
-            "tsc": true
+            "tsc": true,
+            "npx tsc": true
         }
     },
 }
