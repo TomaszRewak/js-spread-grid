@@ -14,7 +14,7 @@ import About from './pages/basics/about';
 import Heatmap from './pages/examples/heatmap';
 import Resources from './pages/basics/resources';
 import Plotter from './pages/examples/plotter';
-import Depth from './pages/examples/depth';
+import OrderBook from './pages/examples/order-book';
 import { default as FormattingIntroduction } from './pages/formatting/introduction';
 import { default as ColumnsAndRowsIntroduction } from './pages/columns-and-rows/introduction';
 import { default as EditingIntroduction } from './pages/editing/introduction';
@@ -49,7 +49,7 @@ const routes = [
         pages: [
             { title: 'app manager', page: AppManager },
             { title: 'plotter', page: Plotter },
-            { title: 'depth', page: Depth },
+            { title: 'order book', page: OrderBook },
             { title: 'heatmap', page: Heatmap }
         ]
     },

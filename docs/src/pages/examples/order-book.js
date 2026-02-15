@@ -1,17 +1,17 @@
 import Example from "../../components/Example";
 import Paragraph from "../../components/Paragraph";
 import Section from "../../components/Section";
-import { default as App } from "./apps/depth";
+import { default as App } from "./apps/order-book";
 
 
-export default function Depth() {
+export default function OrderBook() {
     return (
         <>
             <Example>
                 <App />
             </Example>
             <Paragraph>
-                Code of this example can be found on <a href="https://github.com/TomaszRewak/js-spread-grid/blob/master/docs/src/pages/examples/apps/depth.js">GitHub</a>.
+                Code of this example can be found on <a href="https://github.com/TomaszRewak/js-spread-grid/blob/master/docs/src/pages/examples/apps/order-book.js">GitHub</a>.
             </Paragraph>
             <Section>
                 <Paragraph>

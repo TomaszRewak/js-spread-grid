@@ -237,7 +237,7 @@ const verticalScrollSpeed = [
 ////////////////////////// APP //////////////////////////
 /////////////////////////////////////////////////////////
 
-function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, gap = 0 }) {
+function OrderBookGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, gap = 0 }) {
     const [tick, setTick] = useState(0);
     const [middleIndex, setMiddleIndex] = useState(initialMiddleIndex);
     const bidIndex = middleIndex - gap;
@@ -340,12 +340,12 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
     );
 }
 
-export default function Depth() {
+export default function OrderBook() {
     return (
         <div style={{ maxHeight: '400px', display: 'flex', flexDirection: 'row', gap: '20px', background: '#222222' }}>
-            <DepthGrid initialMiddleIndex={100} defaultSize={10} levels={4} gap={2} />
-            <DepthGrid initialMiddleIndex={1200} defaultSize={1000} levels={10} />
-            <DepthGrid initialMiddleIndex={10000} defaultSize={100} levels={30} bidAsymmetry={0.3} />
+            <OrderBookGrid initialMiddleIndex={100} defaultSize={10} levels={4} gap={2} />
+            <OrderBookGrid initialMiddleIndex={1200} defaultSize={1000} levels={10} />
+            <OrderBookGrid initialMiddleIndex={10000} defaultSize={100} levels={30} bidAsymmetry={0.3} />
         </div>
     );
 }
