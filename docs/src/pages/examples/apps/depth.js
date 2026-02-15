@@ -101,12 +101,16 @@ function mergeVolumes(market, ours) {
 ////////////////////////// LAYOUT //////////////////////////
 ////////////////////////////////////////////////////////////
 
+const rowCount = 100000;
+const revertIdex = (index) => rowCount - 1 - index;
+
 const rows = [
     { type: "HEADER", height: 15 },
     {
         type: "DYNAMIC-BLOCK",
         height: 15,
-        count: 100000,
+        count: rowCount,
+        selector: ({ index }) => revertIdex(index),
         id: ({ selector }) => getPrice(selector),
     },
     { type: "HEADER", height: 15 },
@@ -211,7 +215,7 @@ const formatting = [
         value: ({ row, data, column }) => data.our[column.id][row.id] || 0,
         text: '',
         style: ({ value }) => value ? { background: `rgb(49, 114, 36, ${value * 10}%)` } : {}
-    }
+    },
 ];
 
 const verticalScrollSpeed = [
@@ -305,7 +309,7 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
     }, [marketOrders, ourOrders]);
 
     const verticalScrollTarget = useMemo(() => ({
-        index: middleIndex + 0.5,
+        index: revertIdex(middleIndex) - 0.5,
         position: 'MIDDLE',
     }), [middleIndex]);
 
@@ -331,9 +335,6 @@ function DepthGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry = 1, 
                 style={{
                     scrollbarWidth: "none"
                 }}
-            // onActiveRowsChange={
-            //     (rows) => console.log(rows)
-            // }
             />
         </div>
     );
@@ -344,7 +345,7 @@ export default function Depth() {
         <div style={{ maxHeight: '400px', display: 'flex', flexDirection: 'row', gap: '20px', background: '#222222' }}>
             <DepthGrid initialMiddleIndex={100} defaultSize={10} levels={4} gap={2} />
             <DepthGrid initialMiddleIndex={1200} defaultSize={1000} levels={10} />
-            <DepthGrid initialMiddleIndex={10000} defaultSize={100} levels={30} bidAsymmetry={0.5} />
+            <DepthGrid initialMiddleIndex={10000} defaultSize={100} levels={30} bidAsymmetry={0.3} />
         </div>
     );
 }
