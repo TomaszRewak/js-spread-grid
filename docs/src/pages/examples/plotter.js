@@ -15,10 +15,10 @@ export default function AppManager() {
             </Paragraph>
             <Section>
                 <Paragraph>
-                    <lu>
+                    <ul>
                         <li>Click on the ☐/☑ buttons to enable/disable strategies</li>
                         <li>Observe how the line-plots and the box-plots change together with the values</li>
-                    </lu>
+                    </ul>
                 </Paragraph>
             </Section>
         </>

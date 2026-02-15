@@ -15,7 +15,7 @@ export default function AppManager() {
             </Paragraph>
             <Section>
                 <Paragraph>
-                    <lu>
+                    <ul>
                         <li>Click on the header to sort by the column</li>
                         <li>Click ▷/⟳/▢ buttons next to an app to start/restart/stop it</li>
                         <li>Click ▷/⟳/▢ buttons at the bottom to start/restart/stop all apps</li>
@@ -23,7 +23,7 @@ export default function AppManager() {
                         <li>Search for application names using fuzzy-matching</li>
                         <li>Toggle the "required" search state by clicking on the search field</li>
                         <li>Search for tags using a set of values</li>
-                    </lu>
+                    </ul>
                 </Paragraph>
             </Section>
         </>
