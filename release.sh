@@ -85,14 +85,14 @@ done
 
 update_docs_version
 
-# for package in ${js_packages[@]}; do
-#     release_js_package $package
-# done
+for package in ${js_packages[@]}; do
+    release_js_package $package
+done
 
-# for package in ${dash_packages[@]}; do
-#     release_dash_package $package
-# done
+for package in ${dash_packages[@]}; do
+    release_dash_package $package
+done
 
-# for application in ${applications[@]}; do
-#     publish_application $application
-# done
+for application in ${applications[@]}; do
+    publish_application $application
+done
