@@ -48,9 +48,9 @@ const routes = [
         chapter: 'examples',
         pages: [
             { title: 'app manager', page: AppManager },
-            { title: 'heatmap', page: Heatmap },
             { title: 'plotter', page: Plotter },
-            { title: 'depth', page: Depth }
+            { title: 'depth', page: Depth },
+            { title: 'heatmap', page: Heatmap }
         ]
     },
     {

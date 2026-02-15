@@ -107,6 +107,7 @@ function BasicExample() {
     return (
         <SpreadGrid
             columns={[
+                { type: 'HEADER' },
                 { id: 'value', width: 80 },
                 { id: 'square', width: 80 },
                 { id: 'cube', width: 80 },
