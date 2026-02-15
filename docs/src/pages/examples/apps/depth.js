@@ -136,6 +136,10 @@ const formatting = [
         style: { background: "rgb(41, 76, 151)" }
     },
     {
+        row: { type: "HEADER" },
+        sortOrder: [],
+    },
+    {
         column: { id: "market_bid" },
         value: ({ row, data }) => data.market.bids[row.id] || 0,
     },

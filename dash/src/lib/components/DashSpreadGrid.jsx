@@ -51,6 +51,8 @@ function useResolvedFormatting(formatting) {
                 else {
                     mappedRule.edit = rule.edit;
                 }
+            if ('sort_order' in rule)
+                mappedRule.sortOrder = isString(rule.sort_order) ? eval(`(${context}) => (${rule.sort_order})`) : rule.sort_order;
 
             return mappedRule;
         });

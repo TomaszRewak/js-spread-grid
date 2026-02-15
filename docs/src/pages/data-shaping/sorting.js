@@ -123,6 +123,32 @@ export default function Sorting() {
                     <DirectionalSortingExample />
                 </Example>
             </Section>
+            <SubHeader>Sort order</SubHeader>
+            <Section>
+                <Paragraph>
+                    The <code>sortOrder</code> formatting property controls which sort directions are available when clicking a column header. By default, clicking cycles through ascending, descending, and unsorted (<code>['ASC', 'DESC', null]</code>). You can override this per column to restrict or reorder the cycle.
+                </Paragraph>
+                <Paragraph>
+                    For example, <code>['ASC', null]</code> only allows ascending sort (skipping descending), while <code>['ASC', 'DESC']</code> prevents the column from being unsorted. An empty array disables sorting for that column entirely.
+                </Paragraph>
+                <CodeBlock options={[
+                    {
+                        framework: 'jsx',
+                        code: require('!!raw-loader!./snippets/sorting/sort-order.jsx').default
+                    },
+                    {
+                        framework: 'js',
+                        code: require('!!raw-loader!./snippets/sorting/sort-order.js').default
+                    },
+                    {
+                        framework: 'py',
+                        code: require('!!raw-loader!./snippets/sorting/sort-order.py').default
+                    }
+                ]} />
+                <Example>
+                    <SortOrderExample />
+                </Example>
+            </Section>
             <SubHeader>Continuous data blocks</SubHeader>
             <Section>
                 <Paragraph>
@@ -319,6 +345,44 @@ function DirectionalSortingExample() {
                     column: { id: "score" },
                     comparatorAsc: (lhs, rhs) => Math.abs(lhs.value) < Math.abs(rhs.value),
                     comparatorDesc: (lhs, rhs) => lhs.value < rhs.value,
+                }
+            ]}
+        />
+    );
+}
+
+function SortOrderExample() {
+    const [sortBy, setSortBy] = useState([]);
+
+    return (
+        <SpreadGrid
+            data={[
+                { name: 'John', age: 25, score: 100, registered: true, team: 'red' },
+                { name: 'Alice', age: 24, score: -70, registered: false, team: 'blue' },
+                { name: 'Bob', age: 26, score: 35, registered: true, team: 'blue' },
+                { name: 'Charlie', age: 27, score: -60, registered: false, team: 'red' },
+                { name: 'David', age: 18, score: 60, registered: true, team: 'red' },
+                { name: 'Eve', age: 29, score: 80, registered: false, team: 'green' },
+                { name: 'Frank', age: 30, score: -50, registered: true, team: 'blue' }
+            ]}
+            columns={[{ type: 'DATA-BLOCK', width: 70 }]}
+            sortBy={sortBy}
+            onSortByChange={setSortBy}
+            formatting={[
+                {
+                    column: { id: "age" },
+                    row: { type: "HEADER" },
+                    sortOrder: ['ASC', null],
+                },
+                {
+                    column: { id: "score" },
+                    row: { type: "HEADER" },
+                    sortOrder: ['ASC', 'DESC'],
+                },
+                {
+                    column: { id: "registered" },
+                    row: { type: "HEADER" },
+                    sortOrder: [],
                 }
             ]}
         />
