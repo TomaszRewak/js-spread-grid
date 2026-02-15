@@ -14,9 +14,6 @@ app.layout = DashSpreadGrid(
         {"name": "Frank", "age": 30, "score": 50, "registered": True, "team": "blue"},
     ],
     formatting=[
-        {
-            "text": 25,
-        }
     ],
 )
 
