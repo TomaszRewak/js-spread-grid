@@ -4,7 +4,7 @@ SpreadGrid(div, {
         // default dict data
         // collapse: false
     },
-    onCellClick: ({ columnId, rowId }) => {
+    onCellClick: ({ columnId, rowId, ctrlKey, shiftKey, button, buttons, detail }) => {
         // ...
     }
 });

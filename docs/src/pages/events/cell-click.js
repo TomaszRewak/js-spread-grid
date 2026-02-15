@@ -1,4 +1,3 @@
-import WorkInProgress from "../../components/WorkInProgress";
 import SpreadGrid from "react-spread-gird";
 import Example from "../../components/Example";
 import Paragraph from "../../components/Paragraph";
@@ -10,17 +9,16 @@ import { defaultDictData } from "../../utils/defaults";
 export default function CellClickEvents() {
     return (
         <>
-            <WorkInProgress step="implementation" details="working on adding more details to the click events" />
             <SubHeader>onCellClick</SubHeader>
             <Section>
                 <Paragraph>
-                    The <code>onCellClick</code> callback is invoked whenever a <code>DATA</code> cell is clicked within the grid. The function is invoked with an object containing <code>{'{ columnId, rowId }'}</code> properties (that will allow you to identify the clicked cell). In the future, more fields will be added to the callback event (such as modifier keys).
+                    The <code>onCellClick</code> callback fires whenever a <code>DATA</code> cell is clicked. The callback receives an object with <code>{'{ columnId, rowId }'}</code> to identify the cell, plus a subset of native mouse-event properties: <code>ctrlKey</code>, <code>shiftKey</code>, <code>button</code>, <code>buttons</code>, and <code>detail</code>.
                 </Paragraph>
                 <Paragraph>
-                    The <code>onCellClick</code> event triggers only for <code>DATA</code> cells, meaning it does not trigger for headers, filters, nor custom cells. For <code>CUSTOM</code> cells, you can register an <code>onCustomCellClick</code> callback that will be invoked whenever those are clicked.
+                    The event triggers only for <code>DATA</code> cells - headers, filters, and custom cells are excluded. For <code>CUSTOM</code> cells, use the <code>onCustomCellClick</code> callback instead, which receives the same set of properties.
                 </Paragraph>
                 <Paragraph>
-                    It's recommended to use proper column and row IDs within your grid - in order to be able to identify the clicked cell more easily (without having to refer back to the data).
+                    It's recommended to use proper column and row IDs within your grid so that the clicked cell can be identified directly from the callback without referring back to the data.
                 </Paragraph>
                 <CodeBlock options={[
                     {

@@ -96,7 +96,7 @@ const routes = [
     {
         chapter: 'events',
         pages: [
-            { title: 'cell click', page: CellClick, wip: true },
+            { title: 'cell click', page: CellClick },
             { title: 'tooltips', page: Tooltips, wip: true },
         ]
     },
