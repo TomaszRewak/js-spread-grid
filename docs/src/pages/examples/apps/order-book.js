@@ -12,15 +12,17 @@ const tickSizes = [
 ]
 
 function getPrice(index) {
+    let absIndex = Math.abs(index);
     let price = 0;
+
     for (const [maxPrice, tickSize] of tickSizes) {
         const steps = (maxPrice - price) / tickSize;
 
-        if (maxPrice === null || index < steps)
-            return price + index * tickSize;
+        if (maxPrice === null || absIndex < steps)
+            return (price + absIndex * tickSize) * Math.sign(index);
 
         price += steps * tickSize;
-        index -= steps;
+        absIndex -= steps;
     }
 }
 
@@ -101,8 +103,8 @@ function mergeVolumes(market, ours) {
 ////////////////////////// LAYOUT //////////////////////////
 ////////////////////////////////////////////////////////////
 
-const rowCount = 100000;
-const revertIdex = (index) => rowCount - 1 - index;
+const rowCount = 200000;
+const translateIndex = (index) => rowCount / 2 - 1 - index;
 
 const rows = [
     { type: "HEADER", height: 15 },
@@ -110,7 +112,7 @@ const rows = [
         type: "DYNAMIC-BLOCK",
         height: 15,
         count: rowCount,
-        selector: ({ index }) => revertIdex(index),
+        selector: ({ index }) => translateIndex(index),
         id: ({ selector }) => getPrice(selector),
     },
     { type: "HEADER", height: 15 },
@@ -177,7 +179,7 @@ const formatting = [
     {
         column: { id: "price" },
         value: ({ row }) => row.id,
-        text: ({ value }) => value >= 100 ? value.toFixed(0) : value >= 10 ? value.toFixed(1) : value.toFixed(2),
+        text: ({ value }) => Math.abs(value) >= 100 ? value.toFixed(0) : Math.abs(value) >= 10 ? value.toFixed(1) : value.toFixed(2),
         style: { background: "#414141ff", foreground: "white", border: { width: 1, color: "#9b9b9b" } }
     },
     {
@@ -309,7 +311,7 @@ function OrderBookGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry =
     }, [marketOrders, ourOrders]);
 
     const verticalScrollTarget = useMemo(() => ({
-        index: revertIdex(middleIndex) - 0.5,
+        index: translateIndex(middleIndex) - 0.5,
         position: 'MIDDLE',
     }), [middleIndex]);
 
