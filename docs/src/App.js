@@ -103,7 +103,7 @@ const routes = [
     {
         chapter: 'editing',
         pages: [
-            { title: 'introduction', page: EditingIntroduction, wip: true }
+            { title: 'introduction', page: EditingIntroduction }
         ]
     },
     {
