@@ -90,6 +90,10 @@ function useResolvedSorting(sorting) {
                 mappedRule.row = rule.row;
             if ('comparator' in rule)
                 mappedRule.comparator = eval(`(lhs, rhs) => (${rule.comparator})`);
+            if ('comparatorAsc' in rule)
+                mappedRule.comparatorAsc = eval(`(lhs, rhs) => (${rule.comparatorAsc})`);
+            if ('comparatorDesc' in rule)
+                mappedRule.comparatorDesc = eval(`(lhs, rhs) => (${rule.comparatorDesc})`);
             if ('by' in rule)
                 mappedRule.by = rule.by;
 

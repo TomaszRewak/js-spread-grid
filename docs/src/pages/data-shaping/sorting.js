@@ -97,6 +97,32 @@ export default function Sorting() {
                     <CustomSortingExample />
                 </Example>
             </Section>
+            <SubHeader>Directional comparators</SubHeader>
+            <Section>
+                <Paragraph>
+                    The <code>comparatorAsc</code> and <code>comparatorDesc</code> properties let you define separate comparators for ascending and descending sort directions. When present, they take precedence over <code>comparator</code> for that direction. If only <code>comparator</code> is provided, it is used for both directions.
+                </Paragraph>
+                <Paragraph>
+                    In this example, ascending sort orders the score column by absolute value, while descending sort uses the natural numeric order.
+                </Paragraph>
+                <CodeBlock options={[
+                    {
+                        framework: 'jsx',
+                        code: require('!!raw-loader!./snippets/sorting/directional.jsx').default
+                    },
+                    {
+                        framework: 'js',
+                        code: require('!!raw-loader!./snippets/sorting/directional.js').default
+                    },
+                    {
+                        framework: 'py',
+                        code: require('!!raw-loader!./snippets/sorting/directional.py').default
+                    }
+                ]} />
+                <Example>
+                    <DirectionalSortingExample />
+                </Example>
+            </Section>
             <SubHeader>Continuous data blocks</SubHeader>
             <Section>
                 <Paragraph>
@@ -265,6 +291,34 @@ function CustomSortingExample() {
                 {
                     column: { id: "score" },
                     comparator: (lhs, rhs) => Math.abs(lhs.value) < Math.abs(rhs.value),
+                }
+            ]}
+        />
+    );
+}
+
+function DirectionalSortingExample() {
+    const [sortBy, setSortBy] = useState([{ columnId: "score", direction: "ASC" }]);
+
+    return (
+        <SpreadGrid
+            data={[
+                { name: 'John', age: 25, score: 100, registered: true, team: 'red' },
+                { name: 'Alice', age: 24, score: -70, registered: false, team: 'blue' },
+                { name: 'Bob', age: 26, score: 35, registered: true, team: 'blue' },
+                { name: 'Charlie', age: 27, score: -60, registered: false, team: 'red' },
+                { name: 'David', age: 18, score: 60, registered: true, team: 'red' },
+                { name: 'Eve', age: 29, score: 80, registered: false, team: 'green' },
+                { name: 'Frank', age: 30, score: -50, registered: true, team: 'blue' }
+            ]}
+            columns={[{ type: 'DATA-BLOCK', width: 70 }]}
+            sortBy={sortBy}
+            onSortByChange={setSortBy}
+            sorting={[
+                {
+                    column: { id: "score" },
+                    comparatorAsc: (lhs, rhs) => Math.abs(lhs.value) < Math.abs(rhs.value),
+                    comparatorDesc: (lhs, rhs) => lhs.value < rhs.value,
                 }
             ]}
         />
