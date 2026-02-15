@@ -99,6 +99,16 @@ export default function DynamicBlock() {
                     If your dataset is small enough to be fully materialized, prefer <code>DATA-BLOCK</code> for full sorting, filtering, and per-item sizing support.
                 </Paragraph>
             </Section>
+
+            <SubHeader>Browser scroll limits</SubHeader>
+            <Section>
+                <Paragraph>
+                    While <code>DYNAMIC-BLOCK</code> itself can handle arbitrarily large counts, browsers impose a maximum height (or width) on a single DOM element. When the total size of all rows exceeds this limit, the browser will clamp the scrollable area and you won't be able to scroll to the end of the grid.
+                </Paragraph>
+                <Paragraph>
+                    The exact limit varies by browser - for example, Chrome caps element dimensions at around 33 million pixels, while Firefox allows roughly 17 million. At the default row height, this translates to a few hundred thousand rows before the limit is reached.
+                </Paragraph>
+            </Section>
         </>
     );
 }
