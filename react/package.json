@@ -1,6 +1,6 @@
 {
     "name": "react-spread-grid",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "description": "Fast grid for react applications",
     "author": "Tomasz Rewak <tomasz.rewak@gmail.com>",
     "license": "MIT",
