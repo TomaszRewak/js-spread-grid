@@ -198,6 +198,7 @@ function DashSpreadGrid(props) {
     const onHoveredCellChange = useCallback((hoveredCell) => {
         setProps({ hovered_cell: hoveredCell });
     }, [setProps]);
+    const freezeOnHover = props.freeze_on_hover;
 
     const [element, setElement] = useState(null);
 
@@ -237,6 +238,7 @@ function DashSpreadGrid(props) {
             onActiveColumnsChange,
             onActiveRowsChange,
             onHoveredCellChange,
+            freezeOnHover,
         });
 
     return React.createElement("div", { ref: setElement });
@@ -301,6 +303,10 @@ DashSpreadGrid.propTypes = {
      * _
      */
     borderWidth: PropTypes.number,
+    /**
+     * _
+     */
+    freeze_on_hover: PropTypes.bool,
     /**
      * _
      */
@@ -376,6 +382,7 @@ DashSpreadGrid.defaultProps = {
     pinned_left: 0,
     pinned_right: 0,
     borderWidth: 1,
+    freeze_on_hover: false,
     focusedCell: null,
     selected_cells: [],
     highlightedCells: [],

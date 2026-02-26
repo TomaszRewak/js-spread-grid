@@ -30,6 +30,7 @@ import Draw from './pages/formatting/draw';
 import Font from './pages/formatting/font';
 import Tooltips from './pages/events/tooltips';
 import Active from './pages/data-shaping/active';
+import FreezeOnHover from './pages/data-shaping/freeze-on-hover';
 import ScrollTarget from './pages/scrolling/scroll-target';
 import ScrollSpeed from './pages/scrolling/scroll-speed';
 import ScrollOnHover from './pages/scrolling/scroll-on-hover';
@@ -82,6 +83,7 @@ const routes = [
         pages: [
             { title: 'sorting', page: Sorting },
             { title: 'filtering', page: Filtering },
+            { title: 'freeze on hover', page: FreezeOnHover },
             { title: 'active', page: Active, wip: true }
         ]
     },
