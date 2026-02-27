@@ -376,7 +376,7 @@ DashSpreadGrid.defaultProps = {
     formatting: [],
     filtering: [],
     sorting: [],
-    data_selector: "data[row.selector][column.selector]",
+    data_selector: "data?.[row.selector]?.[column.selector]",
     pinned_top: 0,
     pinned_bottom: 0,
     pinned_left: 0,
