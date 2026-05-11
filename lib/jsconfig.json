@@ -2,12 +2,15 @@
     "compilerOptions": {
         "checkJs": true,
         "noEmit": true,
-        "downlevelIteration": true,
+        "target": "ES2023",
         "lib": [
             "ES2023",
             "DOM"
         ],
-        // "strict": true
+        // TODO: Try changing these to true later on.
+        "strict": false,
+        "strictNullChecks": false,
+        "useUnknownInCatchVariables": false,
         "noImplicitAny": true
     },
     "exclude": [
