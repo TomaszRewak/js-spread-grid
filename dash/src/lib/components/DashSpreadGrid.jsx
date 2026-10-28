@@ -199,6 +199,7 @@ function DashSpreadGrid(props) {
         setProps({ hovered_cell: hoveredCell });
     }, [setProps]);
     const freezeOnHover = props.freeze_on_hover;
+    const enableRightClick = props.enable_right_click;
 
     const [element, setElement] = useState(null);
 
@@ -239,6 +240,7 @@ function DashSpreadGrid(props) {
             onActiveRowsChange,
             onHoveredCellChange,
             freezeOnHover,
+            enableRightClick,
         });
 
     return React.createElement("div", { ref: setElement });
@@ -307,6 +309,10 @@ DashSpreadGrid.propTypes = {
      * _
      */
     freeze_on_hover: PropTypes.bool,
+    /**
+     * Suppress the browser context menu and emit cell click events for right-clicks.
+     */
+    enable_right_click: PropTypes.bool,
     /**
      * _
      */
@@ -383,6 +389,7 @@ DashSpreadGrid.defaultProps = {
     pinned_right: 0,
     borderWidth: 1,
     freeze_on_hover: false,
+    enable_right_click: false,
     focusedCell: null,
     selected_cells: [],
     highlightedCells: [],
