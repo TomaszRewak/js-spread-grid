@@ -108,6 +108,31 @@ function StepsExample() {
     );
 }
 
+function InterpolationExample() {
+    const targets = [0, 30, 199, 100, 5, 180];
+    const [targetIdx, setTargetIdx] = useState(0);
+    useInterval(() => { setTargetIdx((targetIdx + 1) % targets.length); }, 4000);
+    const currentTarget = targets[targetIdx];
+
+    return (
+        <SpreadGrid
+            data={data}
+            rows={rows}
+            columns={columns}
+            pinnedTop={1}
+            verticalScrollTarget={{ index: currentTarget }}
+            verticalScrollSpeed={[
+                { scrollSpeed: 200, maxDistance: 500, transition: 'interpolate' },
+                { scrollSpeed: 1000, maxDistance: 2000, transition: 'interpolate' },
+                { scrollSpeed: 2000, maxDistance: Infinity },
+            ]}
+            formatting={[
+                { row: { id: currentTarget }, style: { background: '#cce5ff' } }
+            ]}
+        />
+    );
+}
+
 export default function ScrollSpeed() {
     return (
         <>
@@ -178,6 +203,27 @@ export default function ScrollSpeed() {
                 ]} />
                 <Example maxHeight={300}>
                     <StepsExample />
+                </Example>
+            </Section>
+
+            <SubHeader>Interpolated Transitions</SubHeader>
+            <Section>
+                <Paragraph>
+                    Set <code>transition: 'interpolate'</code> on a speed step to smooth its transition to the next numerical speed. Over the entire step's distance band, the speed blends linearly toward the next step's speed. The band starts at the previous step's <code>maxDistance</code>, or zero for the first step, and ends at the current step's <code>maxDistance</code>. Omitting this option or setting <code>transition: 'step'</code> preserves threshold-based switching.
+                </Paragraph>
+                <Paragraph>
+                    In this example, the first band blends from 200 to 1000 pixels per second between distances of 0 and 500. The second band blends from 1000 to 2000 between distances of 500 and 2000. As the grid approaches its target, it travels through these bands in reverse, slowing down without abrupt speed changes at the thresholds.
+                </Paragraph>
+                <Paragraph>
+                    Interpolation requires both the current and next speeds to be numerical. Steps without a numerical next speed, with an infinite threshold, or with a zero-width band retain their configured speed.
+                </Paragraph>
+                <CodeBlock options={[
+                    { framework: 'jsx', code: require('!!raw-loader!./snippets/scroll-speed/interpolate.jsx').default },
+                    { framework: 'js', code: require('!!raw-loader!./snippets/scroll-speed/interpolate.js').default },
+                    { framework: 'py', code: require('!!raw-loader!./snippets/scroll-speed/interpolate.py').default }
+                ]} />
+                <Example maxHeight={300}>
+                    <InterpolationExample />
                 </Example>
             </Section>
         </>

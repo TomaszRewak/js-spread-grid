@@ -223,7 +223,8 @@ const formatting = [
 const verticalScrollSpeed = [
     {
         maxDistance: 50,
-        scrollSpeed: 20
+        scrollSpeed: 20,
+        transition: 'interpolate'
     },
     {
         maxDistance: 300,
