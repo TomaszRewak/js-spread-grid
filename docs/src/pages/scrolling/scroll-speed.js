@@ -108,6 +108,30 @@ function StepsExample() {
     );
 }
 
+function SkipExample() {
+    const targets = [0, 199, 30, 180, 5, 100];
+    const [targetIdx, setTargetIdx] = useState(0);
+    useInterval(() => { setTargetIdx((targetIdx + 1) % targets.length); }, 3000);
+    const currentTarget = targets[targetIdx];
+
+    return (
+        <SpreadGrid
+            data={data}
+            rows={rows}
+            columns={columns}
+            pinnedTop={1}
+            verticalScrollTarget={{ index: currentTarget }}
+            verticalScrollSpeed={[
+                { scrollSpeed: 500, maxDistance: 500 },
+                { scrollSpeed: 'skip', maxDistance: Infinity },
+            ]}
+            formatting={[
+                { row: { id: currentTarget }, style: { background: '#cce5ff' } }
+            ]}
+        />
+    );
+}
+
 function InterpolationExample() {
     const targets = [0, 30, 199, 100, 5, 180];
     const [targetIdx, setTargetIdx] = useState(0);
@@ -203,6 +227,24 @@ export default function ScrollSpeed() {
                 ]} />
                 <Example maxHeight={300}>
                     <StepsExample />
+                </Example>
+            </Section>
+
+            <SubHeader>Skip</SubHeader>
+            <Section>
+                <Paragraph>
+                    Use <code>scrollSpeed: 'skip'</code> to instantly jump to the previous step's distance threshold, then let that step handle the remaining distance. For example, if the previous step's <code>maxDistance</code> is 10000 and the target is 15000 pixels away, the grid jumps 5000 pixels toward it, leaving 10000 pixels to scroll. This works in either direction and on either axis.
+                </Paragraph>
+                <Paragraph>
+                    In this example, long jumps skip directly to within 500 pixels of the target, then finish at 500 pixels per second. The previous step can also use <code>'smooth'</code> or <code>'auto'</code>. When there is no previous step, <code>'skip'</code> jumps directly to the target, just like <code>'auto'</code>.
+                </Paragraph>
+                <CodeBlock options={[
+                    { framework: 'jsx', code: require('!!raw-loader!./snippets/scroll-speed/skip.jsx').default },
+                    { framework: 'js', code: require('!!raw-loader!./snippets/scroll-speed/skip.js').default },
+                    { framework: 'py', code: require('!!raw-loader!./snippets/scroll-speed/skip.py').default }
+                ]} />
+                <Example maxHeight={300}>
+                    <SkipExample />
                 </Example>
             </Section>
 
