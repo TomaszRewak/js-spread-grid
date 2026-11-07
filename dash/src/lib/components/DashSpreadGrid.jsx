@@ -10,7 +10,7 @@ function isString(value) {
 
 function useResolvedFormatting(formatting) {
     return useMemo(() => {
-        const context = '{data, rows, columns, row, column, value, newValue, text, string, ctx}';
+        const context = '{data, rows, columns, row, column, value, newValue, text, selectionText, string, ctx}';
 
         return formatting.map(rule => {
             const mappedRule = {};
@@ -25,6 +25,8 @@ function useResolvedFormatting(formatting) {
                 mappedRule.value = eval(`(${context})=> (${rule.value})`);
             if ('text' in rule)
                 mappedRule.text = eval(`(${context}) => (${rule.text})`);
+            if ('selection_text' in rule)
+                mappedRule.selectionText = eval(`(${context}) => (${rule.selection_text})`);
             if ('font' in rule)
                 mappedRule.font = eval(`(${context}) => (${rule.font})`);
             if ('style' in rule)

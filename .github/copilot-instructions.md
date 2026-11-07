@@ -42,6 +42,8 @@ formatting: [
 
 Specialized formatting paths use `getReducedFormatting()` to exclude unrelated fields. Context menus resolve `value`, `text`, and `contextMenu` only on opening in `core/contextMenu.js`; do not include menu functions in render or hover resolvers. Layout menu construction and icons live in their consuming core modules. Popup flip-and-snap placement is implemented locally in `core/contextMenu.js` and `core/tooltip.js`.
 
+`selectionText` is resolved by input formatting for double-click editing and clipboard copying only; exclude it from render, hover, sorting, and measurement resolvers. Fall back with `selectionText ?? text` so an explicit empty string is respected. Custom filter formatting needs explicit row/column type selectors; unscoped rules do not override filter placeholders.
+
 ### Dash Wrapper Convention
 The Dash component converts string expressions to functions using `eval()`. Property names use snake_case (Python) → camelCase (JS):
 - `data_selector` → `dataSelector`
