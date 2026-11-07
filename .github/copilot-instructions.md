@@ -20,6 +20,8 @@ The core follows a state → render pipeline:
 5. **`types/`** - Classes like `FormatResolver`, `FormattingRules`, `Selection` for complex state logic.
 6. **`typings.js`** - JSDoc type definitions. Use `/** @import * as Types from "../typings.js"; */` pattern at the top of each file to import types.
 
+Only nonempty canvas sections may be attached to the DOM. Browser checks should select a visible canvas rather than assuming nine DOM canvases.
+
 ## Key Conventions
 ### TypeScript via JSDoc
 The project uses vanilla JavaScript with JSDoc for types. TypeScript compiler validates via `jsconfig.json`:
@@ -37,6 +39,8 @@ formatting: [
   { condition: ({value}) => value < 0, style: { color: 'red' } }
 ]
 ```
+
+Specialized formatting paths use `getReducedFormatting()` to exclude unrelated fields. Context menus resolve `value`, `text`, and `contextMenu` only on opening in `core/contextMenu.js`; do not include menu functions in render or hover resolvers. Popup flip-and-snap placement is shared through `core-utils/getPopupPosition.js`.
 
 ### Dash Wrapper Convention
 The Dash component converts string expressions to functions using `eval()`. Property names use snake_case (Python) → camelCase (JS):

@@ -35,6 +35,10 @@ function useResolvedFormatting(formatting) {
                 mappedRule.draw = eval(`(${context}) => {${rule.draw}}`);
             if ('tooltip' in rule)
                 mappedRule.tooltip = eval(`(${context}) => (${rule.tooltip})`);
+            if ('context_menu' in rule)
+                mappedRule.contextMenu = isString(rule.context_menu) && rule.context_menu !== 'separator'
+                    ? eval(`(${context}) => (${rule.context_menu})`)
+                    : rule.context_menu;
             if ('edit' in rule)
                 if (rule.edit) {
                     const mappedEdit = {};
@@ -173,6 +177,9 @@ function DashSpreadGrid(props) {
     const onCustomCellClick = useCallback((cell) => {
         setProps({ clicked_custom_cell: { ...cell, n: counter.current++ } });
     }, [setProps]);
+    const onContextMenuSelect = useCallback((selection) => {
+        setProps({ selected_context_menu_item: { ...selection, n: counter.current++ } });
+    }, [setProps]);
     const columnWidths = props.column_widths;
     const onColumnWidthsChange = useCallback((columnWidths) => {
         setProps({ column_widths: columnWidths });
@@ -236,6 +243,7 @@ function DashSpreadGrid(props) {
             onCellClick,
             clickedCustomCell,
             onCustomCellClick,
+            onContextMenuSelect,
             onActiveColumnsChange,
             onActiveRowsChange,
             onHoveredCellChange,
@@ -362,6 +370,10 @@ DashSpreadGrid.propTypes = {
      */
     clicked_custom_cell: PropTypes.object,
     /**
+     * Selected context menu item: id, columnId, rowId, and an event counter n.
+     */
+    selected_context_menu_item: PropTypes.object,
+    /**
      * _
      */
     active_columns: PropTypes.array,
@@ -402,6 +414,7 @@ DashSpreadGrid.defaultProps = {
     rows_order: [],
     clicked_cell: null,
     clicked_custom_cell: null,
+    selected_context_menu_item: null,
     active_columns: [],
     active_rows: [],
     hovered_cell: null,

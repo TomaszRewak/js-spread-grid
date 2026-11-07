@@ -1,3 +1,4 @@
+import { useState } from "react";
 import SpreadGrid from "react-spread-gird";
 import Example from "../../components/Example";
 import Paragraph from "../../components/Paragraph";
@@ -34,9 +35,7 @@ export default function CellClickEvents() {
                         code: require('!!raw-loader!./snippets/cell-click/example.py').default
                     }
                 ]} />
-                <Example>
-                    <CellClickExample />
-                </Example>
+                <CellClickExample />
             </Section>
             <SubHeader>Right Click</SubHeader>
             <Section>
@@ -45,6 +44,9 @@ export default function CellClickEvents() {
                 </Paragraph>
                 <Paragraph>
                     Use <code>button === 2</code> to distinguish a right-click from a left-click (<code>button === 0</code>). With this option enabled, right-clicking a header sorts it, and right-clicking a toggle-editable cell toggles its value instead of emitting a click callback, just like left-clicking. Focus, selection, resizing, and reordering use the same pointer interactions for both buttons regardless of this option.
+                </Paragraph>
+                <Paragraph>
+                    Cells with nonempty <code>contextMenu</code> formatting open their custom context menu instead of following this click logic. If a cell has no menu items, the behavior above is unchanged.
                 </Paragraph>
                 <CodeBlock options={[
                     {
@@ -60,27 +62,29 @@ export default function CellClickEvents() {
                         code: require('!!raw-loader!./snippets/cell-click/right-click.py').default
                     }
                 ]} />
-                <Example>
-                    <SpreadGrid
-                        data={defaultDictData}
-                        enableRightClick
-                        onCellClick={({ columnId, rowId, button }) => {
-                            alert(`${button === 2 ? 'Right' : 'Left'} click:\n[columnId]: ${columnId}\n[rowId]: ${rowId}`);
-                        }}
-                    />
-                </Example>
+                <CellClickExample enableRightClick />
             </Section>
         </>
     );
 }
 
-function CellClickExample() {
+function CellClickExample({ enableRightClick = false }) {
+    const [selection, setSelection] = useState(null);
+
     return (
-        <SpreadGrid
-            data={defaultDictData}
-            onCellClick={({ columnId, rowId, ctrlKey, shiftKey, button, buttons, detail }) => {
-                alert(`Cell clicked:\n[columnId]: ${columnId}\n[rowId]: ${rowId}\n[ctrlKey]: ${ctrlKey}\n[shiftKey]: ${shiftKey}\n[button]: ${button}\n[buttons]: ${buttons}\n[detail]: ${detail}`);
-            }}
-        />
+        <>
+            <Example>
+                <SpreadGrid
+                    data={defaultDictData}
+                    enableRightClick={enableRightClick}
+                    onCellClick={setSelection}
+                />
+            </Example>
+            <div style={{ marginTop: 12, overflowWrap: 'anywhere' }}>
+                <Paragraph>
+                    Clicked cell: <code>{selection ? JSON.stringify(selection) : 'None'}</code>
+                </Paragraph>
+            </div>
+        </>
     );
 }

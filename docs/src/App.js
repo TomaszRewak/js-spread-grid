@@ -29,6 +29,7 @@ import Value from './pages/formatting/value';
 import Draw from './pages/formatting/draw';
 import Font from './pages/formatting/font';
 import Tooltips from './pages/events/tooltips';
+import ContextMenus from './pages/events/context-menus';
 import Active from './pages/data-shaping/active';
 import FreezeOnHover from './pages/data-shaping/freeze-on-hover';
 import ScrollTarget from './pages/scrolling/scroll-target';
@@ -99,6 +100,7 @@ const routes = [
         chapter: 'events',
         pages: [
             { title: 'cell click', page: CellClick },
+            { title: 'context menus', page: ContextMenus },
             { title: 'tooltips', page: Tooltips, wip: true },
         ]
     },

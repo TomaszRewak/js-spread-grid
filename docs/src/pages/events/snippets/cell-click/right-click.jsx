@@ -6,6 +6,6 @@
     }}
     enableRightClick
     onCellClick={({ columnId, rowId, button }) => {
-        alert(`${button === 2 ? 'Right' : 'Left'} click: ${columnId}, ${rowId}`);
+        console.log(`${button === 2 ? 'Right' : 'Left'} click: ${columnId}, ${rowId}`);
     }}
 />
