@@ -40,7 +40,7 @@ formatting: [
 ]
 ```
 
-Specialized formatting paths use `getReducedFormatting()` to exclude unrelated fields. Context menus resolve `value`, `text`, and `contextMenu` only on opening in `core/contextMenu.js`; do not include menu functions in render or hover resolvers. Popup flip-and-snap placement is shared through `core-utils/getPopupPosition.js`.
+Specialized formatting paths use `getReducedFormatting()` to exclude unrelated fields. Context menus resolve `value`, `text`, and `contextMenu` only on opening in `core/contextMenu.js`; do not include menu functions in render or hover resolvers. Layout menu construction and icons live in their consuming core modules. Popup flip-and-snap placement is implemented locally in `core/contextMenu.js` and `core/tooltip.js`.
 
 ### Dash Wrapper Convention
 The Dash component converts string expressions to functions using `eval()`. Property names use snake_case (Python) → camelCase (JS):
@@ -103,6 +103,7 @@ export default function MyPage() {
 ### Code Snippets
 - Located in `pages/<chapter>/snippets/<feature>/` with `.jsx`, `.js`, `.py` variants.
 - Use `// collapse: true` / `// collapse: false` comments to hide boilerplate sections.
+- Do not start a snippet with a collapse marker: the current renderer drops the empty first block but indexes unfiltered collapse flags, which can hide the wrong block. Put ordinary code before the first marker.
 - Snippets are loaded via `raw-loader` and displayed with syntax highlighting (Prism.js).
 
 ### Adding a New Page

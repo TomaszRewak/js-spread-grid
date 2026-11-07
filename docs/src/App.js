@@ -7,6 +7,7 @@ import { Fragment } from 'react';
 import ErrorOverlay from './pages/error-handling/error-overlay';
 import CellClick from './pages/events/cell-click';
 import Filtering from './pages/data-shaping/filtering';
+import Layout from './pages/data-shaping/layout';
 import Size from './pages/columns-and-rows/size';
 import Sorting from './pages/data-shaping/sorting';
 import AppManager from './pages/examples/app-manager';
@@ -84,6 +85,7 @@ const routes = [
         pages: [
             { title: 'sorting', page: Sorting },
             { title: 'filtering', page: Filtering },
+            { title: 'layout management', page: Layout },
             { title: 'freeze on hover', page: FreezeOnHover },
             { title: 'active', page: Active, wip: true }
         ]

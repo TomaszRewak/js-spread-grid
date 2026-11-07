@@ -40,35 +40,20 @@ export default function CellClickEvents() {
             <SubHeader>Right Click</SubHeader>
             <Section>
                 <Paragraph>
-                    Set <code>enableRightClick</code> to <code>true</code> to suppress the browser context menu inside the grid and handle right-clicks through the same click logic as left-clicks, including <code>onCellClick</code> and <code>onCustomCellClick</code>. The option defaults to <code>false</code>, preserving the browser context menu. In Dash, use <code>enable_right_click=True</code>.
+                    The grid always suppresses the browser context menu. When no grid context menu is available, right-clicks use the same click logic as left-clicks, including <code>onCellClick</code> and <code>onCustomCellClick</code>. No setting is required.
                 </Paragraph>
                 <Paragraph>
-                    Use <code>button === 2</code> to distinguish a right-click from a left-click (<code>button === 0</code>). With this option enabled, right-clicking a header sorts it, and right-clicking a toggle-editable cell toggles its value instead of emitting a click callback, just like left-clicking. Focus, selection, resizing, and reordering use the same pointer interactions for both buttons regardless of this option.
+                    Use <code>button === 2</code> to distinguish a right-click from a left-click (<code>button === 0</code>). When no context menu is available, right-clicking a header sorts it, and right-clicking a toggle-editable cell toggles its value instead of emitting a click callback, just like left-clicking. Focus, selection, resizing, and reordering use the same pointer interactions for both buttons.
                 </Paragraph>
                 <Paragraph>
                     Cells with nonempty <code>contextMenu</code> formatting open their custom context menu instead of following this click logic. If a cell has no menu items, the behavior above is unchanged.
                 </Paragraph>
-                <CodeBlock options={[
-                    {
-                        framework: 'jsx',
-                        code: require('!!raw-loader!./snippets/cell-click/right-click.jsx').default
-                    },
-                    {
-                        framework: 'js',
-                        code: require('!!raw-loader!./snippets/cell-click/right-click.js').default
-                    },
-                    {
-                        framework: 'py',
-                        code: require('!!raw-loader!./snippets/cell-click/right-click.py').default
-                    }
-                ]} />
-                <CellClickExample enableRightClick />
             </Section>
         </>
     );
 }
 
-function CellClickExample({ enableRightClick = false }) {
+function CellClickExample() {
     const [selection, setSelection] = useState(null);
 
     return (
@@ -76,7 +61,6 @@ function CellClickExample({ enableRightClick = false }) {
             <Example>
                 <SpreadGrid
                     data={defaultDictData}
-                    enableRightClick={enableRightClick}
                     onCellClick={setSelection}
                 />
             </Example>

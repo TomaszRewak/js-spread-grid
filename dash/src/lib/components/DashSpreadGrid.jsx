@@ -196,6 +196,32 @@ function DashSpreadGrid(props) {
     const onRowsOrderChange = useCallback((rowsOrder) => {
         setProps({ rows_order: rowsOrder });
     }, [setProps]);
+    const hiddenColumns = props.hidden_columns;
+    const onHiddenColumnsChange = useCallback((hiddenColumns) => {
+        setProps({ hidden_columns: hiddenColumns });
+    }, [setProps]);
+    const hiddenRows = props.hidden_rows;
+    const onHiddenRowsChange = useCallback((hiddenRows) => {
+        setProps({ hidden_rows: hiddenRows });
+    }, [setProps]);
+    const enableLayoutManagementContextMenu = props.enable_layout_management_context_menu;
+    const onLayoutChange = useCallback((layout) => {
+        setProps({
+            filters: layout.filters,
+            sort_by: layout.sortBy,
+            columns_order: layout.columnsOrder,
+            rows_order: layout.rowsOrder,
+            column_widths: layout.columnWidths,
+            row_heights: layout.rowHeights,
+            hidden_columns: layout.hiddenColumns,
+            hidden_rows: layout.hiddenRows,
+            pinned_top: layout.pinnedTop,
+            pinned_bottom: layout.pinnedBottom,
+            pinned_left: layout.pinnedLeft,
+            pinned_right: layout.pinnedRight,
+            applied_layout: { ...layout, n: counter.current++ }
+        });
+    }, [setProps]);
     const onActiveColumnsChange = useCallback((activeColumns) => {
         setProps({ active_columns: activeColumns });
     }, [setProps]);
@@ -206,7 +232,6 @@ function DashSpreadGrid(props) {
         setProps({ hovered_cell: hoveredCell });
     }, [setProps]);
     const freezeOnHover = props.freeze_on_hover;
-    const enableRightClick = props.enable_right_click;
 
     const [element, setElement] = useState(null);
 
@@ -239,6 +264,12 @@ function DashSpreadGrid(props) {
             onColumnsOrderChange,
             rowsOrder,
             onRowsOrderChange,
+            hiddenColumns,
+            onHiddenColumnsChange,
+            hiddenRows,
+            onHiddenRowsChange,
+            enableLayoutManagementContextMenu,
+            onLayoutChange,
             clickedCell,
             onCellClick,
             clickedCustomCell,
@@ -248,7 +279,6 @@ function DashSpreadGrid(props) {
             onActiveRowsChange,
             onHoveredCellChange,
             freezeOnHover,
-            enableRightClick,
         });
 
     return React.createElement("div", { ref: setElement });
@@ -318,10 +348,6 @@ DashSpreadGrid.propTypes = {
      */
     freeze_on_hover: PropTypes.bool,
     /**
-     * Suppress the browser context menu and emit cell click events for right-clicks.
-     */
-    enable_right_click: PropTypes.bool,
-    /**
      * _
      */
     focusedCell: PropTypes.object,
@@ -362,6 +388,22 @@ DashSpreadGrid.propTypes = {
      */
     rows_order: PropTypes.array,
     /**
+     * Hidden explicitly defined or data-derived column IDs. Virtualized indices cannot be hidden.
+     */
+    hidden_columns: PropTypes.array,
+    /**
+     * Hidden explicitly defined or data-derived row IDs. Virtualized indices cannot be hidden.
+     */
+    hidden_rows: PropTypes.array,
+    /**
+     * Enable the default layout context menu on header cells.
+     */
+    enable_layout_management_context_menu: PropTypes.bool,
+    /**
+     * Last layout applied through the editor, with camelCase fields and an event counter n.
+     */
+    applied_layout: PropTypes.object,
+    /**
      * _
      */
     clicked_cell: PropTypes.object,
@@ -401,7 +443,6 @@ DashSpreadGrid.defaultProps = {
     pinned_right: 0,
     borderWidth: 1,
     freeze_on_hover: false,
-    enable_right_click: false,
     focusedCell: null,
     selected_cells: [],
     highlightedCells: [],
@@ -412,6 +453,10 @@ DashSpreadGrid.defaultProps = {
     row_heights: [],
     columns_order: [],
     rows_order: [],
+    hidden_columns: [],
+    hidden_rows: [],
+    enable_layout_management_context_menu: true,
+    applied_layout: null,
     clicked_cell: null,
     clicked_custom_cell: null,
     selected_context_menu_item: null,
