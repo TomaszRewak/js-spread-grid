@@ -287,6 +287,32 @@ function OrderBookGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry =
             return { ...prev, [side]: updated };
         });
     }, []);
+    const dataFormatting = useMemo(() => [
+        ...formatting,
+        {
+            row: { type: 'DATA' },
+            column: [{ id: 'our_bid' }, { id: 'our_ask' }],
+            contextMenu: ({ column, row, data }) => {
+                const side = column.id === 'our_bid' ? 'bids' : 'asks';
+                return {
+                    content: 'Cancel orders',
+                    submenu: [
+                        {
+                            content: 'At this price',
+                            disabled: !data.our[side][row.id],
+                            onSelect: ({ rowId }) => removeOrder(side, rowId)
+                        },
+                        'separator',
+                        {
+                            content: `All ${side}`,
+                            disabled: !Object.keys(data.our[side]).length,
+                            onSelect: () => setOurOrders(orders => ({ ...orders, [side]: {} }))
+                        }
+                    ]
+                };
+            }
+        }
+    ], [removeOrder]);
 
     const onCellClick = useCallback(({ columnId, rowId }) => {
         if (columnId === 'market_bid') addOrder('bids', rowId);
@@ -326,7 +352,7 @@ function OrderBookGrid({ initialMiddleIndex, defaultSize, levels, bidAsymmetry =
                 pinnedTop={1}
                 pinnedBottom={1}
                 height={600}
-                formatting={formatting}
+                formatting={dataFormatting}
                 onCellClick={onCellClick}
                 focusedCell={focusedCell}
                 onFocusedCellChange={setFocusedCell}

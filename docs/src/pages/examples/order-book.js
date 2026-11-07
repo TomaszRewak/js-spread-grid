@@ -25,6 +25,7 @@ export default function OrderBook() {
                         <li>The book auto-scrolls smoothly, but you can scroll manually at any time - hovering the grid pauses the auto-scroll</li>
                         <li>Click on <strong>mb</strong>/<strong>ma</strong> (market bid/ask) columns to place orders at the respective price level - either joining the resting book or taking liquidity</li>
                         <li>Click on <strong>ob</strong>/<strong>oa</strong> (our bid/ask) columns to cancel your resting orders at that level</li>
+                        <li>Right-click an <strong>ob</strong>/<strong>oa</strong> cell to cancel orders at that price or all orders on that side</li>
                         <li>You can scroll deep into the book and still place orders at distant price levels</li>
                         <li>A small indicator on the side flashes when one of your orders has traded</li>
                         <li>Your orders are included in the displayed market order sizes</li>

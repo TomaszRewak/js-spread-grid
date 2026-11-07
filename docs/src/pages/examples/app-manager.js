@@ -23,6 +23,7 @@ export default function AppManager() {
                         <li>Search for application names using fuzzy-matching</li>
                         <li>Toggle the "required" search state by clicking on the search field</li>
                         <li>Search for tags using a set of values</li>
+                        <li>Right-click an application cell to start, restart, or stop it</li>
                     </ul>
                 </Paragraph>
             </Section>

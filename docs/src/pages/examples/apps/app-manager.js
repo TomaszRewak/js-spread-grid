@@ -126,7 +126,40 @@ export default function AppManager() {
         { type: 'DATA-BLOCK' },
         { type: 'CUSTOM', id: 'summary' }
     ], []);
+    const onCellClick = useCallback(({ rowId, columnId }) => {
+        setData(data => {
+            const app = data[rowId];
+            if (!app)
+                return data;
+
+            switch (columnId) {
+                case 'start':
+                    if (app.startedAt && !app.stoppedAt)
+                        return data;
+                    return { ...data, [rowId]: { ...app, startedAt: Date.now(), stoppedAt: null } };
+                case 'restart':
+                    return { ...data, [rowId]: { ...app, startedAt: Date.now(), stoppedAt: null } };
+                case 'stop':
+                    if (!app.startedAt || app.stoppedAt)
+                        return data;
+                    return { ...data, [rowId]: { ...app, stoppedAt: Date.now(), startedAt: null } };
+                default:
+                    return data;
+            }
+        });
+    }, []);
     const formatting = useMemo(() => [
+        {
+            row: { type: 'DATA' },
+            contextMenu: ({ data, row }) => {
+                const running = !!data[row.id].startedAt && !data[row.id].stoppedAt;
+                return [
+                    { content: 'Start', disabled: running, onSelect: ({ rowId }) => onCellClick({ rowId, columnId: 'start' }) },
+                    { content: 'Restart', onSelect: ({ rowId }) => onCellClick({ rowId, columnId: 'restart' }) },
+                    { content: 'Stop', disabled: !running, onSelect: ({ rowId }) => onCellClick({ rowId, columnId: 'stop' }) }
+                ];
+            }
+        },
         {
             column: { id: 'status' },
             value: ({ data, row }) => {
@@ -278,7 +311,7 @@ export default function AppManager() {
             style: { textAlign: 'center' },
             text: ({ newValue }) => newValue || '✔'
         }
-    ], []);
+    ], [onCellClick]);
     const filtering = useMemo(() => [
         {
             column: { id: 'name' },
@@ -289,23 +322,6 @@ export default function AppManager() {
             condition: ({ value, expression }) => value.filter(tag => expression.has(tag)).length === expression.size
         }
     ], []);
-    const onCellClick = useCallback(({ rowId, columnId }) => {
-        switch (columnId) {
-            case 'start':
-                if (!data[rowId].startedAt || data[rowId].stoppedAt)
-                    setData({ ...data, [rowId]: { ...data[rowId], startedAt: Date.now(), stoppedAt: null } });
-                break;
-            case 'restart':
-                setData({ ...data, [rowId]: { ...data[rowId], startedAt: Date.now(), stoppedAt: null } });
-                break;
-            case 'stop':
-                if (data[rowId].startedAt && !data[rowId].stoppedAt)
-                    setData({ ...data, [rowId]: { ...data[rowId], stoppedAt: Date.now(), startedAt: null } });
-                break;
-            default:
-                break;
-        }
-    }, [data]);
     const onCustomCellClick = useCallback(({ columnId }) => {
         const activeRowsSet = new Set(activeRows.current);
         switch (columnId) {
